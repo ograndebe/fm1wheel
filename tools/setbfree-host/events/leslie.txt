@@ -1,0 +1,17 @@
+# Leslie: stop, slow, fast, stop.
+drawbars U 888000000
+swell 127
+reverb 0
+leslie stop
+noteon 1 48 100
+noteon 1 55 100
+wait 1000
+leslie slow
+wait 2500
+leslie fast
+wait 2500
+leslie stop
+wait 1000
+noteoff 1 48
+noteoff 1 55
+wait 500

@@ -31,8 +31,8 @@ dump_tables: dump_tables.c host.c $(SETB_SRC) host.h
 check: all
 	mkdir -p build
 	./dump_tables --summary
-	./refrender events/demo.txt build/demo.wav
-	@echo "refrender: build/demo.wav"
+	for f in events/*.txt; do ./refrender $$f build/$$(basename $$f .txt).wav || exit 1; done
+	@echo "refrender: build/*.wav"
 
 clean:
 	rm -rf build $(BINS)

@@ -1,0 +1,18 @@
+# Preamp character: clean, medium, hot.
+drawbars U 888800000
+swell 100
+reverb 0
+leslie slow
+drive 0
+noteon 1 48 100
+noteon 1 52 100
+noteon 1 55 100
+wait 1000
+drive 60
+wait 1000
+drive 127
+wait 1000
+noteoff 1 48
+noteoff 1 52
+noteoff 1 55
+wait 500

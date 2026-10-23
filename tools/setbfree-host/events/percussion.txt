@@ -1,0 +1,19 @@
+# Percussion: 2nd harmonic, fast decay, then 3rd / slow.
+drawbars U 888000000
+swell 127
+reverb 0
+leslie stop
+perc on
+perc harmonic 2
+perc decay fast
+wait 100
+noteon 1 60 100
+wait 800
+noteoff 1 60
+wait 300
+perc harmonic 3
+perc decay slow
+noteon 1 60 100
+wait 1200
+noteoff 1 60
+wait 500

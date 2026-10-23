@@ -1,0 +1,13 @@
+# A plain C-major triad, upper manual, 888000000.
+drawbars U 888000000
+swell 127
+reverb 0
+leslie stop
+noteon 1 48 100
+noteon 1 52 100
+noteon 1 55 100
+wait 2000
+noteoff 1 48
+noteoff 1 52
+noteoff 1 55
+wait 500
