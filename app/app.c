@@ -43,6 +43,14 @@ static const char *const FOOT[9] = {"16", "5.3", "8", "4", "2.6", "2", "1.6", "1
 static volatile int32_t last_note = -1;
 static uint32_t prev_keys;
 static uint32_t prev_btn;
+static uint8_t drawbar_mode;             /* the 27 keys edit drawbars instead of playing */
+static int16_t key_org[NKEYS];           /* 0: not held; else the organ key it started + 1 */
+
+/* Pair -> drawbar and direction. -1: not a drawbar control.
+ * F#/G, G#/A, A#/B, C#/D, D#/E, then the same an octave up.
+ * F3, C4, F4 and C5 are ignored; D#5..G5 are spare for later functions. */
+static const int8_t KEY_BAR[NKEYS] = {-1, 0, 0, 1, 1, 2, 2, -1, 3, 3, 4, 4, -1, 5, 5, 6, 6, 7, 7, -1, 8, 8, -1, -1, -1, -1, -1};
+static const int8_t KEY_DIR[NKEYS] = { 0, 1,-1, 1,-1, 1,-1,  0, 1,-1, 1,-1,  0, 1,-1, 1,-1, 1,-1,  0, 1,-1,  0,  0,  0,  0,  0};
 
 static struct {
     uint8_t page;               /* 0: bars 0-3, 1: 4-7, 2: 8 + percussion */
@@ -279,6 +287,36 @@ static void midi_in(void)
     }
 }
 
+static void release_local_keys(void)
+{
+    uint32_t k;
+    for (k = 0; k < NKEYS; k++) {
+        if (key_org[k]) {
+            organ_key_off(key_org[k] - 1);
+            key_org[k] = 0;
+        }
+    }
+    last_note = -1;
+}
+
+static void drawbar_step(int bar, int dir)
+{
+    int m = ui.manual;
+    int v;
+    if (bar < 0 || bar >= 9 || !dir)
+        return;
+    v = (int)set.bars[m * 9 + bar] + dir;
+    if (v < 0)
+        v = 0;
+    if (v > 8)
+        v = 8;
+    if (v == set.bars[m * 9 + bar])
+        return;
+    set.bars[m * 9 + bar] = (uint8_t)v;
+    organ_set_drawbar(m, bar, v);
+    mark_dirty();
+}
+
 static void keys_poll(void)
 {
     uint32_t now = plat_keys();
@@ -288,15 +326,22 @@ static void keys_poll(void)
         int note, key;
         if (!(ch & (1u << k)))
             continue;
+        if (drawbar_mode) {
+            if (now & (1u << k))
+                drawbar_step(KEY_BAR[k], KEY_DIR[k]);
+            continue;
+        }
         note = 53 + (int)k + (int)set.octave * 12;
         key = note - 36;
-        if (key < 0 || key > 60)
-            continue;
         if (now & (1u << k)) {
+            if (key < 0 || key > 60)
+                continue;
             organ_key_on(key);
+            key_org[k] = (int16_t)(key + 1);
             last_note = note;
-        } else {
-            organ_key_off(key);
+        } else if (key_org[k]) {
+            organ_key_off(key_org[k] - 1);
+            key_org[k] = 0;
             if (last_note == note)
                 last_note = -1;
         }
@@ -373,9 +418,13 @@ static void draw(void)
     int_text(plat_master() * 100 / 4096, t);
     text_cat(t, "%");
     cv_text(156, 4, &FONT_XS, t, C_HI);
-    cv_text(6, 22, &FONT_XS, "K1-K4: bars   SEL: page   EDIT: manual", C_DIM);
-    cv_text(168, 22, &FONT_XS, set.leslie == LESLIE_STOP ? "ROTOR STOP" :
-                                set.leslie == LESLIE_SLOW ? "ROTOR SLOW" : "ROTOR FAST", C_HI);
+    if (drawbar_mode)
+        cv_text(6, 22, &FONT_XS, "DRAWBAR KEYS  FLAT=UP  NAT=DOWN", C_HI);
+    else {
+        cv_text(6, 22, &FONT_XS, "K1-K4: bars   SEL: page   EDIT: manual", C_DIM);
+        cv_text(168, 22, &FONT_XS, set.leslie == LESLIE_STOP ? "ROTOR STOP" :
+                                    set.leslie == LESLIE_SLOW ? "ROTOR SLOW" : "ROTOR FAST", C_HI);
+    }
     if (set_dirty)
         cv_text(6, 38, &FONT_XS, "SAVE has changes", C_AMB);
     else
@@ -393,8 +442,8 @@ static void octave_change(int d)
     if (o < -2 || o > 2)
         return;
     set.octave = (int8_t)o;
-    organ_all_notes_off();
-    prev_keys = 0;                 /* held keys retrigger at the new octave */
+    release_local_keys();
+    prev_keys = drawbar_mode ? plat_keys() : 0;   /* play mode: held keys retrigger */
     last_note = -1;
     mark_dirty();
     say("OCTAVE", o > 0 ? "+1" : o < 0 ? "-1" : "0");
@@ -458,6 +507,13 @@ static void button(int b, uint32_t now)
     case B_HOME:
         set.preset = 0;
         preset_apply();
+        break;
+    case B_GLO:
+        drawbar_mode = (uint8_t)!drawbar_mode;
+        release_local_keys();
+        prev_keys = plat_keys();
+        ui.redraw = 1;
+        say("DRAWBAR KEYS", drawbar_mode ? "ON" : "OFF");
         break;
     case B_SAVE:
         save();
@@ -577,8 +633,21 @@ void app_frame(void)
     encoder(EN_K4, plat_enc(EN_K4));
 
     {
-        uint32_t leds = (set_dirty ? (1u << B_SAVE) : 0u) | (set.perc ? (1u << B_ENV) : 0u);
-        plat_leds(leds, 0);
+        uint32_t leds = (set_dirty ? (1u << B_SAVE) : 0u) | (set.perc ? (1u << B_ENV) : 0u) |
+                        (drawbar_mode ? (1u << B_GLO) : 0u);
+        uint32_t up = 0, down = 0;
+        if (drawbar_mode) {
+            for (i = 0; i < NKEYS; i++)
+                if (KEY_BAR[i] >= 0) {
+                    if (KEY_DIR[i] > 0)
+                        up |= 1u << i;
+                    else
+                        down |= 1u << i;
+                }
+        } else {
+            up = plat_keys();
+        }
+        plat_lights(leds, up, 0, down, 1);
     }
 
     if (ui.redraw || (now & 0x7Fu) == 0) {
@@ -621,6 +690,8 @@ int app_expect(const char *what, int *got)
         *got = set.reverb;
     else if (!strcmp(what, "leslie"))
         *got = set.leslie;
+    else if (!strcmp(what, "drawbar"))
+        *got = drawbar_mode;
     else if (!strncmp(what, "bar", 3) && what[3] >= '0' && what[3] <= '8')
         *got = set.bars[what[3] - '0'];   /* upper manual: the host tests use it */
     else

@@ -26,6 +26,28 @@ The WheelBox firmware app.
 
 The full chain (tonegen, scanner, preamp, reverb, Leslie) is in.
 
+## Drawbar keys (the 27-key "programming" mode)
+
+`GLO` toggles **drawbar keys**. While it is on, the 27 keys do not play:
+each flat/natural pair steps one drawbar of the selected manual (`EDIT`
+changes U/L/P). External MIDI keeps playing, so a controller can play while
+the FM-1 keyboard edits the registration.
+
+| Keys | Drawbar | Keys | Drawbar |
+|---|---|---|---|
+| F#3 / G3 | 16' | F#4 / G4 | 2' |
+| G#3 / A3 | 5 1/3' | G#4 / A4 | 1 3/5' |
+| A#3 / B3 | 8' | A#4 / B4 | 1 1/3' |
+| C#4 / D4 | 4' | C#5 / D5 | 1' |
+| D#4 / E4 | 2 2/3' | | |
+
+The flat (black) key raises the bar; the natural (white) key lowers it.
+`F3`, `C4`, `F4` and `C5` are ignored; `D#5`..`G5` are spare. In drawbar mode
+the 18 control keys light (flat key bright, natural key dim); the others stay
+dark. With the mode off, held keys light as usual.
+
+The full chain is in.
+
 ## Build and test
 
 From the repository root:
