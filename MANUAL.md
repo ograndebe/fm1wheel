@@ -1,5 +1,7 @@
 # WheelBox — manual do hardware
 
+**Português** · [English](MANUAL.en.md)
+
 Firmware de órgão tonewheel para o **M-VAVE FM-1**, derivado do
 [setBfree](https://github.com/pantherb/setBfree), rodando sobre o
 [fm1-base](https://github.com/charlesvestal/fm1-base).
