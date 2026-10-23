@@ -5,7 +5,7 @@ PY ?= ./.venv/bin/python
 AC79_SDK ?= $(HOME)/fw-AC79_AIoT_SDK
 JIELI_TOOLCHAIN ?= $(HOME)/.jieli/toolchain
 
-.PHONY: all build-host test-host ref tables whirl-tables organ-test compare device install clean
+.PHONY: all build-host test-host web serve-web ref tables whirl-tables organ-test compare device install clean
 
 all: build-host ref
 
@@ -14,6 +14,13 @@ build-host:
 
 test-host: build-host
 	./app/build/host/wheelbox_host app/tests/basic.txt app/build/host
+
+web:
+	$(PY) fm1-base/tools/build.py app --web
+
+serve-web: web
+	@echo "open http://localhost:8790/"
+	$(PY) -m http.server -d app/build/emu 8790
 
 ref:
 	$(MAKE) -C tools/setbfree-host check

@@ -32,8 +32,10 @@ typedef struct {
     float lha, lhd, lda, ldd;
 } leslie_t;
 
-#ifdef __APPLE__
+#if defined(__APPLE__)
 #define LES_POOL __attribute__((section("__DATA,.pool")))
+#elif defined(__EMSCRIPTEN__)
+#define LES_POOL
 #else
 #define LES_POOL __attribute__((section(".pool")))
 #endif

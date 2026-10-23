@@ -40,11 +40,23 @@ Then:
 ```sh
 make build-host          # fm1-base/tools/build.py app --host
 make test-host           # app/build/host/wheelbox_host app/tests/basic.txt app/build/host
+make web                 # the browser emulator in app/build/emu/
+make serve-web           # builds it and serves http://localhost:8790/
 make ref                 # setBfree reference renders (tools/setbfree-host/build)
 make organ-test          # the same scripts through the WheelBox engine
 make compare             # A/B: correlation, null depth, band levels
 make tables              # regenerates app/dsp/organ_tables.h
 make whirl-tables        # regenerates app/dsp/whirl_tables.h
+```
+
+The browser emulator is the same app (screen, panel, keys, audio) compiled to
+WebAssembly; it needs Emscripten (`brew install emscripten`). Use it for
+interactive work, and the host simulator for automated tests. The page keeps
+the flash store in the browser.
+
+```sh
+make serve-web
+open http://localhost:8790/
 ```
 
 The reference renderer writes a float32 WAV:

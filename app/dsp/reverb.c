@@ -12,8 +12,10 @@
 #define RV_FS 44100
 #define RV_N 19663
 
-#ifdef __APPLE__
+#if defined(__APPLE__)
 #define RV_POOL __attribute__((section("__DATA,.pool")))
+#elif defined(__EMSCRIPTEN__)
+#define RV_POOL
 #else
 #define RV_POOL __attribute__((section(".pool")))
 #endif
