@@ -17,7 +17,7 @@
 #define BLOCK ORGAN_BLOCK
 #define MAX_EVENTS 8192
 
-enum { EV_NOTE_ON, EV_NOTE_OFF, EV_DRAW, EV_SWELL, EV_PERC, EV_VIB, EV_DRIVE, EV_REVERB };
+enum { EV_NOTE_ON, EV_NOTE_OFF, EV_DRAW, EV_SWELL, EV_PERC, EV_VIB, EV_DRIVE, EV_REVERB, EV_LESLIE };
 
 typedef struct {
     double t;
@@ -128,6 +128,10 @@ static void parse_script(const char *path)
             if (!a1)
                 die("reverb needs 0..127");
             add_event(now, EV_REVERB, parse_int(a1, "reverb", 0, 127), 0, 0, NULL);
+        } else if (!strcmp(cmd, "leslie")) {
+            if (!a1)
+                die("leslie needs stop|slow|fast");
+            add_event(now, EV_LESLIE, !strcmp(a1, "fast") ? 2 : !strcmp(a1, "slow") ? 1 : 0, 0, 0, NULL);
         } else if (!strcmp(cmd, "vib")) {
             if (!a1)
                 die("vib needs off|v1..c3|route");
@@ -190,6 +194,9 @@ static void apply(const event_t *e)
         break;
     case EV_REVERB:
         organ_set_reverb(e->a);
+        break;
+    case EV_LESLIE:
+        organ_set_leslie(e->a);
         break;
     case EV_VIB:
         if (e->a == 0) {
@@ -259,7 +266,7 @@ int main(int argc, char **argv)
     const char *script, *out;
     double tail = 500.0;
     uint32_t frames, done = 0, k;
-    float mono[BLOCK];
+    float lt[BLOCK], rt[BLOCK];
     float *lr;
     double peak = 0, sumsq = 0;
     int ei = 0, i;
@@ -288,14 +295,16 @@ int main(int argc, char **argv)
             apply(&events[ei]);
             ei++;
         }
-        organ_render(mono, (int)n);
+        organ_render(lt, rt, (int)n);
         for (k = 0; k < n; k++) {
-            float v = mono[k];
-            lr[2u * (done + k)] = v;
-            lr[2u * (done + k) + 1u] = v;
-            if (fabsf(v) > peak)
-                peak = fabsf(v);
-            sumsq += (double)v * v;
+            float l = lt[k], r = rt[k];
+            lr[2u * (done + k)] = l;
+            lr[2u * (done + k) + 1u] = r;
+            if (fabsf(l) > peak)
+                peak = fabsf(l);
+            if (fabsf(r) > peak)
+                peak = fabsf(r);
+            sumsq += (double)l * l + (double)r * r;
         }
         done += n;
         now += 1000.0 * (double)n / 44100.0;
@@ -303,7 +312,7 @@ int main(int argc, char **argv)
     write_wav(out, lr, frames, 44100);
     printf("%s: %.2f s, peak %.1f dBFS, rms %.1f dBFS, %d events\n", out,
            (double)frames / 44100.0, 20.0 * log10(peak > 0 ? peak : 1e-30),
-           10.0 * log10(sumsq / frames > 0 ? sumsq / frames : 1e-30), nevents);
+           10.0 * log10(sumsq / (2.0 * frames) > 0 ? sumsq / (2.0 * frames) : 1e-30), nevents);
     free(lr);
     return 0;
 }

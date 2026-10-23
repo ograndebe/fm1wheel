@@ -2,7 +2,8 @@
 
 Análise dos repositórios e plano de execução. Data: 2026-10-23.
 
-**Estado (2026-10-23):** Fase 0 e a Fase 1a/1b/1c feitas no host.
+**Estado (2026-10-23):** Fase 0 e a Fase 1 completas no host (dry + scanner +
+preamp + reverb + Leslie).
 O repositório está montado (`fm1-base` e `setBfree` como submodules), o
 `app/` compila e toca no simulador de host, e o tone generator, o scanner, o
 preamp e o reverb foram portados com A/B contra o setBfree:
@@ -15,6 +16,8 @@ preamp e o reverb foram portados com A/B contra o setBfree:
 | scanner V1→C1→V3 | 0,9815 | -14,3 dB | ±0,5 dB até 1,6 kHz; agudos -3,7/+2,9 dB |
 | preamp (drive 0→60→127) | 0,9999 | -37,8 dB | ±0,0 dB |
 | reverb (demo, mix 40) | 0,9983 | -24,6 dB | ±0,0 dB |
+| Leslie (stop→slow→fast) | 0,9995 | -30,4 dB | ±0,0 dB |
+| cadeia completa (demo) | 0,9991 | -27,6 dB | ±0,0 dB |
 
 O build de device e a gravação no FM-1 ficam pendentes de Docker Desktop +
 toolchain JieLi + SDK AC79 nesta máquina.
@@ -340,10 +343,10 @@ Estimativas para uma pessoa focada. Some 30–50% se for em paralelo com outras 
 - [x] A/B contra o setBfree (`make compare`): acorde 0,99995 / -40 dB; percussão 0,9996 / -31 dB.
 - [x] Portar `vibrato.c` (scanner V1–V3/C1–C3): 0,9815 / -14,3 dB.
 - [x] Portar preamp/overdrive: 0,9999 / -37,8 dB; reverb: 0,9983 / -24,6 dB.
-- [ ] Portar o Leslie (whirl, 1.024 posições).
+- [x] Portar o Leslie (whirl, 1.024 posições): 0,9995 / -30,4 dB.
 - [ ] Medir CPU no device e ajustar o limiter.
 
-**Aceite parcial:** o tone generator dry bate com o setBfree no host; falta a cadeia de FX e o teste no device.
+**Aceite:** a cadeia completa bate com o setBfree no host; falta o teste no device.
 
 ### Fase 2 — Device: áudio e performance (1–2 semanas)
 
@@ -457,7 +460,7 @@ Estimativas para uma pessoa focada. Some 30–50% se for em paralelo com outras 
    - `app/dsp/organ.c`: rodas de fase, drawbars, key matrix, percussão, click.
    - `app/app.c`: teclado, MIDI, drawbars, presets, settings; toca no simulador.
    - A/B: `make compare`.
-   - Feitos o scanner, o preamp e o reverb; próximo: o Leslie (`whirl`).
+   - Feitos o scanner, o preamp, o reverb e o Leslie; próximo: o device.
 
 5. **Primeiro som no device** (2–3 dias)
    - Integrar no `app_render`; saída 24-bit; limiter. (já integrado)

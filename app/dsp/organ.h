@@ -41,6 +41,7 @@ void organ_set_vibrato_routing(int upper, int lower);
 void organ_set_drive(int value);              /* 0 = clean, 1..127 overdrive */
 void organ_set_drive_character(int value);    /* 0..127 */
 void organ_set_reverb(int value);             /* 0 dry .. 127 wet */
+void organ_set_leslie(int mode);              /* LESLIE_STOP/SLOW/FAST */
 
-/* Render n frames (n <= ORGAN_BLOCK) of the mono organ mix. */
-void organ_render(float *out, int n);
+/* Render n frames (n <= ORGAN_BLOCK) of the stereo organ mix. */
+void organ_render(float *outL, float *outR, int n);

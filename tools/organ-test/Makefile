@@ -11,8 +11,8 @@ $(TABLES):
 	$(MAKE) -C ../setbfree-host dump_tables
 	../setbfree-host/dump_tables --header $(TABLES)
 
-render: render.c ../../app/dsp/organ.c ../../app/dsp/vibrato.c ../../app/dsp/preamp.c ../../app/dsp/reverb.c ../../app/dsp/organ.h ../../app/dsp/vibrato.h ../../app/dsp/preamp.h ../../app/dsp/reverb.h $(TABLES)
-	$(CC) $(CFLAGS) -o $@ render.c ../../app/dsp/organ.c ../../app/dsp/vibrato.c ../../app/dsp/preamp.c ../../app/dsp/reverb.c -lm
+render: render.c ../../app/dsp/organ.c ../../app/dsp/vibrato.c ../../app/dsp/preamp.c ../../app/dsp/reverb.c ../../app/dsp/organ.h ../../app/dsp/vibrato.h ../../app/dsp/preamp.h ../../app/dsp/reverb.h ../../app/dsp/leslie.h ../../app/dsp/whirl_tables.h $(TABLES)
+	$(CC) $(CFLAGS) -o $@ render.c ../../app/dsp/organ.c ../../app/dsp/vibrato.c ../../app/dsp/preamp.c ../../app/dsp/reverb.c ../../app/dsp/leslie.c -lm
 
 check: render
 	mkdir -p build
@@ -25,7 +25,7 @@ compare: check
 	mkdir -p build/ref
 	for f in ../setbfree-host/events/*.txt; do \
 		name=$$(basename $$f .txt); \
-		../setbfree-host/refrender $$f build/ref/$$name.wav --reverb >/dev/null || exit 1; \
+		../setbfree-host/refrender $$f build/ref/$$name.wav >/dev/null || exit 1; \
 		$(PY) compare.py build/$$name.wav build/ref/$$name.wav; \
 	done
 

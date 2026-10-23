@@ -7,6 +7,7 @@ of the firmware. GPL-2.0-or-later; see `../../LICENSING.md`.
 |---|---|
 | `refrender` | Renders a text script through setBfree's chain (tonegen → preamp → reverb → whirl) to a float32 WAV. The "golden" side of the A/B tests. Scripts: `events/chord.txt`, `drawbars.txt`, `percussion.txt`, `vib.txt`, `leslie.txt`, `drive.txt`, `demo.txt`. |
 | `dump_tables` | Dumps wheel frequencies/attenuations, the key-contact matrix, the key-compression curve and the click envelopes as a C header for the firmware. |
+| `dump_whirl.sh` | Copies setBfree's whirl at 1,024 displacement positions and writes `app/dsp/whirl_tables.h` (Doppler/reflection/filter tables). |
 
 ## Build
 
@@ -43,7 +44,8 @@ wait 500                 # advance the timeline (ms)
 
 Options: `--gain G`, `--tail MS` (default 500), `--sr HZ`, `--dry` (tonegen
 only), `--preamp` (tonegen + preamp), `--reverb` (tonegen + preamp + reverb,
-no Leslie; what `make compare` uses).
+no Leslie). The default is the full chain (tonegen + preamp + reverb + Leslie;
+what `make compare` uses).
 
 ## Tables
 

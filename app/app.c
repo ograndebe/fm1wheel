@@ -8,8 +8,9 @@
 
 #include "fastmath.h"
 #include "dsp/organ.h"
+#include "dsp/leslie.h"
 
-#define SET_MAGIC 0x57424F5Au   /* "WBOX4": the layout changed with drive/reverb */
+#define SET_MAGIC 0x57424F5Bu   /* "WBOX5": the layout changed with the Leslie */
 
 typedef struct {
     uint32_t magic;
@@ -23,6 +24,7 @@ typedef struct {
     uint8_t drive;              /* 0 clean .. 127 */
     uint8_t drive_char;         /* 0..127 */
     uint8_t reverb;             /* 0..127 */
+    uint8_t leslie;             /* LESLIE_STOP/SLOW/FAST */
     uint8_t bars[ORGAN_BUSES];  /* 0..8, per manual */
 } settings_t;
 
@@ -151,6 +153,7 @@ static void defaults(void)
     set.drive = 0;
     set.drive_char = 64;
     set.reverb = 40;
+    set.leslie = LESLIE_SLOW;
     set.bars[0] = set.bars[1] = set.bars[2] = 8;   /* 888000000 */
 }
 
@@ -170,6 +173,7 @@ static void apply_all(void)
     organ_set_drive(set.drive);
     organ_set_drive_character(set.drive_char);
     organ_set_reverb(set.reverb);
+    organ_set_leslie(set.leslie);
 }
 
 static void preset_apply(void)
@@ -262,6 +266,10 @@ static void midi_in(void)
             } else if (d1 == 93) {
                 set.drive_char = (uint8_t)d2;
                 organ_set_drive_character(set.drive_char);
+                mark_dirty();
+            } else if (d1 == 64 && d2 >= 64) {
+                set.leslie = set.leslie == LESLIE_SLOW ? LESLIE_FAST : LESLIE_SLOW;
+                organ_set_leslie(set.leslie);
                 mark_dirty();
             }
         } else if ((st & 0xF0u) == 0xC0u) {
@@ -365,7 +373,9 @@ static void draw(void)
     int_text(plat_master() * 100 / 4096, t);
     text_cat(t, "%");
     cv_text(156, 4, &FONT_XS, t, C_HI);
-    cv_text(6, 22, &FONT_XS, "K1..K4 edit the four bars of the page; page 3 has bar 1' and percussion", C_DIM);
+    cv_text(6, 22, &FONT_XS, "K1-K4: bars   SEL: page   EDIT: manual", C_DIM);
+    cv_text(168, 22, &FONT_XS, set.leslie == LESLIE_STOP ? "ROTOR STOP" :
+                                set.leslie == LESLIE_SLOW ? "ROTOR SLOW" : "ROTOR FAST", C_HI);
     if (set_dirty)
         cv_text(6, 38, &FONT_XS, "SAVE has changes", C_AMB);
     else
@@ -409,6 +419,12 @@ static void button(int b, uint32_t now)
         say("VIBRATO", VIB_NAME[set.vib_mode]);
         break;
     case B_PLAY:
+        set.leslie = (uint8_t)((set.leslie + 1u) % 3u);
+        organ_set_leslie(set.leslie);
+        mark_dirty();
+        say("ROTOR", set.leslie == LESLIE_STOP ? "STOP" : set.leslie == LESLIE_SLOW ? "SLOW" : "FAST");
+        break;
+    case B_ARP:
         set.perc_second = !set.perc_second;
         organ_set_perc_harmonic(set.perc_second);
         mark_dirty();
@@ -501,7 +517,7 @@ void app_init(void)
         defaults();
     } else if (set.octave < -2 || set.octave > 2 || set.swell > 127 || set.perc > 1 ||
                set.perc_second > 1 || set.perc_fast > 1 || set.preset > 7 || set.vib_mode > VIB_C3 ||
-               set.drive > 127 || set.drive_char > 127 || set.reverb > 127) {
+               set.drive > 127 || set.drive_char > 127 || set.reverb > 127 || set.leslie > LESLIE_FAST) {
         defaults();
     }
     apply_all();
@@ -524,21 +540,20 @@ void app_panic(void)
 
 void app_render(int32_t *lr, uint32_t n, uint32_t master_q12)
 {
-    static float mono[ORGAN_BLOCK];
+    static float lt[ORGAN_BLOCK], rt[ORGAN_BLOCK];
     uint32_t done = 0, i;
     float g = (float)master_q12 / 4096.0f;
     midi_in();
     keys_poll();
     while (done < n) {
         uint32_t m = n - done > ORGAN_BLOCK ? ORGAN_BLOCK : n - done;
-        organ_render(mono, (int)m);
+        organ_render(lt, rt, (int)m);
         for (i = 0; i < m; i++) {
-            float x = mono[i] * 4.0f;
-            int32_t s;
-            x = x / (1.0f + fm_fabsf(x));   /* soft clip: the transient is hot */
-            s = (int32_t)(x * 8388608.0f * g);
-            lr[2u * (done + i)] = s;
-            lr[2u * (done + i) + 1u] = s;
+            float xl = lt[i] * 4.0f, xr = rt[i] * 4.0f;
+            xl = xl / (1.0f + fm_fabsf(xl));   /* soft clip: the transient is hot */
+            xr = xr / (1.0f + fm_fabsf(xr));
+            lr[2u * (done + i)] = (int32_t)(xl * 8388608.0f * g);
+            lr[2u * (done + i) + 1u] = (int32_t)(xr * 8388608.0f * g);
         }
         done += m;
     }
@@ -604,6 +619,8 @@ int app_expect(const char *what, int *got)
         *got = set.drive;
     else if (!strcmp(what, "reverb"))
         *got = set.reverb;
+    else if (!strcmp(what, "leslie"))
+        *got = set.leslie;
     else if (!strncmp(what, "bar", 3) && what[3] >= '0' && what[3] <= '8')
         *got = set.bars[what[3] - '0'];   /* upper manual: the host tests use it */
     else

@@ -5,12 +5,13 @@ A tonewheel organ firmware for the **M-VAVE FM-1**, after
 [fm1-base](https://github.com/charlesvestal/fm1-base) and
 [felucca-bsp](https://github.com/hugelton/felucca-bsp).
 
-**Status: Phase 1c.** The repository, the platform build, the host simulator,
-the setBfree reference tools, the **dry tone generator**, the **scanner
-vibrato/chorus**, the **preamp/overdrive** and the **reverb** are in place. The
-app plays the organ on the host (27 keys, USB/TRS MIDI, drawbars, percussion,
-V1–V3/C1–C3, drive, reverb, settings). The **Leslie** is the next slice. The
-full analysis and roadmap are in [PLANO.md](PLANO.md).
+**Status: Phase 1 complete on the host.** The repository, the platform build,
+the host simulator, the setBfree reference tools, the tone generator, scanner,
+preamp, reverb and the **Leslie** are in place. The app plays the full
+tonewheel chain on the host (27 keys, USB/TRS MIDI, drawbars, percussion,
+V1–V3/C1–C3, drive, reverb, slow/fast/stop rotor). The next step is the device:
+build, flash and measure CPU/latency. The full analysis and roadmap are in
+[PLANO.md](PLANO.md).
 
 ## Layout
 
@@ -43,6 +44,7 @@ make ref                 # setBfree reference renders (tools/setbfree-host/build
 make organ-test          # the same scripts through the WheelBox engine
 make compare             # A/B: correlation, null depth, band levels
 make tables              # regenerates app/dsp/organ_tables.h
+make whirl-tables        # regenerates app/dsp/whirl_tables.h
 ```
 
 The reference renderer writes a float32 WAV:

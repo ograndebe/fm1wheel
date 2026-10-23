@@ -28,6 +28,9 @@ refrender: refrender.c host.c $(SETB_SRC) host.h
 dump_tables: dump_tables.c host.c $(SETB_SRC) host.h
 	$(CC) $(CFLAGS) -o $@ dump_tables.c host.c $(SETB_SRC) $(LDFLAGS) -lm
 
+whirl-tables:
+	./dump_whirl.sh
+
 check: all
 	mkdir -p build
 	./dump_tables --summary
@@ -37,4 +40,4 @@ check: all
 clean:
 	rm -rf build $(BINS)
 
-.PHONY: all check clean
+.PHONY: all check whirl-tables clean

@@ -21,6 +21,7 @@
 #include "vibrato.h"
 #include "preamp.h"
 #include "reverb.h"
+#include "leslie.h"
 
 #define NSINE 2048
 #define SINE_MASK (NSINE - 1)
@@ -55,6 +56,7 @@ static struct {
     int vib_mode, vib_upper, vib_lower;
     vib_t vib;
     reverb_t rev;
+    int leslie_mode;
     float sine[NSINE];
 } o;
 
@@ -325,6 +327,16 @@ void organ_set_reverb(int value)
     reverb_set_mix(&o.rev, (float)value / 127.0f);
 }
 
+void organ_set_leslie(int mode)
+{
+    if (mode < LESLIE_STOP)
+        mode = LESLIE_STOP;
+    if (mode > LESLIE_FAST)
+        mode = LESLIE_FAST;
+    o.leslie_mode = mode;
+    leslie_set_speed(mode);
+}
+
 void organ_set_perc_volume(int soft)
 {
     o.perc_soft = soft != 0;
@@ -334,7 +346,7 @@ void organ_set_perc_volume(int soft)
         o.perc_env = o.perc_reset;
 }
 
-static void render_block(float *out, int n)
+static void render_block(float *mono, float *outL, float *outR, int n)
 {
     float swell[ORGAN_BLOCK], scan[ORGAN_BLOCK], vibout[ORGAN_BLOCK], perc[ORGAN_BLOCK];
     int i, k, wr = 0;
@@ -433,22 +445,25 @@ static void render_block(float *out, int n)
             float p = o.perc_on ? perc[i] * o.perc_env : 0.0f;
             o.current_gain += a * (target - o.current_gain);
             o.key_comp += comp_step;
-            out[i] = o.current_gain * o.key_comp * (swell[i] + vibout[i] + p);
+            mono[i] = o.current_gain * o.key_comp * (swell[i] + vibout[i] + p);
             o.perc_env *= o.perc_decay;
         }
     }
     if (o.upper_keys == 0)
         o.perc_env = o.perc_reset;
-    preamp_run(out, n);
-    reverb_run(&o.rev, out, out, n);
+    preamp_run(mono, n);
+    reverb_run(&o.rev, mono, mono, n);
+    leslie_run(mono, outL, outR, n);
 }
 
-void organ_render(float *out, int n)
+void organ_render(float *outL, float *outR, int n)
 {
+    float mono[ORGAN_BLOCK];
     while (n > 0) {
         int m = n > ORGAN_BLOCK ? ORGAN_BLOCK : n;
-        render_block(out, m);
-        out += m;
+        render_block(mono, outL, outR, m);
+        outL += m;
+        outR += m;
         n -= m;
     }
 }
@@ -468,6 +483,9 @@ void organ_reset(void)
     vib_init(&o.vib, WB_FS);
     preamp_init();
     reverb_init(&o.rev);
+    leslie_init();
+    leslie_set_speed(LESLIE_SLOW);
+    o.leslie_mode = LESLIE_SLOW;
     o.drawbar_changed = 1;
 }
 
@@ -495,5 +513,8 @@ void organ_init(void)
     vib_init(&o.vib, WB_FS);
     preamp_init();
     reverb_init(&o.rev);
+    leslie_init();
+    leslie_set_speed(LESLIE_SLOW);
+    o.leslie_mode = LESLIE_SLOW;
     o.drawbar_changed = 1;
 }
