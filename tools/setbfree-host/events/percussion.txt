@@ -3,6 +3,7 @@ drawbars U 888000000
 swell 127
 reverb 0
 leslie stop
+wait 10
 perc on
 perc harmonic 2
 perc decay fast

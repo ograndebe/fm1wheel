@@ -5,16 +5,17 @@ A tonewheel organ firmware for the **M-VAVE FM-1**, after
 [fm1-base](https://github.com/charlesvestal/fm1-base) and
 [felucca-bsp](https://github.com/hugelton/felucca-bsp).
 
-**Status: Phase 0.** The repository, the platform build, the host simulator and
-the setBfree reference tools are in place. The app is still fm1-base's template;
-the organ DSP lands in Phase 1. The full analysis and roadmap are in
-[PLANO.md](PLANO.md).
+**Status: Phase 1a.** The repository, the platform build, the host simulator,
+the setBfree reference tools and the **dry tone generator** are in place. The
+app plays the organ on the host (27 keys, USB/TRS MIDI, drawbars, percussion,
+settings). The scanner vibrato and the preamp/reverb/Leslie chain are the next
+slices. The full analysis and roadmap are in [PLANO.md](PLANO.md).
 
 ## Layout
 
 | Path | What |
 |---|---|
-| `app/` | The firmware app (fm1-base contract: `app.h`, `app.c`, `fm1.toml`) |
+| `app/` | The firmware app: `app.c` (UI/MIDI), `dsp/organ.c` (the engine), `fm1.toml` |
 | `fm1-base/` | Platform, host simulator, browser emulator, installer (submodule, MPL-2.0) |
 | `fm1-base/bsp/` | felucca-bsp: chip, board, loader, packaging (submodule, MPL-2.0) |
 | `third_party/setBfree/` | The reference DSP (submodule, GPL-2.0-or-later) |
@@ -37,8 +38,10 @@ Then:
 ```sh
 make build-host          # fm1-base/tools/build.py app --host
 make test-host           # app/build/host/wheelbox_host app/tests/basic.txt app/build/host
-make ref                 # builds the setBfree reference tools and renders demo.wav
-make tables              # writes app/dsp/organ_tables.h (generated; Phase 1)
+make ref                 # setBfree reference renders (tools/setbfree-host/build)
+make organ-test          # the same scripts through the WheelBox engine
+make compare             # A/B: correlation, null depth, band levels
+make tables              # regenerates app/dsp/organ_tables.h
 ```
 
 The reference renderer writes a float32 WAV:

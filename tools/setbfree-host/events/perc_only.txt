@@ -1,0 +1,13 @@
+# Percussion alone: all drawbars down, so only the percussion tap is heard.
+drawbars U 000000000
+swell 127
+reverb 0
+leslie stop
+wait 10
+perc on
+perc harmonic 2
+perc decay fast
+noteon 1 60 100
+wait 1200
+noteoff 1 60
+wait 500

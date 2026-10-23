@@ -3,7 +3,7 @@ name = "wheelbox"              # the build's file names (lower case); APP_NAME i
 id_prefix = "FM-1_12"          # package identity: dev FM-1_1200, releases FM-1_12XXYYZZ
 usb_manufacturer = "WheelBox"
 usb_product = "WHEELBOX FM-1"
-o2 = []                        # Phase 1: ["dsp/*.c"] (the organ DSP at -O2)
+o2 = ["dsp/*.c"]               # the organ DSP at -O2
 words = "words.tsv"
 # the site (tools/make_site.py, tools/publish_site.sh)
 tagline = "a tonewheel organ for the M-VAVE FM-1, after setBfree"

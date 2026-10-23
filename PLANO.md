@@ -2,11 +2,19 @@
 
 Análise dos repositórios e plano de execução. Data: 2026-10-23.
 
-**Estado (2026-10-23):** Fase 0 executada no host. O repositório está montado
-(`fm1-base` e `setBfree` como submodules), o template compila e passa no
-simulador de host, e `tools/setbfree-host/` já tem o renderer de referência e o
-dumper de tabelas funcionando. O build de device e a gravação no FM-1 ficam
-pendentes de Docker Desktop + toolchain JieLi + SDK AC79 nesta máquina.
+**Estado (2026-10-23):** Fase 0 e a primeira metade da Fase 1 feitas no host.
+O repositório está montado (`fm1-base` e `setBfree` como submodules), o
+`app/` compila e toca no simulador de host, e o tone generator (dry) foi
+portado para `app/dsp/organ.c` com A/B contra o setBfree:
+
+| Teste | Correlação | Null | Bandas |
+|---|---:|---:|---|
+| acorde (888000000) | 0,99995 | -40 dB | ±0,0 dB |
+| percussão (2º/3º) | 0,9996 | -31 dB | ±0,0 dB |
+| drawbars (mudanças) | 0,9979 | -24 dB | graves/ médios ±0,3 dB; agudos -10 dB no transiente |
+
+O build de device e a gravação no FM-1 ficam pendentes de Docker Desktop +
+toolchain JieLi + SDK AC79 nesta máquina.
 
 ---
 
@@ -321,15 +329,17 @@ Estimativas para uma pessoa focada. Some 30–50% se for em paralelo com outras 
 
 **Aceite:** host OK; falta o teste no device (Docker/toolchain/SDK).
 
-### Fase 1 — Port do tonegen (2–3 semanas)
+### Fase 1 — Port do tonegen (2–3 semanas) — em andamento
 
-- Portar `tonegen.c` com alocação estática, sem config/MIDI/LV2, blocos de 128.
-- Implementar rodas como acumulador de fase + tabela senoidal.
-- Portar drawbars, keyContrib, taper/crosstalk, key compression, click, percussão.
-- Portar `vibrato.c` (scanner).
-- Renderizar no host e comparar com o setBfree: RMS, espectro 1/3 de oitava, escuta.
+- [x] Tone generator dry: rodas como acumulador de fase + tabela senoidal.
+- [x] Drawbars, keyContrib, taper/crosstalk, key compression, click, percussão.
+- [x] App de host tocando: 27 teclas, MIDI USB/TRS, drawbars, percussão, settings.
+- [x] A/B contra o setBfree (`make compare`): acorde 0,99995 / -40 dB; percussão 0,9996 / -31 dB.
+- [ ] Portar `vibrato.c` (scanner V1–V3/C1–C3).
+- [ ] Portar preamp, reverb e Leslie (1.024 posições).
+- [ ] Integrar no `app_render` com limiter e medir CPU no device.
 
-**Aceite:** acordes e registrações soam como o setBfree no host; diferença de nível < 1 dB; sem artefatos.
+**Aceite parcial:** o tone generator dry bate com o setBfree no host; falta a cadeia de FX e o teste no device.
 
 ### Fase 2 — Device: áudio e performance (1–2 semanas)
 
@@ -439,13 +449,14 @@ Estimativas para uma pessoa focada. Some 30–50% se for em paralelo com outras 
    - `tools/setbfree-host/dump_tables` (`wheel_inc`, `wheel_att`, `key_contrib`, `key_comp`, envelopes).
    - `make ref` e `make tables`.
 
-4. **Tonegen no host** (1 semana) — próximo
-   - `app/dsp/organ.c` com rodas de fase, drawbars, key matrix, percussão, click, vibrato.
-   - Teste A/B contra os WAVs do `refrender`.
-   - Medir CPU do host e contar rodas ativas.
+4. **Tonegen no host** (1 semana) — feito (dry)
+   - `app/dsp/organ.c`: rodas de fase, drawbars, key matrix, percussão, click.
+   - `app/app.c`: teclado, MIDI, drawbars, presets, settings; toca no simulador.
+   - A/B: `make compare`.
+   - Próximo: `vibrato.c` + preamp/reverb/whirl.
 
 5. **Primeiro som no device** (2–3 dias)
-   - Integrar no `app_render`; saída 24-bit; limiter.
+   - Integrar no `app_render`; saída 24-bit; limiter. (já integrado)
    - Tocar um acorde no FM-1 e gravar via USB audio.
    - Medir CPU/latência.
 

@@ -3,7 +3,7 @@
 
 PY ?= ./.venv/bin/python
 
-.PHONY: all build-host test-host ref tables device clean
+.PHONY: all build-host test-host ref tables organ-test compare device clean
 
 all: build-host ref
 
@@ -19,6 +19,12 @@ ref:
 tables:
 	$(MAKE) -C tools/setbfree-host dump_tables
 	./tools/setbfree-host/dump_tables --header app/dsp/organ_tables.h --summary
+
+organ-test:
+	$(MAKE) -C tools/organ-test check
+
+compare:
+	$(MAKE) -C tools/organ-test compare
 
 device:
 	$(PY) fm1-base/tools/build.py app

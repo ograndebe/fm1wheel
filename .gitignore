@@ -5,5 +5,6 @@ app/web/words/
 tools/setbfree-host/build/
 tools/setbfree-host/refrender
 tools/setbfree-host/dump_tables
-app/dsp/organ_tables.h
 *.dSYM/
+tools/organ-test/render
+tools/organ-test/build/

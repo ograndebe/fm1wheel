@@ -1,12 +1,12 @@
-# WheelBox smoke test: Phase 0 keeps the template's placeholder app.
-# Build: fm1-base/tools/build.py app --host
+# WheelBox smoke test: the organ engine, the 27-key page and the settings.
+# Build: make build-host
 # Run:   app/build/host/wheelbox_host app/tests/basic.txt app/build/host
 wait 600
 shot boot.png
 key 7 down
 wait 50
 expect note 60
-expect midi_out 1
+shot key.png
 key 7 up
 wait 50
 expect note -1
@@ -16,25 +16,37 @@ expect octave 1
 expect dirty 1
 turn PRESET 1
 wait 30
-expect wave 1
+expect preset 1
+expect bar0 8
+expect bar3 8
+turn K1 -2
+wait 30
+expect bar0 6
 tap SAVE
 wait 30
 expect dirty 0
+expect store_writes 1
 reboot
 wait 600
 expect octave 1
-expect wave 1
+expect bar0 6
 midi 90 3C 64
 wait 30
 expect note 60
-wav note.wav
-wait 200
+wav organ.wav
+wait 300
 wavstop
-expect peak_db_min -30
+expect peak_db_min -40
 midi 80 3C 00
 listen
 wait 100
-said WHEELBOX. OCTAVE +1. WAVE TRIANGLE
-tap ARP
+tap ENV
 wait 30
-said BUTTON ARP
+expect perc 1
+said PERCUSSION ON
+tap LFO
+wait 30
+said PERC 2ND
+tap SAVE
+wait 30
+expect dirty 0
