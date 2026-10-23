@@ -19,11 +19,11 @@ The WheelBox firmware app.
   page 1 = 2⅔', 2', 1⅗', 1⅓'; page 2 = 1', percussion on/off, 2nd/3rd, fast/slow).
 - SEL: page; EDIT: manual (upper/lower/pedal); PRESET: 8 registrations.
 - ENV: percussion on/off; LFO: vibrato/chorus cycle (OFF, V1, C1, V2, C2, V3, C3);
-  PLAY: percussion 2nd/3rd; FX: fast/slow; SAVE: store settings.
+  PLAY: percussion 2nd/3rd; FX: drive on/off; SEQ: reverb 0/30/60/100%; SAVE: store settings.
 - MIDI in (USB/TRS): channels 1/2/3 = upper/lower/pedal; CC 1/11 swell,
   70–78 drawbars, 80/81/82 percussion, program change = preset.
 
-The scanner is in (Phase 1b); the preamp/reverb/Leslie chain is next.
+The scanner, preamp and reverb are in; the Leslie is next.
 
 ## Build and test
 

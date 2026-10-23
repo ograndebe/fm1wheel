@@ -17,7 +17,7 @@
 #define BLOCK ORGAN_BLOCK
 #define MAX_EVENTS 8192
 
-enum { EV_NOTE_ON, EV_NOTE_OFF, EV_DRAW, EV_SWELL, EV_PERC, EV_VIB };
+enum { EV_NOTE_ON, EV_NOTE_OFF, EV_DRAW, EV_SWELL, EV_PERC, EV_VIB, EV_DRIVE, EV_REVERB };
 
 typedef struct {
     double t;
@@ -120,6 +120,14 @@ static void parse_script(const char *path)
             add_event(now, EV_PERC, 0, 0, 0, a1);
             if (a2)
                 add_event(now, EV_PERC, 1, 0, 0, a2);
+        } else if (!strcmp(cmd, "drive")) {
+            if (!a1)
+                die("drive needs 0..127");
+            add_event(now, EV_DRIVE, parse_int(a1, "drive", 0, 127), 0, 0, NULL);
+        } else if (!strcmp(cmd, "reverb")) {
+            if (!a1)
+                die("reverb needs 0..127");
+            add_event(now, EV_REVERB, parse_int(a1, "reverb", 0, 127), 0, 0, NULL);
         } else if (!strcmp(cmd, "vib")) {
             if (!a1)
                 die("vib needs off|v1..c3|route");
@@ -136,7 +144,7 @@ static void parse_script(const char *path)
             add_event(now, !strcmp(cmd, "noteon") ? EV_NOTE_ON : EV_NOTE_OFF,
                       parse_int(a1, "channel", 1, 3), parse_int(a2, "note", 0, 127),
                       a3 ? parse_int(a3, "velocity", 1, 127) : 100, NULL);
-        } else if (!strcmp(cmd, "leslie") || !strcmp(cmd, "drive") || !strcmp(cmd, "reverb")) {
+        } else if (!strcmp(cmd, "leslie")) {
             /* dry test: the FX chain is not part of this renderer */
         } else {
             fprintf(stderr, "render: unknown command '%s'\n", cmd);
@@ -176,6 +184,12 @@ static void apply(const event_t *e)
     }
     case EV_SWELL:
         organ_set_swell(e->a);
+        break;
+    case EV_DRIVE:
+        organ_set_drive(e->a);
+        break;
+    case EV_REVERB:
+        organ_set_reverb(e->a);
         break;
     case EV_VIB:
         if (e->a == 0) {

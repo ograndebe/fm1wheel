@@ -331,7 +331,7 @@ int main(int argc, char **argv)
 {
     const char *script, *out;
     double gain = 1.0, tail_ms = 500.0, sr = 44100.0;
-    int i, dry = 0;
+    int i, dry = 0, preamp_only = 0, reverb_only = 0;
 
     if (argc < 3) {
         fprintf(stderr, "usage: %s SCRIPT OUT.wav [--gain G] [--tail MS] [--sr HZ]\n", argv[0]);
@@ -346,6 +346,10 @@ int main(int argc, char **argv)
             tail_ms = atof(argv[++i]);
         else if (!strcmp(argv[i], "--dry"))
             dry = 1;
+        else if (!strcmp(argv[i], "--preamp"))
+            preamp_only = 1;
+        else if (!strcmp(argv[i], "--reverb"))
+            reverb_only = 1;
         else if (!strcmp(argv[i], "--sr") && i + 1 < argc)
             sr = atof(argv[++i]);
         else {
@@ -407,8 +411,18 @@ int main(int argc, char **argv)
                 memcpy(right, bufA, sizeof right);
             } else {
                 preamp(pa, bufA, bufB, BLOCK);
-                reverb(rv, bufB, bufC, BLOCK);
-                whirlProc3(wh, bufC, left, right, tmpL, tmpR, BLOCK);
+                if (preamp_only) {
+                    memcpy(left, bufB, sizeof left);
+                    memcpy(right, bufB, sizeof right);
+                } else {
+                    reverb(rv, bufB, bufC, BLOCK);
+                    if (reverb_only) {
+                        memcpy(left, bufC, sizeof left);
+                        memcpy(right, bufC, sizeof right);
+                    } else {
+                        whirlProc3(wh, bufC, left, right, tmpL, tmpR, BLOCK);
+                    }
+                }
             }
             for (k = 0; k < n; k++) {
                 float l = left[k] * (float)gain, r = right[k] * (float)gain;

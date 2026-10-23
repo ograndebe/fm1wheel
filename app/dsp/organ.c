@@ -19,6 +19,8 @@
 #include "organ.h"
 #include "organ_tables.h"
 #include "vibrato.h"
+#include "preamp.h"
+#include "reverb.h"
 
 #define NSINE 2048
 #define SINE_MASK (NSINE - 1)
@@ -52,6 +54,7 @@ static struct {
     uint8_t drawbar_changed;
     int vib_mode, vib_upper, vib_lower;
     vib_t vib;
+    reverb_t rev;
     float sine[NSINE];
 } o;
 
@@ -295,6 +298,33 @@ void organ_set_vibrato_routing(int upper, int lower)
     o.drawbar_changed = 1;
 }
 
+void organ_set_drive(int value)
+{
+    if (value < 0)
+        value = 0;
+    if (value > 127)
+        value = 127;
+    preamp_set_drive((float)value / 127.0f);
+}
+
+void organ_set_drive_character(int value)
+{
+    if (value < 0)
+        value = 0;
+    if (value > 127)
+        value = 127;
+    preamp_set_character((float)value / 127.0f);
+}
+
+void organ_set_reverb(int value)
+{
+    if (value < 0)
+        value = 0;
+    if (value > 127)
+        value = 127;
+    reverb_set_mix(&o.rev, (float)value / 127.0f);
+}
+
 void organ_set_perc_volume(int soft)
 {
     o.perc_soft = soft != 0;
@@ -409,6 +439,8 @@ static void render_block(float *out, int n)
     }
     if (o.upper_keys == 0)
         o.perc_env = o.perc_reset;
+    preamp_run(out, n);
+    reverb_run(&o.rev, out, out, n);
 }
 
 void organ_render(float *out, int n)
@@ -434,6 +466,8 @@ void organ_reset(void)
     o.perc_env = 0.0f;
     o.pz = 0.0f;
     vib_init(&o.vib, WB_FS);
+    preamp_init();
+    reverb_init(&o.rev);
     o.drawbar_changed = 1;
 }
 
@@ -459,5 +493,7 @@ void organ_init(void)
     o.perc_env = 0.0f;              /* a silent block re-arms it (setBfree does the same) */
     o.vib_mode = VIB_OFF;
     vib_init(&o.vib, WB_FS);
+    preamp_init();
+    reverb_init(&o.rev);
     o.drawbar_changed = 1;
 }

@@ -51,9 +51,19 @@ tap LFO
 wait 30
 said VIBRATO V1
 expect vib 1
+tap FX
+wait 30
+expect drive 80
+said DRIVE ON
+tap SEQ
+wait 30
+expect reverb 80
+said REVERB
 tap SAVE
 wait 30
 expect dirty 0
 reboot
 wait 600
 expect vib 1
+expect drive 80
+expect reverb 80

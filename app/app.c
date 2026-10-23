@@ -9,7 +9,7 @@
 #include "fastmath.h"
 #include "dsp/organ.h"
 
-#define SET_MAGIC 0x57424F59u   /* "WBOX2": the layout changed with vib_mode */
+#define SET_MAGIC 0x57424F5Au   /* "WBOX4": the layout changed with drive/reverb */
 
 typedef struct {
     uint32_t magic;
@@ -20,8 +20,10 @@ typedef struct {
     uint8_t perc_fast;
     uint8_t preset;
     uint8_t vib_mode;           /* VIB_OFF .. VIB_C3 */
+    uint8_t drive;              /* 0 clean .. 127 */
+    uint8_t drive_char;         /* 0..127 */
+    uint8_t reverb;             /* 0..127 */
     uint8_t bars[ORGAN_BUSES];  /* 0..8, per manual */
-    uint8_t rsv[1];
 } settings_t;
 
 static settings_t set;
@@ -146,6 +148,9 @@ static void defaults(void)
     set.perc_fast = 1;
     set.preset = 0;
     set.vib_mode = VIB_OFF;
+    set.drive = 0;
+    set.drive_char = 64;
+    set.reverb = 40;
     set.bars[0] = set.bars[1] = set.bars[2] = 8;   /* 888000000 */
 }
 
@@ -162,6 +167,9 @@ static void apply_all(void)
     organ_set_percussion(set.perc);
     organ_set_vibrato_routing(set.vib_mode != VIB_OFF, 0);
     organ_set_vibrato_mode(set.vib_mode);
+    organ_set_drive(set.drive);
+    organ_set_drive_character(set.drive_char);
+    organ_set_reverb(set.reverb);
 }
 
 static void preset_apply(void)
@@ -246,6 +254,14 @@ static void midi_in(void)
                 static const uint8_t R[4][2] = {{0, 0}, {0, 1}, {1, 0}, {1, 1}};
                 int r = (int)(d2 / 32u);
                 organ_set_vibrato_routing(R[r][0], R[r][1]);
+                mark_dirty();
+            } else if (d1 == 65) {
+                set.drive = d2 >= 64 ? 80 : 0;
+                organ_set_drive(set.drive);
+                mark_dirty();
+            } else if (d1 == 93) {
+                set.drive_char = (uint8_t)d2;
+                organ_set_drive_character(set.drive_char);
                 mark_dirty();
             }
         } else if ((st & 0xF0u) == 0xC0u) {
@@ -354,6 +370,10 @@ static void draw(void)
         cv_text(6, 38, &FONT_XS, "SAVE has changes", C_AMB);
     else
         cv_text(6, 38, &FONT_XS, "SAVE clean", C_DIM);
+    cv_text(120, 38, &FONT_XS, set.drive ? "DRIVE ON" : "DRIVE OFF", set.drive ? C_HI : C_DIM);
+    int_text((int32_t)set.reverb * 100 / 127, t);
+    text_cat(t, "%");
+    cv_text(196, 38, &FONT_XS, t, C_AMB);
     cv_blit(0, 180);
 }
 
@@ -395,11 +415,21 @@ static void button(int b, uint32_t now)
         say("PERC", set.perc_second ? "2ND" : "3RD");
         break;
     case B_FX:
-        set.perc_fast = !set.perc_fast;
-        organ_set_perc_decay(set.perc_fast);
+        set.drive = set.drive ? 0 : 80;
+        organ_set_drive(set.drive);
         mark_dirty();
-        say("DECAY", set.perc_fast ? "FAST" : "SLOW");
+        say("DRIVE", set.drive ? "ON" : "OFF");
         break;
+    case B_SEQ: {
+        char t[8];
+        set.reverb = set.reverb == 0 ? 40 : set.reverb == 40 ? 80 : set.reverb == 80 ? 127 : 0;
+        organ_set_reverb(set.reverb);
+        mark_dirty();
+        int_text((int32_t)set.reverb * 100 / 127, t);
+        text_cat(t, "%");
+        say("REVERB", t);
+        break;
+    }
     case B_SEL:
         ui.page = (uint8_t)((ui.page + 1u) % 3u);
         ui.redraw = 1;
@@ -470,7 +500,8 @@ void app_init(void)
     if (plat_store_load(OBJ_SETTINGS, &set, sizeof set) != (int)sizeof set || set.magic != SET_MAGIC) {
         defaults();
     } else if (set.octave < -2 || set.octave > 2 || set.swell > 127 || set.perc > 1 ||
-               set.perc_second > 1 || set.perc_fast > 1 || set.preset > 7 || set.vib_mode > VIB_C3) {
+               set.perc_second > 1 || set.perc_fast > 1 || set.preset > 7 || set.vib_mode > VIB_C3 ||
+               set.drive > 127 || set.drive_char > 127 || set.reverb > 127) {
         defaults();
     }
     apply_all();
@@ -569,6 +600,10 @@ int app_expect(const char *what, int *got)
         *got = set.preset;
     else if (!strcmp(what, "vib"))
         *got = set.vib_mode;
+    else if (!strcmp(what, "drive"))
+        *got = set.drive;
+    else if (!strcmp(what, "reverb"))
+        *got = set.reverb;
     else if (!strncmp(what, "bar", 3) && what[3] >= '0' && what[3] <= '8')
         *got = set.bars[what[3] - '0'];   /* upper manual: the host tests use it */
     else

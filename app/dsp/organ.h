@@ -38,5 +38,9 @@ void organ_set_perc_volume(int soft);
 void organ_set_vibrato_mode(int mode);       /* VIB_OFF, VIB_V1 .. VIB_C3 */
 void organ_set_vibrato_routing(int upper, int lower);
 
+void organ_set_drive(int value);              /* 0 = clean, 1..127 overdrive */
+void organ_set_drive_character(int value);    /* 0..127 */
+void organ_set_reverb(int value);             /* 0 dry .. 127 wet */
+
 /* Render n frames (n <= ORGAN_BLOCK) of the mono organ mix. */
 void organ_render(float *out, int n);

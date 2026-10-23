@@ -2,10 +2,10 @@
 
 Análise dos repositórios e plano de execução. Data: 2026-10-23.
 
-**Estado (2026-10-23):** Fase 0 e a Fase 1a/1b feitas no host.
+**Estado (2026-10-23):** Fase 0 e a Fase 1a/1b/1c feitas no host.
 O repositório está montado (`fm1-base` e `setBfree` como submodules), o
-`app/` compila e toca no simulador de host, e o tone generator (dry) foi
-portado para `app/dsp/organ.c` com A/B contra o setBfree:
+`app/` compila e toca no simulador de host, e o tone generator, o scanner, o
+preamp e o reverb foram portados com A/B contra o setBfree:
 
 | Teste | Correlação | Null | Bandas |
 |---|---:|---:|---|
@@ -13,6 +13,8 @@ portado para `app/dsp/organ.c` com A/B contra o setBfree:
 | percussão (2º/3º) | 0,9996 | -31 dB | ±0,0 dB |
 | drawbars (mudanças) | 0,9979 | -24 dB | graves/médios ±0,3 dB; agudos -10 dB no transiente |
 | scanner V1→C1→V3 | 0,9815 | -14,3 dB | ±0,5 dB até 1,6 kHz; agudos -3,7/+2,9 dB |
+| preamp (drive 0→60→127) | 0,9999 | -37,8 dB | ±0,0 dB |
+| reverb (demo, mix 40) | 0,9983 | -24,6 dB | ±0,0 dB |
 
 O build de device e a gravação no FM-1 ficam pendentes de Docker Desktop +
 toolchain JieLi + SDK AC79 nesta máquina.
@@ -337,8 +339,9 @@ Estimativas para uma pessoa focada. Some 30–50% se for em paralelo com outras 
 - [x] App de host tocando: 27 teclas, MIDI USB/TRS, drawbars, percussão, settings.
 - [x] A/B contra o setBfree (`make compare`): acorde 0,99995 / -40 dB; percussão 0,9996 / -31 dB.
 - [x] Portar `vibrato.c` (scanner V1–V3/C1–C3): 0,9815 / -14,3 dB.
-- [ ] Portar preamp, reverb e Leslie (1.024 posições).
-- [ ] Integrar no `app_render` com limiter e medir CPU no device.
+- [x] Portar preamp/overdrive: 0,9999 / -37,8 dB; reverb: 0,9983 / -24,6 dB.
+- [ ] Portar o Leslie (whirl, 1.024 posições).
+- [ ] Medir CPU no device e ajustar o limiter.
 
 **Aceite parcial:** o tone generator dry bate com o setBfree no host; falta a cadeia de FX e o teste no device.
 
@@ -454,7 +457,7 @@ Estimativas para uma pessoa focada. Some 30–50% se for em paralelo com outras 
    - `app/dsp/organ.c`: rodas de fase, drawbars, key matrix, percussão, click.
    - `app/app.c`: teclado, MIDI, drawbars, presets, settings; toca no simulador.
    - A/B: `make compare`.
-   - Feito também o scanner `vibrato.c`; próximo: preamp/reverb/whirl.
+   - Feitos o scanner, o preamp e o reverb; próximo: o Leslie (`whirl`).
 
 5. **Primeiro som no device** (2–3 dias)
    - Integrar no `app_render`; saída 24-bit; limiter. (já integrado)

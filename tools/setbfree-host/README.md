@@ -42,7 +42,8 @@ wait 500                 # advance the timeline (ms)
 ```
 
 Options: `--gain G`, `--tail MS` (default 500), `--sr HZ`, `--dry` (tonegen
-only, for debugging).
+only), `--preamp` (tonegen + preamp), `--reverb` (tonegen + preamp + reverb,
+no Leslie; what `make compare` uses).
 
 ## Tables
 
