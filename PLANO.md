@@ -2,6 +2,12 @@
 
 Análise dos repositórios e plano de execução. Data: 2026-10-23.
 
+**Estado (2026-10-23):** Fase 0 executada no host. O repositório está montado
+(`fm1-base` e `setBfree` como submodules), o template compila e passa no
+simulador de host, e `tools/setbfree-host/` já tem o renderer de referência e o
+dumper de tabelas funcionando. O build de device e a gravação no FM-1 ficam
+pendentes de Docker Desktop + toolchain JieLi + SDK AC79 nesta máquina.
+
 ---
 
 ## 1. Resumo e recomendação
@@ -305,14 +311,15 @@ Estimativas para uma pessoa focada. Some 30–50% se for em paralelo com outras 
 
 ### Fase 0 — Base e referência (3–5 dias)
 
-- Instalar Docker Desktop, toolchain JieLi e SDK AC79.
-- Clonar o fm1-base com submodules; compilar e gravar o **template** no FM-1.
-- Testar: boot, tela, teclas, áudio, USB-MIDI, TRS, update, recovery.
-- Criar o repositório do projeto a partir do `template/`; fixar commits do fm1-base/BSP.
-- Adicionar o **renderer de referência** do setBfree no host (o harness que já fiz) e gerar WAVs de referência.
-- Adicionar o **gerador de tabelas** (frequências, atenuações, keyContrib, drawbar levels).
+- [x] Repositório criado; `fm1-base` (com o BSP) e `setBfree` como submodules fixados.
+- [x] `app/` copiado do template; `APP_BLOCK 128`; `id_prefix FM-1_12`.
+- [x] Build de host e `tests/basic.txt` passando.
+- [x] `tools/setbfree-host/refrender`: cadeia completa do setBfree (tonegen → preamp → reverb → whirl) em WAV float.
+- [x] `tools/setbfree-host/dump_tables`: `wheel_inc`, `wheel_att`, `key_contrib`, `key_comp`, envelopes.
+- [ ] Instalar Docker Desktop, toolchain JieLi e SDK AC79.
+- [ ] Compilar e gravar o template no FM-1; testar boot, tela, teclas, áudio, USB-MIDI, TRS, update, recovery.
 
-**Aceite:** template rodando no FM-1; WAVs de referência do setBfree; build de host do app.
+**Aceite:** host OK; falta o teste no device (Docker/toolchain/SDK).
 
 ### Fase 1 — Port do tonegen (2–3 semanas)
 
@@ -409,41 +416,38 @@ Estimativas para uma pessoa focada. Some 30–50% se for em paralelo com outras 
 
 ## 9. Próximos passos concretos (primeiras 2 semanas)
 
-1. **Ambiente** (1–2 dias)
+1. **Ambiente de device** (1–2 dias) — pendente
    ```sh
-   git clone --recursive https://github.com/charlesvestal/fm1-base.git
-   cd fm1-base
-   tools/get_toolchain.sh
+   # from the repository root; needs Docker Desktop running
+   fm1-base/tools/get_toolchain.sh
    git clone --depth 1 --branch AC79NN_SDK_V1.2.1_2023-12-13 \
        https://gitee.com/Jieli-Tech/fw-AC79_AIoT_SDK.git ~/fw-AC79_AIoT_SDK
-   tools/build.py template --host
-   tools/build.py template
-   python3 tools/fm1_install.py template/build/template.fwsc
+   make device
+   python3 fm1-base/tools/fm1_install.py app/build/wheelbox.fwsc
    ```
    Requer Docker Desktop (o toolchain é Linux x86-64; no Apple Silicon roda via Rosetta).
+   Testar boot, tela, teclas, áudio, USB-MIDI, TRS, update e recovery.
 
-2. **Repositório** (1 dia)
-   - Copiar `template/` para `app/`.
-   - `fm1.toml`: nome, `id_prefix` próprio, USB names, licença GPL-3.0-or-later, `o2 = ["dsp/*.c"]`, `vendored`.
-   - `app.h`: `APP_NAME`, `APP_BLOCK 128`, store objects.
-   - CI: build de host + testes.
+2. **Repositório** (1 dia) — feito
+   - `app/` copiado do template; `APP_BLOCK 128`; `id_prefix FM-1_12`.
+   - `fm1.toml`: nome, USB names, licença GPL-3.0-or-later.
+   - Submodules `fm1-base` (com BSP) e `setBfree` fixados.
+   - `make build-host` e `make test-host` passando.
 
-3. **Referência** (2–3 dias)
-   - Trazer o harness do setBfree (tonegen + FX) para `tools/refrender/`.
-   - Gerar WAVs de referência: acordes, drawbar sweep, percussão, Leslie slow/fast, drive.
-   - Trazer o dumper de tabelas (`wheel_inc`, `wheel_att`, `key_contrib`, `key_comp`).
+3. **Referência** (2–3 dias) — feito
+   - `tools/setbfree-host/refrender` (tonegen → preamp → reverb → whirl).
+   - `tools/setbfree-host/dump_tables` (`wheel_inc`, `wheel_att`, `key_contrib`, `key_comp`, envelopes).
+   - `make ref` e `make tables`.
 
-4. **Tonegen no host** (1 semana)
-   - `dsp/organ.c` com rodas de fase, drawbars, key matrix, percussão, click, vibrato.
-   - Teste A/B contra os WAVs de referência.
+4. **Tonegen no host** (1 semana) — próximo
+   - `app/dsp/organ.c` com rodas de fase, drawbars, key matrix, percussão, click, vibrato.
+   - Teste A/B contra os WAVs do `refrender`.
    - Medir CPU do host e contar rodas ativas.
 
 5. **Primeiro som no device** (2–3 dias)
    - Integrar no `app_render`; saída 24-bit; limiter.
    - Tocar um acorde no FM-1 e gravar via USB audio.
    - Medir CPU/latência.
-
----
 
 ## 10. Decisões que preciso de você
 
@@ -454,9 +458,9 @@ Defaults que adotei (diga se quer outro caminho):
 3. **Licença:** GPL-3.0-or-later.
 4. **Escopo v1:** upper manual, drawbars, percussão, vibrato/chorus, drive, reverb, Leslie; sem BLE/WiFi/segundo core/editor web.
 5. **Leslie:** 1.024 posições (89 KB, -50 dB) — se você tiver ouvido exigente, testamos 2.048.
-6. **Nome do produto:** evitar marcas; sugestões neutras (ex.: "Tonewheel FM-1", "WheelBox"). O `id_prefix` do instalador precisa ser único (`FM-1_xx`).
+6. **Nome do produto:** adotei **WheelBox** como placeholder (neutral, sem marcas). Trocar é barato enquanto o `id_prefix` (`FM-1_12`) ainda não foi publicado.
 
-Se estiver de acordo, o próximo passo é a Fase 0: montar o ambiente, gravar o template e colocar o renderer de referência + dumper de tabelas no repositório.
+A Fase 0 está feita no host. O próximo passo é o ambiente de device (Docker + toolchain + SDK), gravar o template no FM-1 e então começar a Fase 1 (port do tonegen).
 
 ---
 
@@ -502,4 +506,4 @@ O harness usado nesta análise:
 - Compila `overdrive.c` + `filterTools.c` e `reverb.c` para medir memória/CPU.
 - Para o teste do Leslie, muda `WHIRL_DISPLC_SIZE` de `1 << 14` para `1 << 10` e compara os WAVs (diferença -50,2 dB).
 
-Esses arquivos podem virar `tools/refrender/` no repositório e ser a base dos testes golden.
+Esses arquivos vivem em `tools/setbfree-host/` no repositório e são a base dos testes golden.
