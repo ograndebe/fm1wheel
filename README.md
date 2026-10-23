@@ -9,9 +9,10 @@ A tonewheel organ firmware for the **M-VAVE FM-1**, after
 the host simulator, the setBfree reference tools, the tone generator, scanner,
 preamp, reverb and the **Leslie** are in place. The app plays the full
 tonewheel chain on the host (27 keys, USB/TRS MIDI, drawbars, percussion,
-V1–V3/C1–C3, drive, reverb, slow/fast/stop rotor). The next step is the device:
-build, flash and measure CPU/latency. The full analysis and roadmap are in
-[PLANO.md](PLANO.md).
+V1–V3/C1–C3, drive, reverb, slow/fast/stop rotor). The device build works
+through Colima + Rosetta; the FM-1 has not been flashed yet. Read
+[MANUAL.md](MANUAL.md) for the controls and the drawbar-key mode, and
+[PLANO.md](PLANO.md) for the analysis and roadmap.
 
 ## Layout
 
@@ -22,6 +23,7 @@ build, flash and measure CPU/latency. The full analysis and roadmap are in
 | `fm1-base/bsp/` | felucca-bsp: chip, board, loader, packaging (submodule, MPL-2.0) |
 | `third_party/setBfree/` | The reference DSP (submodule, GPL-2.0-or-later) |
 | `tools/setbfree-host/` | Host-only reference renderer and table dumper (GPL-2.0-or-later) |
+| `MANUAL.md` | Hardware manual: controls, drawbar-key mode, MIDI, settings |
 | `PLANO.md` | Analysis, architecture, risks, roadmap |
 
 ## Host quick start

@@ -44,6 +44,7 @@ static volatile int32_t last_note = -1;
 static uint32_t prev_keys;
 static uint32_t prev_btn;
 static uint8_t drawbar_mode;             /* the 27 keys edit drawbars instead of playing */
+static uint8_t led_key_count;            /* keys lit at the last frame (host test) */
 static int16_t key_org[NKEYS];           /* 0: not held; else the organ key it started + 1 */
 
 /* Pair -> drawbar and direction. -1: not a drawbar control.
@@ -635,19 +636,19 @@ void app_frame(void)
     {
         uint32_t leds = (set_dirty ? (1u << B_SAVE) : 0u) | (set.perc ? (1u << B_ENV) : 0u) |
                         (drawbar_mode ? (1u << B_GLO) : 0u);
-        uint32_t up = 0, down = 0;
+        uint32_t keys = 0;
         if (drawbar_mode) {
             for (i = 0; i < NKEYS; i++)
-                if (KEY_BAR[i] >= 0) {
-                    if (KEY_DIR[i] > 0)
-                        up |= 1u << i;
-                    else
-                        down |= 1u << i;
-                }
+                if (KEY_BAR[i] >= 0)
+                    keys |= 1u << i;
         } else {
-            up = plat_keys();
+            keys = plat_keys();
         }
-        plat_lights(leds, up, 0, down, 1);
+        led_key_count = 0;
+        for (i = 0; i < NKEYS; i++)
+            if (keys & (1u << i))
+                led_key_count++;
+        plat_lights(leds, keys, 0, 0, 1);
     }
 
     if (ui.redraw || (now & 0x7Fu) == 0) {
@@ -692,6 +693,8 @@ int app_expect(const char *what, int *got)
         *got = set.leslie;
     else if (!strcmp(what, "drawbar"))
         *got = drawbar_mode;
+    else if (!strcmp(what, "ledkeys"))
+        *got = led_key_count;
     else if (!strncmp(what, "bar", 3) && what[3] >= '0' && what[3] <= '8')
         *got = set.bars[what[3] - '0'];   /* upper manual: the host tests use it */
     else
