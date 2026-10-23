@@ -19,10 +19,13 @@ preamp e o reverb foram portados com A/B contra o setBfree:
 | Leslie (stop→slow→fast) | 0,9995 | -30,4 dB | ±0,0 dB |
 | cadeia completa (demo) | 0,9991 | -27,6 dB | ±0,0 dB |
 
-O build de device já roda nesta máquina via **Colima + Rosetta**
+O **emulador web** compila com Emscripten e roda em `app/build/emu/`
+(`make serve-web` → http://localhost:8790/), com a mesma cadeia e a mesma UI do
+device. O build de device também roda nesta máquina via **Colima + Rosetta**
 (`colima start --vz-rosetta`). Pacote gerado: `app/build/wheelbox.fwsc`
 (611.354 B), app 315.520 B, `.data+.bss` 77.300 B de 98.304, pool 180.844 B de
-344.064, sem soft-double. Falta apenas conectar o FM-1 e gravar/medir.
+344.064, sem soft-double. Falta apenas conectar o FM-1 e gravar/medir; até lá, o emulador web é o
+ambiente de trabalho interativo.
 
 ---
 
