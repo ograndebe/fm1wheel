@@ -5,7 +5,7 @@
  *
  * The delay lengths are setBfree's at 44.1 kHz (end[i] * 2, odd, + 2). The
  * pool lives in the FM-1's .pool RAM (79 KB), not in the 96 KB .bss. */
-#include <string.h>
+#include "wb_libc.h"
 
 #include "reverb.h"
 

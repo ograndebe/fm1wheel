@@ -2,7 +2,7 @@
 CC ?= cc
 PY ?= ../../.venv/bin/python
 CFLAGS ?= -O2 -g -std=c99 -Wall -Wextra -ffp-contract=off \
-          -I../../app/dsp -I../../fm1-base/include
+          -DPLAT_HOST -I../../app/dsp -I../../fm1-base/include
 TABLES = ../../app/dsp/organ_tables.h
 
 all: render

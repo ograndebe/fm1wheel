@@ -2,7 +2,7 @@
  * Scanner vibrato/chorus, after setBfree (GPL-2.0-or-later).
  * The fixed-point delay write/read is kept as in setBfree; the tables use
  * float math from fastmath so the firmware needs no libm or double. */
-#include <string.h>
+#include "wb_libc.h"
 
 #include "fastmath.h"
 #include "vibrato.h"

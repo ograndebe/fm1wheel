@@ -56,19 +56,25 @@ afplay /tmp/demo.wav
 
 ## Device build
 
-Needs Docker Desktop (the JieLi toolchain is Linux x86-64), the toolchain and
-the AC79 SDK. See `fm1-base/README.md` and `fm1-base/BUILDING.md`:
+The JieLi toolchain is Linux x86-64. On macOS, Colima works with Rosetta
+(`colima start --vz-rosetta`; the build runs `linux/amd64` containers through
+Rosetta). Docker Desktop also works. Then:
 
 ```sh
 fm1-base/tools/get_toolchain.sh
 git clone --depth 1 --branch AC79NN_SDK_V1.2.1_2023-12-13 \
     https://gitee.com/Jieli-Tech/fw-AC79_AIoT_SDK.git ~/fw-AC79_AIoT_SDK
-./.venv/bin/python fm1-base/tools/build.py app
-python3 fm1-base/tools/fm1_install.py app/build/wheelbox.fwsc
+make device                 # app/build/wheelbox.fwsc
+make install                # asks before writing; the FM-1 must be connected
 ```
 
+The 2026-10-23 build: app 315,520 B, package 611,354 B, `.data+.bss` 77,300 B
+of 98,304, pool 180,844 B of 344,064, no soft-double routines.
+
 Flashing is at your own risk. Keep the official firmware and the recovery
-tools (`fm1-base/bsp/tools/fm1_rescue.py`, `FM-1-transporter`) at hand.
+tools (`fm1-base/bsp/tools/fm1_rescue.py`, `FM-1-transporter`) at hand. If the
+install is interrupted, the FM-1 stays in update mode and `make install`
+finishes the write.
 
 ## Licence
 

@@ -9,10 +9,7 @@
  */
 /* Interpolation filter at digital frequency 0.25 */
 /* Decimation filter at digital frequency 0.25 */
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
+#include "wb_libc.h"
 #include "preamp.h"
 
 
@@ -127,8 +124,8 @@ struct b_preamp {
   float aal[33];
   /* Decimation filter end sentinel */
   float * aalEnd;
-  size_t ipolFilterLength;
-  size_t aalFilterLength;
+  unsigned ipolFilterLength;
+  unsigned aalFilterLength;
   /* Zero-filled filter of anti-aliasing length */
   float aalZeros[33];
   /* Clean/overdrive switch */
@@ -167,7 +164,7 @@ struct b_preamp {
 static void mixFilterWeights (void *pa, const float * ipolDef, const float * aalDef) {
   struct b_preamp *pp = (struct b_preamp *) pa;
   int i;
-  float sum = 0.0;
+  float sum = 0.0f;
   
   float mix[33];
   
@@ -222,7 +219,7 @@ static void mixFilterWeights (void *pa, const float * ipolDef, const float * aal
   
   /* Copy the anti-aliasing filter definition */
   
-  sum = 0.0;
+  sum = 0.0f;
   for (i = 0; i < 33; i++) {
     mix[i] = aalDef[i];
     sum += mix[i] < 0 ? -mix[i] : mix[i];
@@ -237,19 +234,19 @@ static void mixFilterWeights (void *pa, const float * ipolDef, const float * aal
 
 
 
-float * overdrive (void *pa, const float * inBuf, float * outBuf, size_t buflen)
+float * overdrive (void *pa, const float * inBuf, float * outBuf, unsigned buflen)
 {
   struct b_preamp *pp = (struct b_preamp *) pa;
   const float * xp = inBuf;
   float * yp = outBuf;
   int i;
-  size_t n;
+  unsigned n;
   
   for (n = 0; n < buflen; n++) {
     float xin;
-    float u = 0.0;
+    float u = 0.0f;
     float v;
-    float y = 0.0;
+    float y = 0.0f;
     
     /* Place the next input sample in the input history. */
     if (++(pp->xzp) == pp->xzpe) {
@@ -259,7 +256,7 @@ float * overdrive (void *pa, const float * inBuf, float * outBuf, size_t buflen)
     xin = pp->inputGain * (*xp++);
     pp->sagZ = (pp->sagFb * pp->sagZ) + (xin < 0 ? -xin : xin);
     pp->bias = pp->biasBase - (pp->sagZgb * pp->sagZ);
-    pp->norm = 1.0 - (1.0 / (1.0 + (pp->bias * pp->bias)));
+    pp->norm = 1.0f - (1.0f / (1.0f + (pp->bias * pp->bias)));
     *(pp->xzp) = xin;
     
     /* Check the input history wrap sentinel */
@@ -314,12 +311,12 @@ float * overdrive (void *pa, const float * inBuf, float * outBuf, size_t buflen)
       pp->adwZ = u + (pp->adwZ * pp->adwFb);
       u = temp;
     }
-    if (u < 0.0) {
+    if (u < 0.0f) {
       float x2 = u - pp->bias;
-      v = (1.0 / (1.0 + (x2 * x2))) - 1.0 + pp->norm;
+      v = (1.0f / (1.0f + (x2 * x2))) - 1.0f + pp->norm;
     } else {
       float x2 = u + pp->bias;
-      v = 1.0 - pp->norm - (1.0 / (1.0 + (x2 * x2)));
+      v = 1.0f - pp->norm - (1.0f / (1.0f + (x2 * x2)));
     }
     {
       float temp = v + (pp->adwFb2 * pp->adwZ1);
@@ -375,7 +372,7 @@ float * overdrive (void *pa, const float * inBuf, float * outBuf, size_t buflen)
 float * preamp (void * pa,
                 float * inBuf,
                 float * outBuf,
-                size_t bufLengthSamples) {
+                unsigned bufLengthSamples) {
   struct b_preamp *pp = (struct b_preamp *) pa;
   if (pp->isClean) {
     memcpy(outBuf, inBuf, bufLengthSamples*sizeof(float));
@@ -476,5 +473,5 @@ void preamp_set_character(float u)
 
 void preamp_run(float *buf, int n)
 {
-    preamp(&pp, buf, buf, (size_t)n);
+    preamp(&pp, buf, buf, (unsigned)n);
 }

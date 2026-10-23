@@ -19,8 +19,10 @@ preamp e o reverb foram portados com A/B contra o setBfree:
 | Leslie (stop→slow→fast) | 0,9995 | -30,4 dB | ±0,0 dB |
 | cadeia completa (demo) | 0,9991 | -27,6 dB | ±0,0 dB |
 
-O build de device e a gravação no FM-1 ficam pendentes de Docker Desktop +
-toolchain JieLi + SDK AC79 nesta máquina.
+O build de device já roda nesta máquina via **Colima + Rosetta**
+(`colima start --vz-rosetta`). Pacote gerado: `app/build/wheelbox.fwsc`
+(611.354 B), app 315.520 B, `.data+.bss` 77.300 B de 98.304, pool 180.844 B de
+344.064, sem soft-double. Falta apenas conectar o FM-1 e gravar/medir.
 
 ---
 
@@ -331,7 +333,8 @@ Estimativas para uma pessoa focada. Some 30–50% se for em paralelo com outras 
 - [x] `tools/setbfree-host/refrender`: cadeia completa do setBfree (tonegen → preamp → reverb → whirl) em WAV float.
 - [x] `tools/setbfree-host/dump_tables`: `wheel_inc`, `wheel_att`, `key_contrib`, `key_comp`, envelopes.
 - [ ] Instalar Docker Desktop, toolchain JieLi e SDK AC79.
-- [ ] Compilar e gravar o template no FM-1; testar boot, tela, teclas, áudio, USB-MIDI, TRS, update, recovery.
+- [x] Compilar o firmware no device via Colima/Rosetta (pacote `wheelbox.fwsc`).
+- [ ] Gravar no FM-1 e testar boot, tela, teclas, áudio, USB-MIDI, TRS, update, recovery.
 
 **Aceite:** host OK; falta o teste no device (Docker/toolchain/SDK).
 

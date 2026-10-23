@@ -2,8 +2,10 @@
 # The device build needs Docker, the JieLi toolchain and the AC79 SDK; see README.md.
 
 PY ?= ./.venv/bin/python
+AC79_SDK ?= $(HOME)/fw-AC79_AIoT_SDK
+JIELI_TOOLCHAIN ?= $(HOME)/.jieli/toolchain
 
-.PHONY: all build-host test-host ref tables whirl-tables organ-test compare device clean
+.PHONY: all build-host test-host ref tables whirl-tables organ-test compare device install clean
 
 all: build-host ref
 
@@ -30,7 +32,10 @@ compare:
 	$(MAKE) -C tools/organ-test compare
 
 device:
-	$(PY) fm1-base/tools/build.py app
+	AC79_SDK="$(AC79_SDK)" JIELI_TOOLCHAIN="$(JIELI_TOOLCHAIN)" $(PY) fm1-base/tools/build.py app
+
+install: device
+	$(PY) fm1-base/tools/fm1_install.py app/build/wheelbox.fwsc
 
 clean:
 	rm -rf app/build

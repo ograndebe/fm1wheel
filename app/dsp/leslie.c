@@ -7,7 +7,7 @@
  * displacement positions (whirl_tables.h). The runtime is the same horn/drum
  * Doppler, reflections, filters and mic mix; the speed state machine is float
  * only (no double, exp/fmod at runtime except the prefilters' exp at init). */
-#include <string.h>
+#include "wb_libc.h"
 
 #include "fastmath.h"
 #include "leslie.h"

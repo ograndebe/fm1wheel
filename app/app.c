@@ -4,7 +4,7 @@
  * generator is live; this UI is a working drawbar page, not the final one.
  * The small text/note helpers are adapted from fm1-base's template app.c
  * (MPL-2.0, Copyright (C) 2026 Charles Vestal). */
-#include <string.h>
+#include "dsp/wb_libc.h"
 
 #include "fastmath.h"
 #include "dsp/organ.h"

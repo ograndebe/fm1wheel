@@ -13,7 +13,7 @@
  * are added in the next slices.
  */
 #include <stdint.h>
-#include <string.h>
+#include "wb_libc.h"
 
 #include "fastmath.h"
 #include "organ.h"
@@ -351,10 +351,10 @@ static void render_block(float *mono, float *outL, float *outR, int n)
     float swell[ORGAN_BLOCK], scan[ORGAN_BLOCK], vibout[ORGAN_BLOCK], perc[ORGAN_BLOCK];
     int i, k, wr = 0;
 
-    memset(swell, 0, sizeof(float) * (size_t)n);
-    memset(scan, 0, sizeof(float) * (size_t)n);
-    memset(vibout, 0, sizeof(float) * (size_t)n);
-    memset(perc, 0, sizeof(float) * (size_t)n);
+    memset(swell, 0, sizeof(float) * (unsigned)n);
+    memset(scan, 0, sizeof(float) * (unsigned)n);
+    memset(vibout, 0, sizeof(float) * (unsigned)n);
+    memset(perc, 0, sizeof(float) * (unsigned)n);
 
     if (o.drawbar_changed) {
         for (i = 0; i < o.nactive; i++) {
