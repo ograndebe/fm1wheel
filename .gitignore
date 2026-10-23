@@ -8,3 +8,4 @@ tools/setbfree-host/dump_tables
 *.dSYM/
 tools/organ-test/render
 tools/organ-test/build/
+renders/

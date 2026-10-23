@@ -63,6 +63,23 @@ make serve-web
 open http://localhost:8790/
 ```
 
+### Rendering a MIDI file
+
+`tools/mid2organ.py` isolates the organ tracks of a MIDI file (programs 16/17
+or drawbar/percussion names), writes an isolated `.mid`, and renders it through
+the same engine the firmware and the emulator use:
+
+```sh
+./.venv/bin/python tools/mid2organ.py ~/Downloads/Song.mid \
+    --out renders/song --stems
+```
+
+Options: `--drive 0..127`, `--rotor stop|slow|fast`, `--vib off|v1..c3`,
+`--reverb 0..127`, `--upper/--lower/--pedal 888000000`, `--stems`,
+`--seconds N` and `--normalize`. The WAVs are 16-bit stereo; `renders/` is
+gitignored. It needs `mido` and `numpy` (the `.venv` has them) and the host
+renderer (`make -C tools/organ-test`).
+
 The reference renderer writes a float32 WAV:
 
 ```sh
