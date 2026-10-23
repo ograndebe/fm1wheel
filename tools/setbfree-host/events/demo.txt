@@ -1,0 +1,38 @@
+# WheelBox reference script: a chord, a drawbar change, percussion and the
+# Leslie ramping to fast. Times are implicit: each event applies at the next
+# 128-sample block (2.9 ms at 44.1 kHz).
+
+drawbars U 888000000
+swell 127
+reverb 40
+leslie slow
+
+noteon 1 48 100
+noteon 1 52 100
+noteon 1 55 100
+wait 1500
+noteoff 1 48
+noteoff 1 52
+noteoff 1 55
+wait 500
+
+drawbars U 888800000
+noteon 1 60 100
+noteon 1 64 100
+wait 1000
+
+perc on
+perc harmonic 2
+perc decay fast
+noteon 1 67 100
+wait 1000
+noteoff 1 60
+noteoff 1 64
+noteoff 1 67
+wait 500
+
+leslie fast
+noteon 1 60 100
+wait 2000
+noteoff 1 60
+wait 2000

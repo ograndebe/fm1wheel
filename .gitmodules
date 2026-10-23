@@ -1,0 +1,6 @@
+[submodule "fm1-base"]
+	path = fm1-base
+	url = https://github.com/charlesvestal/fm1-base.git
+[submodule "third_party/setBfree"]
+	path = third_party/setBfree
+	url = https://github.com/pantherb/setBfree.git

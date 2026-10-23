@@ -1,0 +1,9 @@
+.venv/
+.DS_Store
+app/build/
+app/web/words/
+tools/setbfree-host/build/
+tools/setbfree-host/refrender
+tools/setbfree-host/dump_tables
+app/dsp/organ_tables.h
+*.dSYM/

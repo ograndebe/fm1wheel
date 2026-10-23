@@ -1,0 +1,40 @@
+# WheelBox smoke test: Phase 0 keeps the template's placeholder app.
+# Build: fm1-base/tools/build.py app --host
+# Run:   app/build/host/wheelbox_host app/tests/basic.txt app/build/host
+wait 600
+shot boot.png
+key 7 down
+wait 50
+expect note 60
+expect midi_out 1
+key 7 up
+wait 50
+expect note -1
+tap OCT+
+wait 30
+expect octave 1
+expect dirty 1
+turn PRESET 1
+wait 30
+expect wave 1
+tap SAVE
+wait 30
+expect dirty 0
+reboot
+wait 600
+expect octave 1
+expect wave 1
+midi 90 3C 64
+wait 30
+expect note 60
+wav note.wav
+wait 200
+wavstop
+expect peak_db_min -30
+midi 80 3C 00
+listen
+wait 100
+said WHEELBOX. OCTAVE +1. WAVE TRIANGLE
+tap ARP
+wait 30
+said BUTTON ARP
