@@ -11,8 +11,8 @@ $(TABLES):
 	$(MAKE) -C ../setbfree-host dump_tables
 	../setbfree-host/dump_tables --header $(TABLES)
 
-render: render.c ../../app/dsp/organ.c ../../app/dsp/organ.h $(TABLES)
-	$(CC) $(CFLAGS) -o $@ render.c ../../app/dsp/organ.c -lm
+render: render.c ../../app/dsp/organ.c ../../app/dsp/vibrato.c ../../app/dsp/organ.h ../../app/dsp/vibrato.h $(TABLES)
+	$(CC) $(CFLAGS) -o $@ render.c ../../app/dsp/organ.c ../../app/dsp/vibrato.c -lm
 
 check: render
 	mkdir -p build

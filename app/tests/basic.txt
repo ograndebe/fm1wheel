@@ -44,9 +44,16 @@ tap ENV
 wait 30
 expect perc 1
 said PERCUSSION ON
-tap LFO
+tap PLAY
 wait 30
 said PERC 2ND
+tap LFO
+wait 30
+said VIBRATO V1
+expect vib 1
 tap SAVE
 wait 30
 expect dirty 0
+reboot
+wait 600
+expect vib 1

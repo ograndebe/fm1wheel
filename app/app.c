@@ -9,7 +9,7 @@
 #include "fastmath.h"
 #include "dsp/organ.h"
 
-#define SET_MAGIC 0x57424F58u   /* "WBOX" */
+#define SET_MAGIC 0x57424F59u   /* "WBOX2": the layout changed with vib_mode */
 
 typedef struct {
     uint32_t magic;
@@ -19,8 +19,9 @@ typedef struct {
     uint8_t perc_second;        /* 1 = 2nd, 0 = 3rd */
     uint8_t perc_fast;
     uint8_t preset;
+    uint8_t vib_mode;           /* VIB_OFF .. VIB_C3 */
     uint8_t bars[ORGAN_BUSES];  /* 0..8, per manual */
-    uint8_t rsv[2];
+    uint8_t rsv[1];
 } settings_t;
 
 static settings_t set;
@@ -32,6 +33,7 @@ static const char REG[8][10] = {
     "008000000", "888888888", "858000000", "006876540",
 };
 static const char *const MANUAL_NAME[3] = {"UPPER", "LOWER", "PEDAL"};
+static const char *const VIB_NAME[7] = {"OFF", "V1", "C1", "V2", "C2", "V3", "C3"};
 static const char *const FOOT[9] = {"16", "5.3", "8", "4", "2.6", "2", "1.6", "1.3", "1"};
 
 static volatile int32_t last_note = -1;
@@ -143,6 +145,7 @@ static void defaults(void)
     set.perc_second = 0;
     set.perc_fast = 1;
     set.preset = 0;
+    set.vib_mode = VIB_OFF;
     set.bars[0] = set.bars[1] = set.bars[2] = 8;   /* 888000000 */
 }
 
@@ -157,6 +160,8 @@ static void apply_all(void)
     organ_set_perc_decay(set.perc_fast);
     organ_set_perc_volume(0);
     organ_set_percussion(set.perc);
+    organ_set_vibrato_routing(set.vib_mode != VIB_OFF, 0);
+    organ_set_vibrato_mode(set.vib_mode);
 }
 
 static void preset_apply(void)
@@ -233,6 +238,15 @@ static void midi_in(void)
                 set.perc_second = d2 >= 64;
                 organ_set_perc_harmonic(set.perc_second);
                 mark_dirty();
+            } else if (d1 == 92) {
+                set.vib_mode = (uint8_t)((d2 * 7u) / 128u);
+                organ_set_vibrato_mode(set.vib_mode);
+                mark_dirty();
+            } else if (d1 == 95) {
+                static const uint8_t R[4][2] = {{0, 0}, {0, 1}, {1, 0}, {1, 1}};
+                int r = (int)(d2 / 32u);
+                organ_set_vibrato_routing(R[r][0], R[r][1]);
+                mark_dirty();
             }
         } else if ((st & 0xF0u) == 0xC0u) {
             set.preset = (uint8_t)(d1 & 7u);
@@ -298,9 +312,10 @@ static void draw(void)
     cv_text(6, 2, &FONT_XS, MANUAL_NAME[ui.manual], C_AMB);
     cv_text(66, 2, &FONT_XS, REG_NAME[set.preset], C_GRAY);
     if (set.perc)
-        cv_text(140, 2, &FONT_XS, set.perc_second ? "PERC 2ND" : "PERC 3RD", C_HI);
+        cv_text(132, 2, &FONT_XS, set.perc_second ? "PERC 2ND" : "PERC 3RD", C_HI);
     else
-        cv_text(140, 2, &FONT_XS, "PERC OFF", C_DIM);
+        cv_text(132, 2, &FONT_XS, "PERC OFF", C_DIM);
+    cv_text(204, 2, &FONT_XS, VIB_NAME[set.vib_mode], C_AMB);
 
     for (i = 0; i < 9; i++) {
         int32_t x = 6 + i * 25, y = 18, w = 20, h = 84;
@@ -367,6 +382,13 @@ static void button(int b, uint32_t now)
         say("PERCUSSION", set.perc ? "ON" : "OFF");
         break;
     case B_LFO:
+        set.vib_mode = (uint8_t)((set.vib_mode + 1u) % 7u);
+        organ_set_vibrato_routing(set.vib_mode != VIB_OFF, 0);
+        organ_set_vibrato_mode(set.vib_mode);
+        mark_dirty();
+        say("VIBRATO", VIB_NAME[set.vib_mode]);
+        break;
+    case B_PLAY:
         set.perc_second = !set.perc_second;
         organ_set_perc_harmonic(set.perc_second);
         mark_dirty();
@@ -448,7 +470,7 @@ void app_init(void)
     if (plat_store_load(OBJ_SETTINGS, &set, sizeof set) != (int)sizeof set || set.magic != SET_MAGIC) {
         defaults();
     } else if (set.octave < -2 || set.octave > 2 || set.swell > 127 || set.perc > 1 ||
-               set.perc_second > 1 || set.perc_fast > 1 || set.preset > 7) {
+               set.perc_second > 1 || set.perc_fast > 1 || set.preset > 7 || set.vib_mode > VIB_C3) {
         defaults();
     }
     apply_all();
@@ -545,6 +567,8 @@ int app_expect(const char *what, int *got)
         *got = ui.page;
     else if (!strcmp(what, "preset"))
         *got = set.preset;
+    else if (!strcmp(what, "vib"))
+        *got = set.vib_mode;
     else if (!strncmp(what, "bar", 3) && what[3] >= '0' && what[3] <= '8')
         *got = set.bars[what[3] - '0'];   /* upper manual: the host tests use it */
     else

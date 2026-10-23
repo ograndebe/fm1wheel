@@ -17,7 +17,7 @@
 #define BLOCK ORGAN_BLOCK
 #define MAX_EVENTS 8192
 
-enum { EV_NOTE_ON, EV_NOTE_OFF, EV_DRAW, EV_SWELL, EV_PERC };
+enum { EV_NOTE_ON, EV_NOTE_OFF, EV_DRAW, EV_SWELL, EV_PERC, EV_VIB };
 
 typedef struct {
     double t;
@@ -120,14 +120,23 @@ static void parse_script(const char *path)
             add_event(now, EV_PERC, 0, 0, 0, a1);
             if (a2)
                 add_event(now, EV_PERC, 1, 0, 0, a2);
+        } else if (!strcmp(cmd, "vib")) {
+            if (!a1)
+                die("vib needs off|v1..c3|route");
+            if (!strcmp(a1, "route")) {
+                if (!a2)
+                    die("vib route needs off|upper|lower|both");
+                add_event(now, EV_VIB, 1, 0, 0, a2);
+            } else {
+                add_event(now, EV_VIB, 0, 0, 0, a1);
+            }
         } else if (!strcmp(cmd, "noteon") || !strcmp(cmd, "noteoff")) {
             if (!a1 || !a2)
                 die("noteon/noteoff needs channel and note");
             add_event(now, !strcmp(cmd, "noteon") ? EV_NOTE_ON : EV_NOTE_OFF,
                       parse_int(a1, "channel", 1, 3), parse_int(a2, "note", 0, 127),
                       a3 ? parse_int(a3, "velocity", 1, 127) : 100, NULL);
-        } else if (!strcmp(cmd, "leslie") || !strcmp(cmd, "vib") ||
-                   !strcmp(cmd, "drive") || !strcmp(cmd, "reverb")) {
+        } else if (!strcmp(cmd, "leslie") || !strcmp(cmd, "drive") || !strcmp(cmd, "reverb")) {
             /* dry test: the FX chain is not part of this renderer */
         } else {
             fprintf(stderr, "render: unknown command '%s'\n", cmd);
@@ -167,6 +176,17 @@ static void apply(const event_t *e)
     }
     case EV_SWELL:
         organ_set_swell(e->a);
+        break;
+    case EV_VIB:
+        if (e->a == 0) {
+            int m = !strcmp(e->s, "v1") ? VIB_V1 : !strcmp(e->s, "c1") ? VIB_C1 :
+                    !strcmp(e->s, "v2") ? VIB_V2 : !strcmp(e->s, "c2") ? VIB_C2 :
+                    !strcmp(e->s, "v3") ? VIB_V3 : !strcmp(e->s, "c3") ? VIB_C3 : VIB_OFF;
+            organ_set_vibrato_mode(m);
+        } else {
+            organ_set_vibrato_routing(!strcmp(e->s, "upper") || !strcmp(e->s, "both"),
+                                      !strcmp(e->s, "lower") || !strcmp(e->s, "both"));
+        }
         break;
     case EV_PERC:
         if (e->a == 0) {

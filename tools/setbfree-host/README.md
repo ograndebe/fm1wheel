@@ -5,7 +5,7 @@ of the firmware. GPL-2.0-or-later; see `../../LICENSING.md`.
 
 | Tool | What |
 |---|---|
-| `refrender` | Renders a text script through setBfree's chain (tonegen → preamp → reverb → whirl) to a float32 WAV. The "golden" side of the A/B tests. Scripts: `events/chord.txt`, `drawbars.txt`, `percussion.txt`, `leslie.txt`, `drive.txt`, `demo.txt`. |
+| `refrender` | Renders a text script through setBfree's chain (tonegen → preamp → reverb → whirl) to a float32 WAV. The "golden" side of the A/B tests. Scripts: `events/chord.txt`, `drawbars.txt`, `percussion.txt`, `vib.txt`, `leslie.txt`, `drive.txt`, `demo.txt`. |
 | `dump_tables` | Dumps wheel frequencies/attenuations, the key-contact matrix, the key-compression curve and the click envelopes as a C header for the firmware. |
 
 ## Build

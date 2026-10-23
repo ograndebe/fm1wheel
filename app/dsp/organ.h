@@ -11,6 +11,7 @@
 #pragma once
 
 #include <stdint.h>
+#include "vibrato.h"
 
 #define ORGAN_BLOCK 128
 #define ORGAN_MANUAL_UPPER 0
@@ -33,6 +34,9 @@ void organ_set_percussion(int on);
 void organ_set_perc_harmonic(int second);                 /* 1 = 2nd, 0 = 3rd */
 void organ_set_perc_decay(int fast);
 void organ_set_perc_volume(int soft);
+
+void organ_set_vibrato_mode(int mode);       /* VIB_OFF, VIB_V1 .. VIB_C3 */
+void organ_set_vibrato_routing(int upper, int lower);
 
 /* Render n frames (n <= ORGAN_BLOCK) of the mono organ mix. */
 void organ_render(float *out, int n);

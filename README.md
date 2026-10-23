@@ -5,11 +5,12 @@ A tonewheel organ firmware for the **M-VAVE FM-1**, after
 [fm1-base](https://github.com/charlesvestal/fm1-base) and
 [felucca-bsp](https://github.com/hugelton/felucca-bsp).
 
-**Status: Phase 1a.** The repository, the platform build, the host simulator,
-the setBfree reference tools and the **dry tone generator** are in place. The
-app plays the organ on the host (27 keys, USB/TRS MIDI, drawbars, percussion,
-settings). The scanner vibrato and the preamp/reverb/Leslie chain are the next
-slices. The full analysis and roadmap are in [PLANO.md](PLANO.md).
+**Status: Phase 1b.** The repository, the platform build, the host simulator,
+the setBfree reference tools, the **dry tone generator** and the **scanner
+vibrato/chorus** are in place. The app plays the organ on the host (27 keys,
+USB/TRS MIDI, drawbars, percussion, V1–V3/C1–C3, settings). The
+preamp/reverb/Leslie chain is the next slice. The full analysis and roadmap are
+in [PLANO.md](PLANO.md).
 
 ## Layout
 

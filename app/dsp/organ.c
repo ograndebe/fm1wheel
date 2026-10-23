@@ -18,6 +18,7 @@
 #include "fastmath.h"
 #include "organ.h"
 #include "organ_tables.h"
+#include "vibrato.h"
 
 #define NSINE 2048
 #define SINE_MASK (NSINE - 1)
@@ -49,6 +50,8 @@ static struct {
     int perc_trig_bus;
     float perc_trig_restore;
     uint8_t drawbar_changed;
+    int vib_mode, vib_upper, vib_lower;
+    vib_t vib;
     float sine[NSINE];
 } o;
 
@@ -78,8 +81,16 @@ static void wheel_sums(wheel_t *w)
         lower += w->bus[b] * o.drawbar[b];
     for (b = 18; b < 27; b++)
         pedal += w->bus[b] * o.drawbar[b];
-    w->target[0] = upper + lower + pedal;    /* swell (no scanner routing yet) */
-    w->target[1] = 0.0f;                     /* scanner */
+    w->target[0] = pedal;
+    w->target[1] = 0.0f;
+    if (o.vib_mode != VIB_OFF && o.vib_upper)
+        w->target[1] += upper;
+    else
+        w->target[0] += upper;
+    if (o.vib_mode != VIB_OFF && o.vib_lower)
+        w->target[1] += lower;
+    else
+        w->target[0] += lower;
     w->target[2] = o.perc_on ? w->bus[o.perc_send] : 0.0f;
 }
 
@@ -266,6 +277,24 @@ void organ_set_perc_decay(int fast)
     o.perc_decay = perc_decay_for(o.perc_fast);
 }
 
+void organ_set_vibrato_mode(int mode)
+{
+    if (mode < VIB_OFF)
+        mode = VIB_OFF;
+    if (mode > VIB_C3)
+        mode = VIB_C3;
+    o.vib_mode = mode;
+    vib_set_mode(&o.vib, mode);
+    o.drawbar_changed = 1;
+}
+
+void organ_set_vibrato_routing(int upper, int lower)
+{
+    o.vib_upper = upper != 0;
+    o.vib_lower = lower != 0;
+    o.drawbar_changed = 1;
+}
+
 void organ_set_perc_volume(int soft)
 {
     o.perc_soft = soft != 0;
@@ -277,10 +306,12 @@ void organ_set_perc_volume(int soft)
 
 static void render_block(float *out, int n)
 {
-    float swell[ORGAN_BLOCK], perc[ORGAN_BLOCK];
+    float swell[ORGAN_BLOCK], scan[ORGAN_BLOCK], vibout[ORGAN_BLOCK], perc[ORGAN_BLOCK];
     int i, k, wr = 0;
 
     memset(swell, 0, sizeof(float) * (size_t)n);
+    memset(scan, 0, sizeof(float) * (size_t)n);
+    memset(vibout, 0, sizeof(float) * (size_t)n);
     memset(perc, 0, sizeof(float) * (size_t)n);
 
     if (o.drawbar_changed) {
@@ -311,22 +342,26 @@ static void render_block(float *out, int n)
         uint32_t phase = w->phase, inc = wb_wheel_inc[o.active[i] + 1];
         for (k = 0; k < n; k++) {
             float x = sine_at(phase);
-            float gs, gp;
+            float gs, gv, gp;
             if (w->env_pos < ORGAN_BLOCK && w->env) {
                 float e = (float)w->env[w->env_pos] * COMP_SCALE;
                 gs = w->g0[0] + w->gd[0] * e;
+                gv = w->g0[1] + w->gd[1] * e;
                 gp = w->g0[2] + w->gd[2] * e;
                 w->env_pos++;
                 if (w->env_pos >= ORGAN_BLOCK) {
                     w->g0[0] = w->target[0];
+                    w->g0[1] = w->target[1];
                     w->g0[2] = w->target[2];
-                    w->gd[0] = w->gd[2] = 0.0f;
+                    w->gd[0] = w->gd[1] = w->gd[2] = 0.0f;
                 }
             } else {
                 gs = w->g0[0];
+                gv = w->g0[1];
                 gp = w->g0[2];
             }
             swell[k] += x * gs;
+            scan[k] += x * gv;
             perc[k] += x * gp;
             phase += inc;
         }
@@ -347,6 +382,9 @@ static void render_block(float *out, int n)
     }
     o.nactive = wr;
 
+    if (o.vib_mode != VIB_OFF)
+        vib_proc(&o.vib, scan, vibout, n);
+
     /* percussion high-pass (setBfree's HIPASS_PERCUSSION) */
     if (o.perc_on && n > 0) {
         float temp = perc[n - 1];
@@ -365,7 +403,7 @@ static void render_block(float *out, int n)
             float p = o.perc_on ? perc[i] * o.perc_env : 0.0f;
             o.current_gain += a * (target - o.current_gain);
             o.key_comp += comp_step;
-            out[i] = o.current_gain * o.key_comp * (swell[i] + p);
+            out[i] = o.current_gain * o.key_comp * (swell[i] + vibout[i] + p);
             o.perc_env *= o.perc_decay;
         }
     }
@@ -395,6 +433,7 @@ void organ_reset(void)
     o.key_comp = 1.0f;
     o.perc_env = 0.0f;
     o.pz = 0.0f;
+    vib_init(&o.vib, WB_FS);
     o.drawbar_changed = 1;
 }
 
@@ -418,5 +457,7 @@ void organ_init(void)
     o.perc_drawbar_gain = 0.60512f;
     o.perc_decay = perc_decay_for(1);
     o.perc_env = 0.0f;              /* a silent block re-arms it (setBfree does the same) */
+    o.vib_mode = VIB_OFF;
+    vib_init(&o.vib, WB_FS);
     o.drawbar_changed = 1;
 }

@@ -1,0 +1,16 @@
+# Scanner: off, V1, C1, V3; the routing is set before the first note.
+drawbars U 888000000
+swell 127
+reverb 0
+leslie stop
+wait 10
+vib route upper
+vib v1
+noteon 1 60 100
+wait 1000
+vib c1
+wait 1000
+vib v3
+wait 1000
+noteoff 1 60
+wait 500

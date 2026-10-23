@@ -18,11 +18,12 @@ The WheelBox firmware app.
 - K1..K4: the four drawbars of the current page (page 0 = 16', 5⅓', 8', 4';
   page 1 = 2⅔', 2', 1⅗', 1⅓'; page 2 = 1', percussion on/off, 2nd/3rd, fast/slow).
 - SEL: page; EDIT: manual (upper/lower/pedal); PRESET: 8 registrations.
-- ENV: percussion on/off; LFO: 2nd/3rd; FX: fast/slow; SAVE: store settings.
+- ENV: percussion on/off; LFO: vibrato/chorus cycle (OFF, V1, C1, V2, C2, V3, C3);
+  PLAY: percussion 2nd/3rd; FX: fast/slow; SAVE: store settings.
 - MIDI in (USB/TRS): channels 1/2/3 = upper/lower/pedal; CC 1/11 swell,
   70–78 drawbars, 80/81/82 percussion, program change = preset.
 
-The scanner vibrato and the preamp/reverb/Leslie chain are the next slices.
+The scanner is in (Phase 1b); the preamp/reverb/Leslie chain is next.
 
 ## Build and test
 
