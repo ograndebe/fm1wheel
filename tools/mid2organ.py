@@ -145,11 +145,12 @@ def write_pcm16(path, rate, x):
 
 def convert(raw, out, normalize):
     rate, x = read_float_wav(raw)
-    x *= 4.0
-    x = x / (1.0 + np.abs(x))                  # the app's soft clip at MASTER max
+    # The renderer already has the engine's own gain. Do not add the app's 4x
+    # soft clip here: on a dense four-track organ mix it saturates. Keep a
+    # linear -1 dBFS ceiling; normalize the stems/mix if asked.
     peak = float(np.max(np.abs(x))) if x.size else 0.0
-    if peak > 0.9 or (normalize and peak > 0):
-        x *= 0.9 / peak
+    if peak > 0 and (normalize or peak > 0.89):
+        x *= 0.89 / peak
     write_pcm16(out, rate, x)
     os.remove(raw)
 
@@ -170,7 +171,7 @@ def main():
     ap.add_argument("--tail", type=int, default=1500)
     ap.add_argument("--seconds", type=float, default=0, help="render only the first N seconds")
     ap.add_argument("--stems", action="store_true", help="render each selected track too")
-    ap.add_argument("--normalize", action="store_true", help="normalize each output to -1 dBFS")
+    ap.add_argument("--normalize", action="store_true", help="normalize each output to -1 dBFS (linear, no soft clip)")
     ap.add_argument("--no-render", action="store_true", help="write the isolated MIDI and scripts only")
     args = ap.parse_args()
 
