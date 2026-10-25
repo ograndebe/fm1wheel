@@ -1,4 +1,4 @@
-# Host renderer for the WheelBox organ engine. GPL-3.0-or-later.
+# Host renderer for the fm1-wheel organ engine. GPL-3.0-or-later.
 CC ?= cc
 PY ?= ../../.venv/bin/python
 CFLAGS ?= -O2 -g -std=c99 -Wall -Wextra -ffp-contract=off \

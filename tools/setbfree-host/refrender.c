@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later
- * Reference renderer for WheelBox: the unmodified setBfree DSP (tonegen,
+ * Reference renderer for fm1-wheel: the unmodified setBfree DSP (tonegen,
  * scanner, preamp, reverb, Leslie) driven by a small text script.
  *
  * This is the "golden" side of the A/B tests. It is a host tool, not firmware.

@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later
- * WheelBox organ engine.
+ * fm1-wheel organ engine.
  *
  * The tone generator is a port of setBfree's src/tonegen.c (GPL-2.0-or-later),
  * Copyright (C) 2003-2004 Fredrik Kilander, 2008-2018 Robin Gareus,

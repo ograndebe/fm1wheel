@@ -1,4 +1,4 @@
-# WheelBox: host build, host tests, the setBfree reference and the device build.
+# fm1-wheel: host build, host tests, the setBfree reference and the device build.
 # The device build needs Docker, the JieLi toolchain and the AC79 SDK; see README.md.
 
 PY ?= ./.venv/bin/python
@@ -13,7 +13,7 @@ build-host:
 	$(PY) fm1-base/tools/build.py app --host
 
 test-host: build-host
-	./app/build/host/wheelbox_host app/tests/basic.txt app/build/host
+	./app/build/host/fm1-wheel_host app/tests/basic.txt app/build/host
 
 web:
 	$(PY) fm1-base/tools/build.py app --web
@@ -42,7 +42,7 @@ device:
 	AC79_SDK="$(AC79_SDK)" JIELI_TOOLCHAIN="$(JIELI_TOOLCHAIN)" $(PY) fm1-base/tools/build.py app
 
 install: device
-	$(PY) fm1-base/tools/fm1_install.py app/build/wheelbox.fwsc
+	$(PY) fm1-base/tools/fm1_install.py app/build/fm1-wheel.fwsc
 
 clean:
 	rm -rf app/build

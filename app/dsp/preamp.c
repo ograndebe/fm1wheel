@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later
- * WheelBox preamp/overdrive, after setBfree's b_overdrive/overdrive.c
+ * fm1-wheel preamp/overdrive, after setBfree's b_overdrive/overdrive.c
  * Copyright (C) 2003-2004 Fredrik Kilander, 2008-2018 Robin Gareus,
  * 2012 Will Panther. GPL-2.0-or-later.
  *

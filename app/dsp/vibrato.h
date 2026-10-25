@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later
- * WheelBox scanner vibrato/chorus: a float port of setBfree's src/vibrato.c
+ * fm1-wheel scanner vibrato/chorus: a float port of setBfree's src/vibrato.c
  * (GPL-2.0-or-later, Copyright (C) 2003-2004 Fredrik Kilander, 2008-2018
  * Robin Gareus). The tables are built at init with fastmath's fm_sinf. */
 #pragma once

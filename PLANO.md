@@ -22,7 +22,7 @@ preamp e o reverb foram portados com A/B contra o setBfree:
 O **emulador web** compila com Emscripten e roda em `app/build/emu/`
 (`make serve-web` → http://localhost:8790/), com a mesma cadeia e a mesma UI do
 device. O build de device também roda nesta máquina via **Colima + Rosetta**
-(`colima start --vz-rosetta`). Pacote gerado: `app/build/wheelbox.fwsc`
+(`colima start --vz-rosetta`). Pacote gerado: `app/build/fm1-wheel.fwsc`
 (611.354 B), app 315.520 B, `.data+.bss` 77.300 B de 98.304, pool 180.844 B de
 344.064, sem soft-double. Falta apenas conectar o FM-1 e gravar/medir; até lá, o emulador web é o
 ambiente de trabalho interativo.
@@ -336,7 +336,7 @@ Estimativas para uma pessoa focada. Some 30–50% se for em paralelo com outras 
 - [x] `tools/setbfree-host/refrender`: cadeia completa do setBfree (tonegen → preamp → reverb → whirl) em WAV float.
 - [x] `tools/setbfree-host/dump_tables`: `wheel_inc`, `wheel_att`, `key_contrib`, `key_comp`, envelopes.
 - [ ] Instalar Docker Desktop, toolchain JieLi e SDK AC79.
-- [x] Compilar o firmware no device via Colima/Rosetta (pacote `wheelbox.fwsc`).
+- [x] Compilar o firmware no device via Colima/Rosetta (pacote `fm1-wheel.fwsc`).
 - [ ] Gravar no FM-1 e testar boot, tela, teclas, áudio, USB-MIDI, TRS, update, recovery.
 
 **Aceite:** host OK; falta o teste no device (Docker/toolchain/SDK).
@@ -446,7 +446,7 @@ Estimativas para uma pessoa focada. Some 30–50% se for em paralelo com outras 
    git clone --depth 1 --branch AC79NN_SDK_V1.2.1_2023-12-13 \
        https://gitee.com/Jieli-Tech/fw-AC79_AIoT_SDK.git ~/fw-AC79_AIoT_SDK
    make device
-   python3 fm1-base/tools/fm1_install.py app/build/wheelbox.fwsc
+   python3 fm1-base/tools/fm1_install.py app/build/fm1-wheel.fwsc
    ```
    Requer Docker Desktop (o toolchain é Linux x86-64; no Apple Silicon roda via Rosetta).
    Testar boot, tela, teclas, áudio, USB-MIDI, TRS, update e recovery.
@@ -482,7 +482,7 @@ Defaults que adotei (diga se quer outro caminho):
 3. **Licença:** GPL-3.0-or-later.
 4. **Escopo v1:** upper manual, drawbars, percussão, vibrato/chorus, drive, reverb, Leslie; sem BLE/WiFi/segundo core/editor web.
 5. **Leslie:** 1.024 posições (89 KB, -50 dB) — se você tiver ouvido exigente, testamos 2.048.
-6. **Nome do produto:** adotei **WheelBox** como placeholder (neutral, sem marcas). Trocar é barato enquanto o `id_prefix` (`FM-1_12`) ainda não foi publicado.
+6. **Nome do produto:** **fm1-wheel**, em referência às tonewheels. O `id_prefix` do pacote continua `FM-1_12` para não invalidar instalações.
 
 A Fase 0 está feita no host. O próximo passo é o ambiente de device (Docker + toolchain + SDK), gravar o template no FM-1 e então começar a Fase 1 (port do tonegen).
 

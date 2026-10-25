@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later
- * WheelBox organ engine: a port of setBfree's tone generator (GPL-2.0-or-later)
+ * fm1-wheel organ engine: a port of setBfree's tone generator (GPL-2.0-or-later)
  * to phase-accumulator sine wheels. One instance, called from the audio block.
  *
  * Keys are setBfree's key numbers:

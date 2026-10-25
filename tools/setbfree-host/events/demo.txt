@@ -1,4 +1,4 @@
-# WheelBox reference script: a chord, a drawbar change, percussion and the
+# fm1-wheel reference script: a chord, a drawbar change, percussion and the
 # Leslie ramping to fast. Times are implicit: each event applies at the next
 # 128-sample block (2.9 ms at 44.1 kHz).
 

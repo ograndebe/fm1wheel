@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later
- * Dump the tables the WheelBox firmware needs from the unmodified setBfree
+ * Dump the tables the fm1-wheel firmware needs from the unmodified setBfree
  * tone generator: wheel frequencies/attenuations, the key-contact matrix,
  * the key-compression curve and the click envelopes.
  *

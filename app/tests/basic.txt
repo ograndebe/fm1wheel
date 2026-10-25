@@ -1,6 +1,6 @@
-# WheelBox smoke test: the organ engine, the 27-key page and the settings.
+# fm1-wheel smoke test: the organ engine, the 27-key page and the settings.
 # Build: make build-host
-# Run:   app/build/host/wheelbox_host app/tests/basic.txt app/build/host
+# Run:   app/build/host/fm1-wheel_host app/tests/basic.txt app/build/host
 wait 600
 shot boot.png
 key 7 down

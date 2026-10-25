@@ -1,4 +1,4 @@
-# WheelBox
+# fm1-wheel
 
 A tonewheel organ firmware for the **M-VAVE FM-1**, after
 [setBfree](https://github.com/pantherb/setBfree), on
@@ -43,11 +43,11 @@ Then:
 
 ```sh
 make build-host          # fm1-base/tools/build.py app --host
-make test-host           # app/build/host/wheelbox_host app/tests/basic.txt app/build/host
+make test-host           # app/build/host/fm1-wheel_host app/tests/basic.txt app/build/host
 make web                 # the browser emulator in app/build/emu/
 make serve-web           # builds it and serves http://localhost:8790/
 make ref                 # setBfree reference renders (tools/setbfree-host/build)
-make organ-test          # the same scripts through the WheelBox engine
+make organ-test          # the same scripts through the fm1-wheel engine
 make compare             # A/B: correlation, null depth, band levels
 make tables              # regenerates app/dsp/organ_tables.h
 make whirl-tables        # regenerates app/dsp/whirl_tables.h
@@ -97,11 +97,11 @@ Rosetta). Docker Desktop also works. Then:
 fm1-base/tools/get_toolchain.sh
 git clone --depth 1 --branch AC79NN_SDK_V1.2.1_2023-12-13 \
     https://gitee.com/Jieli-Tech/fw-AC79_AIoT_SDK.git ~/fw-AC79_AIoT_SDK
-make device                 # app/build/wheelbox.fwsc
+make device                 # app/build/fm1-wheel.fwsc
 make install                # asks before writing; the FM-1 must be connected
 ```
 
-The 2026-10-23 build: app 315,520 B, package 611,354 B, `.data+.bss` 77,300 B
+The 2026-10-25 build: app 316,040 B, package 611,354 B, `.data+.bss` 77,364 B
 of 98,304, pool 180,844 B of 344,064, no soft-double routines.
 
 Flashing is at your own risk. Keep the official firmware and the recovery
@@ -114,5 +114,5 @@ finishes the write.
 The firmware as a whole is **GPL-3.0-or-later**: the setBfree-derived DSP is
 GPL-2.0-or-later, fm1-base and felucca-bsp are MPL-2.0, and JieLi's SDK files
 are Apache-2.0. File-level notices are kept; see [LICENSING.md](LICENSING.md).
-"Hammond", "B3" and "Leslie" are trademarks of their owners; WheelBox is not
+"Hammond", "B3" and "Leslie" are trademarks of their owners; fm1-wheel is not
 affiliated with or endorsed by them.

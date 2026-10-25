@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later
- * WheelBox preamp/overdrive, after setBfree's b_overdrive/overdrive.c
+ * fm1-wheel preamp/overdrive, after setBfree's b_overdrive/overdrive.c
  * (GPL-2.0-or-later). Static instance, no config/MIDI registration, no libm. */
 #pragma once
 

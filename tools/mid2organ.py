@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""Isolate the organ tracks of a MIDI file and render them through WheelBox.
+"""Isolate the organ tracks of a MIDI file and render them through fm1-wheel.
 
 The renderer is tools/organ-test/render, the same engine the app/emulator use.
 The selected tracks are merged into one performance (upper manual, with notes

@@ -1,11 +1,11 @@
 # Licences
 
-WheelBox combines components under several free-software licences. The
+fm1-wheel combines components under several free-software licences. The
 combined firmware is distributed under **GPL-3.0-or-later**.
 
 | Component | Files | Licence |
 |---|---|---|
-| WheelBox app, DSP port, tools | `app/`, `tools/` | GPL-3.0-or-later |
+| fm1-wheel app, DSP port, tools | `app/`, `tools/` | GPL-3.0-or-later |
 | setBfree | `third_party/setBfree/`, `tools/setbfree-host/` | GPL-2.0-or-later |
 | fm1-base | `fm1-base/` | MPL-2.0 (file by file) |
 | felucca-bsp | `fm1-base/bsp/` | MPL-2.0 (file by file) |

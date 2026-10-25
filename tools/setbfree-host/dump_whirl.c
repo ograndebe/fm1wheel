@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later
- * Host-only dumper for the WheelBox Leslie: initializes setBfree's whirl at
+ * Host-only dumper for the fm1-wheel Leslie: initializes setBfree's whirl at
  * 1,024 displacement positions and writes the static tables the firmware
  * needs. Not firmware. */
 #include <stdio.h>

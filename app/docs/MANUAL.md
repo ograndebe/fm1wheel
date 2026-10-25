@@ -1,4 +1,4 @@
-# WheelBox manual
+# fm1-wheel manual
 
 The hardware manual — controls, the drawbar-key mode, MIDI, settings and
 troubleshooting — is in the repository root:

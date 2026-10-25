@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later
- * WheelBox reverb, after setBfree's b_reverb/reverb.c (GPL-2.0-or-later).
+ * fm1-wheel reverb, after setBfree's b_reverb/reverb.c (GPL-2.0-or-later).
  * Static delay pool (in .pool) and no config/MIDI registration. */
 #pragma once
 

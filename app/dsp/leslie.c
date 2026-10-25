@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later
- * WheelBox Leslie, after setBfree's b_whirl/whirl.c
+ * fm1-wheel Leslie, after setBfree's b_whirl/whirl.c
  * Copyright (C) 2003-2004 Fredrik Kilander, 2008-2018 Robin Gareus,
  * 2010 Ken Restivo, 2012 Will Panther. GPL-2.0-or-later.
  *

@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later
  * Copyright (C) 2026 Rafael
- * WheelBox: FM-1 tonewheel organ app. Phase 1: the setBfree-derived tone
+ * fm1-wheel: FM-1 tonewheel organ app. Phase 1: the setBfree-derived tone
  * generator is live; this UI is a working drawbar page, not the final one.
  * The small text/note helpers are adapted from fm1-base's template app.c
  * (MPL-2.0, Copyright (C) 2026 Charles Vestal). */

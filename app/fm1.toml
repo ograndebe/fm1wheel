@@ -1,8 +1,8 @@
-# WheelBox build settings (fm1-base tools/build.py)
-name = "wheelbox"              # the build's file names (lower case); APP_NAME is in app.h
+# fm1-wheel build settings (fm1-base tools/build.py)
+name = "fm1-wheel"              # the build's file names (lower case); APP_NAME is in app.h
 id_prefix = "FM-1_12"          # package identity: dev FM-1_1200, releases FM-1_12XXYYZZ
-usb_manufacturer = "WheelBox"
-usb_product = "WHEELBOX FM-1"
+usb_manufacturer = "fm1-wheel"
+usb_product = "FM1-WHEEL FM-1"
 o2 = ["dsp/*.c"]               # the organ DSP at -O2
 words = "words.tsv"
 # the site (tools/make_site.py, tools/publish_site.sh)

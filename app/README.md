@@ -1,6 +1,6 @@
 # app
 
-The WheelBox firmware app.
+The fm1-wheel firmware app.
 
 | File | What |
 |---|---|

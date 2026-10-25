@@ -1,13 +1,13 @@
 /* SPDX-License-Identifier: MPL-2.0
  * Copyright (C) 2026 Charles Vestal
  * Copyright (C) 2026 Rafael */
-/* WheelBox: the app's half of the fm1-base contract. Phase 1: the tone
+/* fm1-wheel: the app's half of the fm1-base contract. Phase 1: the tone
  * generator is live; the full drawbar/MIDI UI comes in Phase 3. */
 #pragma once
 #include <stdint.h>
 #include "plat.h"
 
-#define APP_NAME "WHEELBOX"
+#define APP_NAME "FM1-WHEEL"
 #define APP_SPLASH_RGB RGB(242, 120, 72)
 #define APP_BLOCK 128u                   /* 2.9 ms at 44.1 kHz: organ key latency */
 

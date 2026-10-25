@@ -1,4 +1,4 @@
-# WheelBox — manual do hardware
+# fm1-wheel — manual do hardware
 
 **Português** · [English](MANUAL.en.md)
 
@@ -20,7 +20,7 @@ O firmware é instalado por USB-MIDI. É preciso o FM-1 conectado por um cabo US
 de **dados** e nenhum outro aplicativo usando as portas MIDI do aparelho.
 
 ```sh
-make device          # gera app/build/wheelbox.fwsc
+make device          # gera app/build/fm1-wheel.fwsc
 make install         # mostra o aparelho e pede confirmação antes de gravar
 ```
 
@@ -47,7 +47,7 @@ MASTER e a tela de 240×240.
 - Um controlador MIDI externo (USB ou TRS) pode tocar qualquer manual; veja a
   seção 5.
 
-![WheelBox no emulador](docs/img/emulator.png)
+![fm1-wheel no emulador](docs/img/emulator.png)
 
 A tela mostra:
 
@@ -246,6 +246,6 @@ O firmware é **GPL-3.0-or-later**. O setBfree é GPL-2.0-or-later; fm1-base e
 felucca-bsp são MPL-2.0; os arquivos do SDK JieLi são Apache-2.0. Veja
 `LICENSING.md` e `LICENSES/`.
 
-“Hammond”, “B3” e “Leslie” são marcas de seus proprietários. O WheelBox não é
+“Hammond”, “B3” e “Leslie” são marcas de seus proprietários. O fm1-wheel não é
 afiliado nem endossado por eles. Use “tonewheel organ” e “rotary speaker” em
 material público.

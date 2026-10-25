@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later
- * Host renderer for the WheelBox organ engine. Same event format as
+ * Host renderer for the fm1-wheel organ engine. Same event format as
  * tools/setbfree-host/refrender (the subset the dry engine implements).
  *
  * Build: make -C tools/organ-test
