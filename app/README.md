@@ -16,6 +16,10 @@ The DSP in `dsp/` is a port of setBfree's algorithms. The platform, host
 simulator and browser emulator come from fm1-base, which pins felucca-bsp as
 `fm1-base/bsp`. The exact licences and obligations are in `../LICENSING.md`.
 
+The fm1-wheel code, DSP port, tests, tools and documentation were developed
+with **OpenCode** using **DeepSeek V4.1 Flash**, under human direction and
+review.
+
 ## Files
 
 | File | What |

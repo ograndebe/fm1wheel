@@ -249,3 +249,9 @@ felucca-bsp são MPL-2.0; os arquivos do SDK JieLi são Apache-2.0. Veja
 “Hammond”, “B3” e “Leslie” são marcas de seus proprietários. O fm1-wheel não é
 afiliado nem endossado por eles. Use “tonewheel organ” e “rotary speaker” em
 material público.
+
+### Desenvolvimento
+
+O código, o port do DSP, os testes, as ferramentas e a documentação do
+fm1-wheel foram desenvolvidos com **OpenCode** usando **DeepSeek V4.1 Flash**,
+sob direção e revisão humanas.

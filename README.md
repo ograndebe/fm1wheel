@@ -116,3 +116,11 @@ GPL-2.0-or-later, fm1-base and felucca-bsp are MPL-2.0, and JieLi's SDK files
 are Apache-2.0. File-level notices are kept; see [LICENSING.md](LICENSING.md).
 "Hammond", "B3" and "Leslie" are trademarks of their owners; fm1-wheel is not
 affiliated with or endorsed by them.
+
+## Credits and AI assistance
+
+The fm1-wheel code, DSP port, tests, tools and documentation were developed
+with **OpenCode** using **DeepSeek V4.1 Flash**, under human direction and
+review. The base projects and their authors are credited in
+[`app/README.md`](app/README.md) and in the file headers; the licences are in
+[`LICENSING.md`](LICENSING.md).
