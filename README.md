@@ -1,5 +1,7 @@
 # fm1-wheel
 
+**Site:** https://ograndebe.github.io/fm1wheel/ · **Source:** https://github.com/ograndebe/fm1wheel
+
 A tonewheel organ firmware for the **M-VAVE FM-1**, after
 [setBfree](https://github.com/pantherb/setBfree), on
 [fm1-base](https://github.com/charlesvestal/fm1-base) and
@@ -26,6 +28,7 @@ analysis and roadmap.
 | `tools/setbfree-host/` | Host-only reference renderer and table dumper (GPL-2.0-or-later) |
 | `MANUAL.md` | Hardware manual (pt-BR): controls, drawbar-key mode, MIDI, settings |
 | `MANUAL.en.md` | Hardware manual (English) |
+| `docs/` | Static site (landing, manual, installer, emulator, firmware) |
 | `PLANO.md` | Analysis, architecture, risks, roadmap |
 
 ## Host quick start
@@ -46,6 +49,7 @@ make build-host          # fm1-base/tools/build.py app --host
 make test-host           # app/build/host/fm1-wheel_host app/tests/basic.txt app/build/host
 make web                 # the browser emulator in app/build/emu/
 make serve-web           # builds it and serves http://localhost:8790/
+make site                # static site in docs/ (GitHub Pages)
 make ref                 # setBfree reference renders (tools/setbfree-host/build)
 make organ-test          # the same scripts through the fm1-wheel engine
 make compare             # A/B: correlation, null depth, band levels

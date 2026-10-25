@@ -5,7 +5,7 @@ PY ?= ./.venv/bin/python
 AC79_SDK ?= $(HOME)/fw-AC79_AIoT_SDK
 JIELI_TOOLCHAIN ?= $(HOME)/.jieli/toolchain
 
-.PHONY: all build-host test-host web serve-web ref tables whirl-tables organ-test compare device install clean
+.PHONY: all build-host test-host web serve-web site ref tables whirl-tables organ-test compare device install clean
 
 all: build-host ref
 
@@ -21,6 +21,9 @@ web:
 serve-web: web
 	@echo "open http://localhost:8790/"
 	$(PY) -m http.server -d app/build/emu 8790
+
+site:
+	AC79_SDK="$(AC79_SDK)" JIELI_TOOLCHAIN="$(JIELI_TOOLCHAIN)" $(PY) tools/site/build_site.py --version 0.1
 
 ref:
 	$(MAKE) -C tools/setbfree-host check

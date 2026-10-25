@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>fm1-wheel: fm1-wheel — hardware manual</title>
+<meta name="description" content="fm1-wheel — hardware manual for fm1-wheel, a firmware for the M-VAVE FM-1.">
+<style>
+/* paper and ink: warm white paper, ink-blue type, vermilion for what is played, mustard for asides; a shade of the
+   paper for code and callouts (CTL-1's; a firmware may restyle its site) */
+:root {
+  --paper: #fbf8f1; --sheet: #efe9dc; --rule: #ddd4c2; --ink: #1e2b5a; --muted: #5d6585;
+  --hot: #e5482e; --hot-t: #f8d3c9; --cool: #d9a21b; --cool-t: #f5e4b8;
+  --hot-ink: #c23a22;                                 /* the vermilion as text: 4.5:1 on the paper */
+  color-scheme: light;
+}
+body {
+  background: var(--paper); color: var(--ink); margin: 0;
+  font: 400 17px/1.6 "Helvetica Neue", Helvetica, Arial, sans-serif;
+  padding-inline: 16px; padding-block: 32px 64px;
+}
+main { max-width: 46rem; margin: 0 auto; }
+.page > .site { max-width: 46rem; margin-inline: auto; }
+main:focus { outline: none; }
+h1, h2, h3 { font-family: inherit; text-wrap: balance; line-height: 1.2; }
+h1 { font-size: 2.2rem; font-weight: 700; margin: 0 0 .4rem; letter-spacing: .02em; }
+h2 { font-size: 1.3rem; font-weight: 700; margin: 3rem 0 .8rem; padding-top: .8rem; border-top: 2px solid var(--ink); }
+h2 .num { color: var(--hot); margin-right: .5em; font-variant-numeric: tabular-nums; }
+h3 { font-size: 1.1rem; font-weight: 700; margin: 2rem 0 .5rem; }
+p, li { max-width: 65ch; }
+p { margin: 0 0 1rem; }
+ul, ol { padding-left: 1.3rem; margin: 0 0 1rem; }
+li { margin: .2rem 0; }
+li::marker { color: var(--hot); }
+strong { font-weight: 700; }
+a { color: var(--ink); text-decoration-color: var(--hot); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+a:hover { background: var(--hot-t); }
+:focus-visible { outline: 3px solid var(--hot-ink); outline-offset: 2px; }
+.skip { position: absolute; left: 16px; top: -100px; background: var(--ink); color: var(--paper); padding: 8px 14px; border-radius: 0 0 6px 6px; z-index: 1; }
+.skip:focus { top: 0; }
+code, pre { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .86em; }
+code { background: var(--sheet); padding: .08em .35em; border-radius: 3px; }
+pre { background: var(--sheet); border-radius: 6px; padding: 14px 16px; overflow-x: auto; line-height: 1.45; margin: 0 0 1.2rem; }
+pre code { background: none; padding: 0; font-size: inherit; }
+hr { display: none; }
+.table { overflow-x: auto; margin: 0 0 1.3rem; }
+table { border-collapse: collapse; width: 100%; font-size: .95rem; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; vertical-align: top; padding: .45rem .7rem .45rem 0; border-bottom: 1px solid var(--rule); }
+th { font-weight: 700; text-transform: uppercase; letter-spacing: .06em; font-size: .78rem; color: var(--muted); border-bottom: 2px solid var(--ink); }
+td:first-child { white-space: nowrap; }
+.lede { margin-bottom: 1.6rem; }
+.status { background: var(--sheet); border-radius: 6px; padding: 12px 16px; }
+.status p { margin: 0; }
+.site { display: flex; flex-wrap: wrap; align-items: baseline; gap: .3rem 1.2rem; margin: 0 0 1.6rem; padding-bottom: .5rem; border-bottom: 2px solid var(--ink); }
+.site .home { font-size: 1.1rem; font-weight: 700; letter-spacing: .04em; color: var(--ink); text-decoration: none; }
+.site .home:hover { color: var(--hot-ink); background: none; }
+.site nav { margin-left: auto; display: flex; flex-wrap: wrap; gap: .2rem 1rem; font-size: .92rem; }
+.site nav a { color: var(--ink); text-underline-offset: 3px; }
+.site nav a[aria-current] { text-decoration: none; color: var(--hot-ink); }
+a.home { color: inherit; text-decoration: none; }
+a.home:hover { background: none; color: var(--hot-ink); }
+main > a.home { display: inline-block; font-size: .9rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 0 .4rem; }
+.callout { border-left: 4px solid var(--cool); background: var(--cool-t); padding: 10px 16px; margin: 0 0 1.2rem; max-width: 65ch; border-radius: 0 6px 6px 0; }
+.callout p { margin: 0; }
+details { background: var(--sheet); border-radius: 6px; padding: 0 16px; margin: 0 0 1.2rem; }
+details > summary { cursor: pointer; padding: 10px 0; }
+details[open] > summary { margin-bottom: .4rem; }
+details > :last-child { margin-bottom: 1rem; }
+.swatch { display: inline-block; width: .7em; height: .7em; margin-right: .4em; vertical-align: .02em; }
+nav.contents ol { columns: 2 14rem; column-gap: 2rem; padding-left: 1.3rem; }
+.figs { display: flex; flex-wrap: wrap; gap: 20px; margin: .4rem 0 1.6rem; }
+figure { margin: 0; flex: 0 1 auto; }
+figure img { display: block; max-width: 100%; height: auto; }
+figure.shot img { width: 300px; image-rendering: pixelated; border-radius: 4px; box-shadow: 0 0 0 1px var(--rule); }
+figure.wide { flex-basis: 100%; }
+figure.wide img { width: 100%; }
+figcaption { color: var(--muted); font-size: .88rem; margin-top: .4rem; max-width: 300px; }
+figure.wide figcaption { max-width: none; }
+nav.contents li { break-inside: avoid; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+</style>
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../../style.css">
+</head>
+<body class="manual">
+<nav class="topnav"><div class="wrap navwrap"><a class="brand" href="../../">fm1-wheel</a><nav class="navlinks" aria-label="Site"><a href="../../manual/">Manual PT</a><a href="../../manual/en/">English</a><a href="../../emu/">Experimentar</a><a href="../../install/">Instalar</a><a class="github" href="https://github.com/ograndebe/fm1wheel">GitHub ↗</a></nav></div></nav>
+
+<a class="skip" href="#content">Skip to content</a>
+<div class="page">
+<main id="content" tabindex="-1">
+<a class="home" href="../">fm1-wheel</a>
+<h1>fm1-wheel — hardware manual</h1>
+<p><a href="../">Português</a> · <strong>English</strong></p>
+<p>Tonewheel organ firmware for the <strong>M-VAVE FM-1</strong>, derived from <a href="https://github.com/pantherb/setBfree">setBfree</a>, running on <a href="https://github.com/charlesvestal/fm1-base">fm1-base</a>.</p>
+<div class="callout"><p><strong>Status:</strong> the firmware builds for the FM-1 and passes the build checks, but it has <strong>not been tested on hardware yet</strong>. The host simulator and the web emulator run the full chain (tone generator, scanner, preamp, reverb and Leslie). This manual describes the intended/implemented behaviour; keyboard and performance details may change after the first device test.</p></div>
+<hr>
+<h2 id="s1"><span class="num">1</span>Install</h2>
+<p>The firmware is installed over USB-MIDI. Connect the FM-1 with a USB <strong>data</strong> cable and close any other application using its MIDI ports.</p>
+<pre tabindex="0" role="region" aria-label="Command: Install"><code>make device          # builds app/build/fm1-wheel.fwsc
+make install         # shows the device and asks before writing</code></pre>
+<p>You can also use the project's web installer (Chrome/Edge) or run <code>fm1_install.py</code> directly. Installing firmware is at your own risk. Keep the official firmware and the recovery tools (<code>fm1-base/bsp/tools/fm1_rescue.py</code>, <code>FM-1-transporter</code>) at hand.</p>
+<p>If the install is interrupted, the FM-1 stays in update mode and the same command finishes the write. To go back to the official firmware, use M-VAVE's updater or the web installer.</p>
+<hr>
+<h2 id="s2"><span class="num">2</span>Power on and play</h2>
+<p>The FM-1 has <strong>27 keys</strong> (F3–G5), 7 encoders, 14 buttons, a MASTER pot and a 240×240 screen.</p>
+<ul><li>The keys play the <strong>upper manual</strong> by default.</li><li><code>OCT-</code> / <code>OCT+</code> transpose the built-in keyboard by up to ±2 octaves. External MIDI is <strong>not</strong> transposed by these buttons.</li><li>The MASTER pot controls the output level.</li><li>An external MIDI controller (USB or TRS) can play any manual; see section 5.</li></ul>
+<div class="figs"><figure class="shot"><img src="img/emulator.png" alt="fm1-wheel in the emulator" loading="lazy"><figcaption>fm1-wheel in the emulator</figcaption></figure></div>
+<p>The screen shows:</p>
+<ul><li><strong>header:</strong> name, the note that is sounding, and CPU load;</li><li><strong>body:</strong> selected manual, registration, percussion, vibrato and the nine drawbar columns with the 16', 5⅓', 8', 4', 2⅔', 2', 1⅗', 1⅓', 1' footages;</li><li><strong>footer:</strong> octave, page, volume, rotor, SAVE state, drive and reverb.</li></ul>
+<hr>
+<h2 id="s3"><span class="num">3</span>Buttons and encoders</h2>
+<h3 id="encoders">Encoders</h3>
+<div class="table" tabindex="0" role="region" aria-label="Table: Encoders (Encoder, Function)"><table><thead><tr><th>Encoder</th><th>Function</th></tr></thead><tbody><tr><td><code>SELECT</code></td><td>edit page: 0 = bars 0–3, 1 = bars 4–7, 2 = bar 8 + percussion</td></tr><tr><td><code>ALGO</code></td><td>manual being edited: UPPER, LOWER, PEDAL</td></tr><tr><td><code>PRESET</code></td><td>eight factory registrations; applies to the selected manual</td></tr><tr><td><code>K1</code>–<code>K4</code></td><td>edit the four bars of the current page</td></tr></tbody></table></div>
+<p>On page 2, <code>K1</code> edits the 1' bar and <code>K2</code>–<code>K4</code> control percussion (on/off), harmonic (2nd/3rd) and decay (fast/slow).</p>
+<h3 id="buttons">Buttons</h3>
+<div class="table" tabindex="0" role="region" aria-label="Table: Buttons (Button, Function)"><table><thead><tr><th>Button</th><th>Function</th></tr></thead><tbody><tr><td><code>FX</code></td><td>drive on/off (preamp/overdrive)</td></tr><tr><td><code>SEL</code></td><td>next drawbar page</td></tr><tr><td><code>ENV</code></td><td>percussion on/off</td></tr><tr><td><code>LFO</code></td><td>vibrato/chorus cycle: OFF → V1 → C1 → V2 → C2 → V3 → C3</td></tr><tr><td><code>EDIT</code></td><td>next manual: UPPER → LOWER → PEDAL</td></tr><tr><td><code>GLO</code></td><td><strong>drawbar-key mode</strong> (section 4); its LED is lit while the mode is on</td></tr><tr><td><code>HOME</code></td><td>back to registration 0 (3BAR)</td></tr><tr><td><code>SAVE</code></td><td>write the settings to flash</td></tr><tr><td><code>ARP</code></td><td>percussion 2nd/3rd harmonic</td></tr><tr><td><code>SEQ</code></td><td>reverb cycle: OFF → 30% → 60% → 100%</td></tr><tr><td><code>PLAY</code></td><td>rotor: STOP → SLOW → FAST</td></tr><tr><td><code>REC</code></td><td>reserved (no function in this version)</td></tr><tr><td><code>OCT-</code> / <code>OCT+</code></td><td>transpose the built-in keyboard (−2..+2 octaves)</td></tr><tr><td><code>MASTER</code></td><td>output volume</td></tr></tbody></table></div>
+<p>The labels printed on the FM-1 are the stock ones; the screen shows the real function of each control.</p>
+<h3 id="factory-registrations">Factory registrations</h3>
+<div class="table" tabindex="0" role="region" aria-label="Table: Factory registrations (#, Name, Bars)"><table><thead><tr><th>#</th><th>Name</th><th>Bars</th></tr></thead><tbody><tr><td>0</td><td>3BAR</td><td>888000000</td></tr><tr><td>1</td><td>BLUES</td><td>888800000</td></tr><tr><td>2</td><td>ROCK</td><td>888000008</td></tr><tr><td>3</td><td>TOPS</td><td>800000888</td></tr><tr><td>4</td><td>FLUTE</td><td>008000000</td></tr><tr><td>5</td><td>FULL</td><td>888888888</td></tr><tr><td>6</td><td>BASS</td><td>858000000</td></tr><tr><td>7</td><td>STRNG</td><td>006876540</td></tr></tbody></table></div>
+<p>The registration is applied to the selected manual (<code>ALGO</code>/<code>EDIT</code>).</p>
+<hr>
+<h2 id="s4"><span class="num">4</span>Drawbar-key mode (the keyboard as a controller)</h2>
+<p><code>GLO</code> turns on/off the mode in which the 27 keys stop playing and edit the drawbars of the selected manual. It is the equivalent of the programming mode on older clonewheel organs.</p>
+<ul><li><strong>Mode on:</strong> the built-in keys <strong>do not play</strong>; each press raises or lowers one drawbar by one position. External MIDI <strong>keeps playing</strong> — you can play from a controller and use the FM-1 keyboard to edit the registration.</li><li><strong>Mode off:</strong> the keys play normally again.</li><li>The mode is not saved: it starts off at the next boot.</li><li>Drawbar changes mark <code>SAVE</code>; press <code>SAVE</code> to store them.</li></ul>
+<h3 id="key-map">Key map</h3>
+<p>Each pair <strong>flat (black key) / natural (white key)</strong> controls one drawbar:</p>
+<div class="table" tabindex="0" role="region" aria-label="Table: Key map (Pair, Drawbar, Action)"><table><thead><tr><th>Pair</th><th>Drawbar</th><th>Action</th></tr></thead><tbody><tr><td>F#3 / G3</td><td>16'</td><td>F# up, G down</td></tr><tr><td>G#3 / A3</td><td>5⅓'</td><td>G# up, A down</td></tr><tr><td>A#3 / B3</td><td>8'</td><td>A# up, B down</td></tr><tr><td>C#4 / D4</td><td>4'</td><td>C# up, D down</td></tr><tr><td>D#4 / E4</td><td>2⅔'</td><td>D# up, E down</td></tr><tr><td>F#4 / G4</td><td>2'</td><td>F# up, G down</td></tr><tr><td>G#4 / A4</td><td>1⅗'</td><td>G# up, A down</td></tr><tr><td>A#4 / B4</td><td>1⅓'</td><td>A# up, B down</td></tr><tr><td>C#5 / D5</td><td>1'</td><td>C# up, D down</td></tr></tbody></table></div>
+<ul><li><strong>F3, C4, F4 and C5</strong> are ignored.</li><li><strong>D#5, E5, F5, F#5 and G5</strong> are free (no function in this version).</li><li>In drawbar mode all <strong>18 control keys light equally</strong>; the ignored/free keys stay dark. The key position (black = up, white = down) shows the direction.</li><li>Each press changes one step (0..8). The value appears in the corresponding column on the screen; at 0 or 8 the key does not go past the limit.</li><li>The edited manual is the one shown at the top of the screen (<code>UPPER</code>/<code>LOWER</code>/<code>PEDAL</code>); use <code>EDIT</code> or the <code>ALGO</code> encoder to change it.</li></ul>
+<p>To play from the built-in keyboard again, press <code>GLO</code> again. If a key is held while switching, it is released and only sounds again after being released and pressed again.</p>
+<hr>
+<h2 id="s5"><span class="num">5</span>MIDI</h2>
+<p>The FM-1 has USB-MIDI (in/out) and a TRS-MIDI input; there is no DIN output.</p>
+<div class="table" tabindex="0" role="region" aria-label="Table: MIDI (Channel, Manual)"><table><thead><tr><th>Channel</th><th>Manual</th></tr></thead><tbody><tr><td>1</td><td>upper</td></tr><tr><td>2</td><td>lower</td></tr><tr><td>3</td><td>pedal</td></tr></tbody></table></div>
+<h3 id="control-changes">Control Changes</h3>
+<div class="table" tabindex="0" role="region" aria-label="Table: Control Changes (CC, Function)"><table><thead><tr><th>CC</th><th>Function</th></tr></thead><tbody><tr><td>1 / 11</td><td>swell (volume)</td></tr><tr><td>70–78</td><td>upper drawbars: 16', 5⅓', 8', 4', 2⅔', 2', 1⅗', 1⅓', 1' (0 = maximum, 127 = minimum)</td></tr><tr><td>80</td><td>percussion on/off (≥64 on)</td></tr><tr><td>81</td><td>decay fast/slow (≥64 fast)</td></tr><tr><td>82</td><td>percussion 2nd/3rd (≥64 2nd)</td></tr><tr><td>64</td><td>rotor slow/fast (≥64 toggles)</td></tr><tr><td>65</td><td>drive on/off (≥64 on)</td></tr><tr><td>92</td><td>vibrato: 0..127 → OFF/V1/C1/V2/C2/V3/C3</td></tr><tr><td>93</td><td>drive character</td></tr><tr><td>95</td><td>vibrato routing: 0 off, 32 lower, 64 upper, 96 both</td></tr></tbody></table></div>
+<p>Program Change 0–7 selects one of the eight registrations.</p>
+<p>The drawbar map is setBfree's (inverted: 0 = maximum). An external drawbar controller works without extra configuration, including in drawbar-key mode.</p>
+<hr>
+<h2 id="s6"><span class="num">6</span>What is saved</h2>
+<p><code>SAVE</code> writes to flash:</p>
+<ul><li>the octave;</li><li>the swell;</li><li>all 27 drawbars (upper/lower/pedal);</li><li>percussion (on/off, 2nd/3rd, fast/slow);</li><li>the selected registration;</li><li>vibrato (mode);</li><li>drive and character;</li><li>reverb;</li><li>rotor (stop/slow/fast).</li></ul>
+<p>Not saved: drawbar-key mode, the edit page and the selected manual (they return to their defaults at boot).</p>
+<hr>
+<h2 id="s7"><span class="num">7</span>Troubleshooting</h2>
+<div class="table" tabindex="0" role="region" aria-label="Table: Troubleshooting (Symptom, What to check)"><table><thead><tr><th>Symptom</th><th>What to check</th></tr></thead><tbody><tr><td>No sound</td><td>MASTER, audio cable, <code>PLAY</code>/rotor, amplifier volume; in drawbar mode the keys do not play (press <code>GLO</code>)</td></tr><tr><td>Keys do not play</td><td>drawbar-key mode is on (<code>GLO</code> lit)</td></tr><tr><td>Stuck note</td><td>release and press the key again; if it persists, power-cycle the FM-1</td></tr><tr><td>External MIDI does not play</td><td>channel 1/2/3, USB data cable, another app using the port</td></tr><tr><td>Installer cannot find the FM-1</td><td>USB data cable, close DAWs/MIDI apps; check <code>fm1_install.py --info</code></td></tr><tr><td>Install interrupted</td><td>reconnect and run <code>make install</code> again; the FM-1 stays in update mode</td></tr><tr><td>Distorted sound</td><td>lower MASTER, drive or the registration (FULL); the app's limiter acts on peaks</td></tr></tbody></table></div>
+<hr>
+<h2 id="s8"><span class="num">8</span>Development</h2>
+<pre tabindex="0" role="region" aria-label="Command: Development"><code>make build-host      # host simulator
+make test-host       # app tests (keys, drawbars, MIDI, persistence)
+make web             # browser emulator (Emscripten)
+make serve-web       # http://localhost:8790/
+make compare         # A/B against setBfree
+make device          # firmware for the FM-1
+make install         # writes it to the connected FM-1</code></pre>
+<p>The web emulator runs the same C code as the firmware; use Cmd+Shift+R to load a new wasm after <code>make web</code>.</p>
+<hr>
+<h2 id="s9"><span class="num">9</span>Licence and trademarks</h2>
+<p>The firmware is <strong>GPL-3.0-or-later</strong>. setBfree is GPL-2.0-or-later; fm1-base and felucca-bsp are MPL-2.0; the JieLi SDK files are Apache-2.0. See <code>LICENSING.md</code> and <code>LICENSES/</code>.</p>
+<p>“Hammond”, “B3” and “Leslie” are trademarks of their owners. fm1-wheel is not affiliated with or endorsed by them. Use “tonewheel organ” and “rotary speaker” in public material.</p>
+<h3 id="development">Development</h3>
+<p>The fm1-wheel code, DSP port, tests, tools and documentation were developed with <strong>OpenCode</strong> using <strong>DeepSeek V4.1 Flash</strong>, under human direction and review.</p>
+</main>
+</div>
+<footer class="sitefoot"><div class="wrap"><span>fm1-wheel 0.1 · 2026-10-25</span><span class="right"><a href="https://github.com/ograndebe/fm1wheel">GitHub</a> · <a href="../../">Site</a> · GPL-3.0-or-later · OpenCode + DeepSeek V4.1 Flash</span></div></footer>
+</body>
+</html>

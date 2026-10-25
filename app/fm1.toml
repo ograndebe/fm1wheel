@@ -7,6 +7,6 @@ o2 = ["dsp/*.c"]               # the organ DSP at -O2
 words = "words.tsv"
 # the site (tools/make_site.py, tools/publish_site.sh)
 tagline = "a tonewheel organ for the M-VAVE FM-1, after setBfree"
-repo = ""
+repo = "https://github.com/ograndebe/fm1wheel"
 licence = "GPL-3.0-or-later"
-credits = "setBfree (GPL-2.0-or-later), fm1-base and felucca-bsp (MPL-2.0), JieLi AC79 SDK (Apache-2.0)"
+credits = "setBfree (GPL-2.0-or-later), fm1-base and felucca-bsp (MPL-2.0), JieLi AC79 SDK (Apache-2.0). Built with OpenCode + DeepSeek V4.1 Flash."

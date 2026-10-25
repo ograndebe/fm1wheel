@@ -9,3 +9,4 @@ tools/setbfree-host/dump_tables
 tools/organ-test/render
 tools/organ-test/build/
 renders/
+build/
