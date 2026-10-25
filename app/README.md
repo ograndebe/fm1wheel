@@ -68,10 +68,11 @@ keyboard edits the registration.
 | C#4 / D4 | 4' | C#5 / D5 | 1' |
 | D#4 / E4 | 2 2/3' | | |
 
-The flat (black) key raises the bar; the natural (white) key lowers it.
-`F3`, `C4`, `F4` and `C5` are ignored; `D#5`..`G5` are spare. In drawbar mode
-all 18 control keys light equally; the others stay dark. With the mode off,
-held keys light as usual.
+The flat (black) key pushes the bar in (decreases); the natural (white) key
+pulls it out (increases). The bar fills from top to bottom, so 8 is fully
+pulled. `F3`, `C4`, `F4` and `C5` are ignored; `D#5`..`G5` are spare. In
+drawbar mode all 18 control keys light equally; the others stay dark. With the
+mode off, held keys light as usual.
 
 ## Build and test
 

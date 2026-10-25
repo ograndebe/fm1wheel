@@ -23,7 +23,7 @@ serve-web: web
 	$(PY) -m http.server -d app/build/emu 8790
 
 site:
-	AC79_SDK="$(AC79_SDK)" JIELI_TOOLCHAIN="$(JIELI_TOOLCHAIN)" $(PY) tools/site/build_site.py --version 0.1
+	AC79_SDK="$(AC79_SDK)" JIELI_TOOLCHAIN="$(JIELI_TOOLCHAIN)" $(PY) tools/site/build_site.py --version 0.1.1
 
 ref:
 	$(MAKE) -C tools/setbfree-host check

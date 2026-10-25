@@ -49,9 +49,11 @@ static int16_t key_org[NKEYS];           /* 0: not held; else the organ key it s
 
 /* Pair -> drawbar and direction. -1: not a drawbar control.
  * F#/G, G#/A, A#/B, C#/D, D#/E, then the same an octave up.
+ * The black key pushes the bar in (decreases); the white key pulls it out
+ * (increases). The on-screen bar fills from top to bottom.
  * F3, C4, F4 and C5 are ignored; D#5..G5 are spare for later functions. */
 static const int8_t KEY_BAR[NKEYS] = {-1, 0, 0, 1, 1, 2, 2, -1, 3, 3, 4, 4, -1, 5, 5, 6, 6, 7, 7, -1, 8, 8, -1, -1, -1, -1, -1};
-static const int8_t KEY_DIR[NKEYS] = { 0, 1,-1, 1,-1, 1,-1,  0, 1,-1, 1,-1,  0, 1,-1, 1,-1, 1,-1,  0, 1,-1,  0,  0,  0,  0,  0};
+static const int8_t KEY_DIR[NKEYS] = { 0,-1, 1,-1, 1,-1, 1,  0,-1, 1,-1, 1,  0,-1, 1,-1, 1,-1, 1,  0,-1, 1,  0,  0,  0,  0,  0};
 
 static struct {
     uint8_t page;               /* 0: bars 0-3, 1: 4-7, 2: 8 + percussion */
@@ -398,7 +400,7 @@ static void draw(void)
         cv_rect(x, y, 1, h, edge);
         cv_rect(x + w - 1, y, 1, h, edge);
         if (fh)
-            cv_rect(x + 2, y + h - 2 - fh, w - 4, fh, C_HI);
+            cv_rect(x + 2, y + 2, w - 4, fh, C_HI);
         cv_text(x, y + h + 3, &FONT_XS, FOOT[i], C_GRAY);
         int_text(v, t);
         cv_text(x + (w - 5) / 2, y + h + 15, &FONT_XS, t, C_WHITE);
@@ -420,7 +422,7 @@ static void draw(void)
     text_cat(t, "%");
     cv_text(156, 4, &FONT_XS, t, C_HI);
     if (drawbar_mode)
-        cv_text(6, 22, &FONT_XS, "DRAWBAR KEYS  FLAT=UP  NAT=DOWN", C_HI);
+        cv_text(6, 22, &FONT_XS, "DRAWBAR KEYS  FLAT=PUSH  NAT=PULL", C_HI);
     else {
         cv_text(6, 22, &FONT_XS, "K1-K4: bars   SEL: page   EDIT: manual", C_DIM);
         cv_text(168, 22, &FONT_XS, set.leslie == LESLIE_STOP ? "ROTOR STOP" :
@@ -514,7 +516,8 @@ static void button(int b, uint32_t now)
         release_local_keys();
         prev_keys = plat_keys();
         ui.redraw = 1;
-        say("DRAWBAR KEYS", drawbar_mode ? "ON" : "OFF");
+        say(drawbar_mode ? "DRAWBAR KEYS ON" : "DRAWBAR KEYS OFF",
+            drawbar_mode ? "FLAT=PUSH NAT=PULL" : "");
         break;
     case B_SAVE:
         save();

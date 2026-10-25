@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 """Build the fm1-wheel static site in docs/ (GitHub Pages).
 
-  tools/site/build_site.py [--version 0.1] [--no-build]
+  tools/site/build_site.py [--version 0.1.1] [--no-build]
 
 --no-build reuses app/build and build/site (for a quick manual/landing rebuild).
 The normal run builds the browser emulator and a release package first, then
@@ -87,7 +87,7 @@ def manual(src, dst, lang, root_rel, old_lang_link, new_lang_link, version, date
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--version", default="0.1")
+    ap.add_argument("--version", default="0.1.1")
     ap.add_argument("--no-build", action="store_true")
     args = ap.parse_args()
     version = args.version

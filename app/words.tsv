@@ -4,3 +4,6 @@
 FM1-WHEEL	fm one wheel
 K1 OCTAVE	knob 1, octave
 K2 WAVE	knob 2, wave
+DRAWBAR KEYS	drawbar keys
+FLAT=PUSH	flat key pushes in
+NAT=PULL	natural key pulls out

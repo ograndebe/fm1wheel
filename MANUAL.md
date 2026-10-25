@@ -117,8 +117,8 @@ O `GLO` liga/desliga o modo em que as 27 teclas deixam de tocar e passam a
 editar os drawbars do manual selecionado. É o equivalente ao modo de
 programação dos órgãos clonewheel antigos.
 
-- **Modo ligado:** as teclas embutidas **não tocam**; cada pressão sobe ou
-  desce uma posição de um drawbar. O MIDI externo **continua tocando** — você
+- **Modo ligado:** as teclas embutidas **não tocam**; cada pressão empurra ou
+  puxa um drawbar em uma posição. O MIDI externo **continua tocando** — você
   pode usar um controlador para tocar e o teclado do FM-1 para editar a
   registração.
 - **Modo desligado:** as teclas voltam a tocar normalmente.
@@ -131,21 +131,23 @@ Cada par **bemol (tecla preta) / natural (tecla branca)** controla um drawbar:
 
 | Par | Drawbar | Ação |
 |---|---|---|
-| F#3 / G3 | 16' | F# sobe, G desce |
-| G#3 / A3 | 5⅓' | G# sobe, A desce |
-| A#3 / B3 | 8' | A# sobe, B desce |
-| C#4 / D4 | 4' | C# sobe, D desce |
-| D#4 / E4 | 2⅔' | D# sobe, E desce |
-| F#4 / G4 | 2' | F# sobe, G desce |
-| G#4 / A4 | 1⅗' | G# sobe, A desce |
-| A#4 / B4 | 1⅓' | A# sobe, B desce |
-| C#5 / D5 | 1' | C# sobe, D desce |
+| F#3 / G3 | 16' | F# empurra, G puxa |
+| G#3 / A3 | 5⅓' | G# empurra, A puxa |
+| A#3 / B3 | 8' | A# empurra, B puxa |
+| C#4 / D4 | 4' | C# empurra, D puxa |
+| D#4 / E4 | 2⅔' | D# empurra, E puxa |
+| F#4 / G4 | 2' | F# empurra, G puxa |
+| G#4 / A4 | 1⅗' | G# empurra, A puxa |
+| A#4 / B4 | 1⅓' | A# empurra, B puxa |
+| C#5 / D5 | 1' | C# empurra, D puxa |
 
 - **F3, C4, F4 e C5** são ignoradas.
 - **D#5, E5, F5, F#5 e G5** ficam livres (sem função nesta versão).
 - No modo drawbar, **as 18 teclas de controle acendem com o mesmo brilho**;
-  as ignoradas/livres ficam apagadas. A posição (preta = sobe, branca = desce)
-  indica a direção.
+  as ignoradas/livres ficam apagadas. A cor da tecla (preta = empurra,
+  branca = puxa) indica a direção.
+- A barra cresce de cima para baixo: 0 = todo empurrado, 8 = todo puxado
+  (volume máximo).
 - Cada pressão muda uma posição (0..8). O valor aparece na barra correspondente
   na tela; ao chegar em 0 ou 8, a tecla não passa do limite.
 - O manual editado é o que aparece no topo da tela (`UPPER`/`LOWER`/`PEDAL`);

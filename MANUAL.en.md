@@ -116,9 +116,9 @@ The registration is applied to the selected manual (`ALGO`/`EDIT`).
 drawbars of the selected manual. It is the equivalent of the programming mode
 on older clonewheel organs.
 
-- **Mode on:** the built-in keys **do not play**; each press raises or lowers
-  one drawbar by one position. External MIDI **keeps playing** — you can play
-  from a controller and use the FM-1 keyboard to edit the registration.
+- **Mode on:** the built-in keys **do not play**; each press pushes or pulls a
+  drawbar by one position. External MIDI **keeps playing** — you can play from
+  a controller and use the FM-1 keyboard to edit the registration.
 - **Mode off:** the keys play normally again.
 - The mode is not saved: it starts off at the next boot.
 - Drawbar changes mark `SAVE`; press `SAVE` to store them.
@@ -129,20 +129,22 @@ Each pair **flat (black key) / natural (white key)** controls one drawbar:
 
 | Pair | Drawbar | Action |
 |---|---|---|
-| F#3 / G3 | 16' | F# up, G down |
-| G#3 / A3 | 5⅓' | G# up, A down |
-| A#3 / B3 | 8' | A# up, B down |
-| C#4 / D4 | 4' | C# up, D down |
-| D#4 / E4 | 2⅔' | D# up, E down |
-| F#4 / G4 | 2' | F# up, G down |
-| G#4 / A4 | 1⅗' | G# up, A down |
-| A#4 / B4 | 1⅓' | A# up, B down |
-| C#5 / D5 | 1' | C# up, D down |
+| F#3 / G3 | 16' | F# push, G pull |
+| G#3 / A3 | 5⅓' | G# push, A pull |
+| A#3 / B3 | 8' | A# push, B pull |
+| C#4 / D4 | 4' | C# push, D pull |
+| D#4 / E4 | 2⅔' | D# push, E pull |
+| F#4 / G4 | 2' | F# push, G pull |
+| G#4 / A4 | 1⅗' | G# push, A pull |
+| A#4 / B4 | 1⅓' | A# push, B pull |
+| C#5 / D5 | 1' | C# push, D pull |
 
 - **F3, C4, F4 and C5** are ignored.
 - **D#5, E5, F5, F#5 and G5** are free (no function in this version).
 - In drawbar mode all **18 control keys light equally**; the ignored/free keys
-  stay dark. The key position (black = up, white = down) shows the direction.
+  stay dark. The key color (black = push, white = pull) shows the direction.
+- The bar grows from top to bottom: 0 = fully pushed in, 8 = fully pulled out
+  (maximum volume).
 - Each press changes one step (0..8). The value appears in the corresponding
   column on the screen; at 0 or 8 the key does not go past the limit.
 - The edited manual is the one shown at the top of the screen

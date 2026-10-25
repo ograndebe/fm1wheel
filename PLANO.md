@@ -387,7 +387,7 @@ Estimativas para uma pessoa focada. Some 30–50% se for em paralelo com outras 
 ### Fase 5 — Produto (1–2 semanas)
 
 - Site + instalador (fm1-base), manual, guia de recuperação.
-- Release 0.1; changelog; licenças e créditos.
+- Release 0.1.1; changelog; licenças e créditos.
 - Opcional: editor web via USB SysEx, BLE MIDI, segundo core.
 
 **Aceite:** instalador funciona em Chrome/Edge; manual cobre controles, MIDI e recovery.

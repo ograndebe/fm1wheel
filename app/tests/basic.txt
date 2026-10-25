@@ -63,17 +63,17 @@ tap SEQ
 wait 30
 expect reverb 80
 said REVERB
-# drawbar keys: GLO toggles; F#3/G3 step drawbar 1; F3 and C4 are ignored
+# drawbar keys: GLO toggles; F#3 pushes/G3 pulls bar 1; F3 and C4 are ignored
 tap GLO
 wait 30
 expect drawbar 1
 expect ledkeys 18
-said DRAWBAR KEYS ON
+said DRAWBAR KEYS ON FLAT=PUSH NAT=PULL
 key 1 down
 wait 20
 key 1 up
 wait 20
-expect bar0 7
+expect bar0 5
 key 2 down
 wait 20
 key 2 up
