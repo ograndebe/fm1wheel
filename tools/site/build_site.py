@@ -7,7 +7,8 @@
 --no-build reuses app/build and build/site (for a quick manual/landing rebuild).
 The normal run builds the browser emulator and a release package first, then
 uses fm1-base's make_site.py for the installer, emulator, firmware and words,
-and writes our own landing and manual pages.
+and writes the bilingual landing and manual pages: /pt/ and /en/, with / as a
+browser-language detector and English as the fallback.
 """
 import argparse
 import datetime
@@ -36,7 +37,12 @@ def copy_tree(src, dst):
     shutil.copytree(src, dst)
 
 
-def manual(src, dst, lang, root_rel, old_lang_link, new_lang_link, version, date):
+def render(text, version, date):
+    return (text.replace("{{VERSION}}", version).replace("{{DATE}}", date)
+            .replace("{{SITE}}", SITE_URL).replace("{{REPO}}", REPO))
+
+
+def manual(src, dst, lang, root_rel, home_rel, old_lang_link, new_lang_link, version, date):
     text = (ROOT / src).read_text(encoding="utf-8")
     text = text.replace("docs/img/emulator.png", "img/emulator.png")
     text = text.replace("](LICENSING.md)", f"]({REPO}/blob/main/LICENSING.md)")
@@ -53,26 +59,49 @@ def manual(src, dst, lang, root_rel, old_lang_link, new_lang_link, version, date
     page = dst.read_text(encoding="utf-8")
     page = page.replace('<html lang="en">', f'<html lang="{lang}">')
     page = page.replace("<body>", '<body class="manual">')
+    page = page.replace('<a class="home" href="../">', f'<a class="home" href="{home_rel}">')
+    if lang == "pt-BR":
+        page = page.replace(">Skip to content</a>", ">Ir para o conteúdo</a>")
+        page = page.replace('<a href="en/">English</a>', '<a href="en/" data-lang="en">English</a>')
+        canonical = f"{SITE_URL}manual/"
+        nav = (
+            '<nav class="topnav"><div class="wrap navwrap"><a class="brand" href="' + home_rel + '">fm1-wheel</a>'
+            '<nav class="navlinks" aria-label="Site">'
+            '<a href="./" data-lang="pt">Manual PT</a>'
+            '<a href="en/" data-lang="en" hreflang="en" lang="en">English</a>'
+            '<a href="../emu/">Experimentar</a>'
+            '<a href="../install/">Instalar</a>'
+            f'<a class="github" href="{REPO}">GitHub ↗</a>'
+            '</nav></div></nav>\n'
+        )
+    else:
+        page = page.replace('<a href="../">Português</a>', '<a href="../" data-lang="pt">Português</a>')
+        canonical = f"{SITE_URL}manual/en/"
+        nav = (
+            '<nav class="topnav"><div class="wrap navwrap"><a class="brand" href="' + home_rel + '">fm1-wheel</a>'
+            '<nav class="navlinks" aria-label="Site">'
+            '<a href="../" data-lang="pt" hreflang="pt-BR" lang="pt-BR">Manual PT</a>'
+            '<a href="./" data-lang="en">English</a>'
+            '<a href="../../emu/">Try it</a>'
+            '<a href="../../install/">Install</a>'
+            f'<a class="github" href="{REPO}">GitHub ↗</a>'
+            '</nav></div></nav>\n'
+        )
     head = (
+        f'<link rel="canonical" href="{canonical}">\n'
+        f'<link rel="alternate" hreflang="pt-BR" href="{SITE_URL}manual/">\n'
+        f'<link rel="alternate" hreflang="en" href="{SITE_URL}manual/en/">\n'
+        f'<link rel="alternate" hreflang="x-default" href="{SITE_URL}manual/en/">\n'
         f'<link rel="icon" href="{root_rel}favicon.svg" type="image/svg+xml">\n'
         f'<link rel="stylesheet" href="{root_rel}style.css">\n'
+        f'<script src="{root_rel}lang.js" defer></script>\n'
     )
     page = page.replace("</head>", head + "</head>")
-    nav = (
-        '<nav class="topnav"><div class="wrap navwrap"><a class="brand" href="' + root_rel + '">fm1-wheel</a>'
-        '<nav class="navlinks" aria-label="Site">'
-        f'<a href="{root_rel}manual/">Manual PT</a>'
-        f'<a href="{root_rel}manual/en/">English</a>'
-        f'<a href="{root_rel}emu/">Experimentar</a>'
-        f'<a href="{root_rel}install/">Instalar</a>'
-        f'<a class="github" href="{REPO}">GitHub ↗</a>'
-        '</nav></div></nav>\n'
-    )
     page = page.replace('<body class="manual">', '<body class="manual">\n' + nav)
     footer = (
         '<footer class="sitefoot"><div class="wrap">'
         f'<span>fm1-wheel {version} · {date}</span>'
-        f'<span class="right"><a href="{REPO}">GitHub</a> · <a href="{root_rel}">Site</a> · '
+        f'<span class="right"><a href="{REPO}">GitHub</a> · <a href="{home_rel}">Site</a> · '
         'GPL-3.0-or-later · OpenCode + DeepSeek V4.1 Flash</span>'
         '</div></footer>\n'
     )
@@ -113,26 +142,39 @@ def main():
 
     if (DOCS / "manual").exists():
         shutil.rmtree(DOCS / "manual")
-    for name in ("install", "emu", "firmware", "words"):
+    for name in ("install", "emu", "words"):
         src = BUILD / name
         if src.exists():
             copy_tree(src, DOCS / name)
+    # Keep published firmware packages: the build only adds the current one.
+    fw_src = BUILD / "firmware"
+    if fw_src.exists():
+        fw_dst = DOCS / "firmware"
+        fw_dst.mkdir(parents=True, exist_ok=True)
+        for f in fw_src.iterdir():
+            if f.is_file():
+                shutil.copy2(f, fw_dst / f.name)
     shutil.copy2(BUILD / ".nojekyll", DOCS / ".nojekyll")
     shutil.copy2(TOOLS / "style.css", DOCS / "style.css")
+    shutil.copy2(TOOLS / "lang.js", DOCS / "lang.js")
     shutil.copy2(TOOLS / "favicon.svg", DOCS / "favicon.svg")
     (DOCS / "backup").mkdir(parents=True, exist_ok=True)
     shutil.copy2(TOOLS / "backup.html", DOCS / "backup" / "index.html")
 
-    landing = (TOOLS / "landing.html").read_text(encoding="utf-8")
-    landing = (landing.replace("{{VERSION}}", version).replace("{{DATE}}", date)
-               .replace("{{SITE}}", SITE_URL).replace("{{REPO}}", REPO))
-    (DOCS / "index.html").write_text(landing, encoding="utf-8")
-    print("wrote", DOCS / "index.html")
+    (DOCS / "pt").mkdir(parents=True, exist_ok=True)
+    (DOCS / "en").mkdir(parents=True, exist_ok=True)
+    (DOCS / "pt" / "index.html").write_text(
+        render((TOOLS / "landing.pt.html").read_text(encoding="utf-8"), version, date), encoding="utf-8")
+    (DOCS / "en" / "index.html").write_text(
+        render((TOOLS / "landing.en.html").read_text(encoding="utf-8"), version, date), encoding="utf-8")
+    (DOCS / "index.html").write_text(
+        render((TOOLS / "root.html").read_text(encoding="utf-8"), version, date), encoding="utf-8")
+    print("wrote", DOCS / "index.html", DOCS / "pt/index.html", DOCS / "en/index.html")
 
-    manual("MANUAL.md", DOCS / "manual" / "index.html", "pt-BR", "../",
-           "[English](MANUAL.en.md)", "[English](../en/)", version, date)
-    manual("MANUAL.en.md", DOCS / "manual" / "en" / "index.html", "en", "../../",
-           "[Português](MANUAL.md)", "[Português](../)", version, date)
+    manual("MANUAL.pt.md", DOCS / "manual" / "index.html", "pt-BR", "../", "../pt/",
+           "[English](MANUAL.md)", "[English](en/)", version, date)
+    manual("MANUAL.md", DOCS / "manual" / "en" / "index.html", "en", "../../", "../../en/",
+           "[Português](MANUAL.pt.md)", "[Português](../)", version, date)
     print("site:", SITE_URL)
 
 

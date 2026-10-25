@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>fm1-wheel · tonewheel organ for the M-VAVE FM-1</title>
+<meta name="description" content="fm1-wheel: tonewheel organ firmware for the M-VAVE FM-1, based on setBfree. 91 wheels, scanner, preamp, reverb and Leslie.">
+<meta property="og:title" content="fm1-wheel">
+<meta property="og:description" content="A complete tonewheel organ for the M-VAVE FM-1, based on setBfree.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="{{SITE}}en/">
+<meta property="og:image" content="{{SITE}}img/emulator.png">
+<link rel="canonical" href="{{SITE}}en/">
+<link rel="alternate" hreflang="pt-BR" href="{{SITE}}pt/">
+<link rel="alternate" hreflang="en" href="{{SITE}}en/">
+<link rel="alternate" hreflang="x-default" href="{{SITE}}en/">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../style.css">
+<script src="../lang.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topnav">
+  <div class="wrap navwrap">
+    <a class="brand" href="./">fm1-wheel</a>
+    <nav class="navlinks" aria-label="Main">
+      <a href="../manual/en/">Manual</a>
+      <a href="../pt/" data-lang="pt" hreflang="pt-BR" lang="pt-BR">Português</a>
+      <a href="../emu/">Try it</a>
+      <a href="../install/">Install</a>
+      <a class="github" href="{{REPO}}">GitHub ↗</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <div class="wrap">
+    <section class="hero">
+      <div>
+        <p class="eyebrow">M-VAVE FM-1 · tonewheel organ · after setBfree</p>
+        <h1>fm1-wheel</h1>
+        <p class="lede">A complete <strong>tonewheel</strong> organ for the FM-1: 91 wheels, contact matrix, scanner, tube preamp, reverb and Leslie. The same code runs on the device and in the browser.</p>
+        <div class="actions">
+          <a class="btn primary" href="../emu/">Try it in the browser</a>
+          <a class="btn" href="../manual/en/">Manual</a>
+          <a class="btn" href="../install/">Install</a>
+        </div>
+        <p class="hero-note">Version {{VERSION}} · firmware in development · device and emulator builds validated; FM-1 test pending.</p>
+      </div>
+      <figure class="shot">
+        <img src="../img/emulator.png" width="756" height="413" alt="fm1-wheel running in the emulator: FM-1 screen, panel and keyboard.">
+        <figcaption>The full firmware in the emulator: screen, panel, keyboard and real-time audio.</figcaption>
+      </figure>
+    </section>
+  </div>
+
+  <section class="section" id="about">
+    <div class="wrap">
+      <h2>What fm1-wheel is</h2>
+      <p class="sub">It is not a per-voice organ: it is a shared tonewheel generator, like the original instrument. The timbre comes from the wheels, the contacts, the drawbars and the analogue chain.</p>
+      <div class="cards">
+        <article class="card">
+          <div class="kicker">Tone generator</div>
+          <h3>91 wheels</h3>
+          <p>Mechanical frequencies (gear ratios), 27 buses, terminal taper and crosstalk, wiring and compartments. The wheels are shared between the keys.</p>
+        </article>
+        <article class="card">
+          <div class="kicker">setBfree chain</div>
+          <h3>From scanner to Leslie</h3>
+          <p>V1–V3/C1–C3 scanner vibrato/chorus, tube preamp, Schroeder reverb and Leslie with Doppler, reflections and acceleration.</p>
+        </article>
+        <article class="card">
+          <div class="kicker">FM-1</div>
+          <h3>27 keys + MIDI</h3>
+          <p>Built-in keyboard, USB-MIDI and TRS-MIDI. Drawbar-key mode turns the keys into drawbar controls while an external controller keeps playing.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="start">
+    <div class="wrap">
+      <h2>Start in three steps</h2>
+      <p class="sub">You can listen now in the browser, or install on the FM-1 when the device is connected.</p>
+      <div class="steps">
+        <article class="step">
+          <h3>Install</h3>
+          <p>Connect the FM-1 with a USB data cable and use the web installer in Chrome/Edge. The installer can also restore the official firmware.</p>
+        </article>
+        <article class="step">
+          <h3>Play</h3>
+          <p>The 27 keys play the upper manual. An external MIDI controller can play upper, lower and pedal on channels 1, 2 and 3.</p>
+        </article>
+        <article class="step">
+          <h3>Edit</h3>
+          <p>Press <strong>GLO</strong>: the keys stop playing and push/pull the drawbars. External MIDI keeps sounding.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="drawbars">
+    <div class="wrap split">
+      <div>
+        <h2>Drawbar-key mode</h2>
+        <p>With the mode on, each <strong>flat / natural</strong> pair controls one drawbar of the selected manual. The black key pushes in (decreases); the white key pulls out (increases). The bar fills from top to bottom: 8 is fully pulled out, at maximum volume. All 18 control keys light equally; the others stay dark.</p>
+        <p><span class="pill">GLO</span> toggles the mode. External MIDI keeps playing — the built-in keyboard becomes the registration control.</p>
+        <p>F3, C4, F4 and C5 are ignored. D#5, E5, F5, F#5 and G5 are free.</p>
+        <p><a href="../manual/en/">See the full map in the manual →</a></p>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Pair</th><th>Drawbar</th></tr></thead>
+          <tbody>
+            <tr><td>F#3 / G3</td><td>16'</td></tr>
+            <tr><td>G#3 / A3</td><td>5⅓'</td></tr>
+            <tr><td>A#3 / B3</td><td>8'</td></tr>
+            <tr><td>C#4 / D4</td><td>4'</td></tr>
+            <tr><td>D#4 / E4</td><td>2⅔'</td></tr>
+            <tr><td>F#4 / G4</td><td>2'</td></tr>
+            <tr><td>G#4 / A4</td><td>1⅗'</td></tr>
+            <tr><td>A#4 / B4</td><td>1⅓'</td></tr>
+            <tr><td>C#5 / D5</td><td>1'</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="controls">
+    <div class="wrap">
+      <h2>Controls on the FM-1</h2>
+      <p class="sub">The labels printed on the device are the originals; the screen shows the real function.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Control</th><th>Function</th></tr></thead>
+          <tbody>
+            <tr><td><strong>SELECT</strong></td><td>drawbar page: 0–3, 4–7, 8 + percussion</td></tr>
+            <tr><td><strong>ALGO / EDIT</strong></td><td>manual: UPPER, LOWER, PEDAL</td></tr>
+            <tr><td><strong>PRESET</strong></td><td>eight factory registrations</td></tr>
+            <tr><td><strong>K1–K4</strong></td><td>the four bars on the current page; on page 3, the 1' bar and percussion</td></tr>
+            <tr><td><strong>FX</strong></td><td>drive on/off</td></tr>
+            <tr><td><strong>ENV / ARP</strong></td><td>percussion on/off; 2nd/3rd harmonic</td></tr>
+            <tr><td><strong>LFO</strong></td><td>vibrato/chorus OFF → V1 → C1 → V2 → C2 → V3 → C3</td></tr>
+            <tr><td><strong>PLAY</strong></td><td>rotor STOP → SLOW → FAST</td></tr>
+            <tr><td><strong>SEQ</strong></td><td>reverb OFF → 30% → 60% → 100%</td></tr>
+            <tr><td><strong>GLO</strong></td><td>drawbar-key mode</td></tr>
+            <tr><td><strong>SAVE</strong></td><td>write settings to flash</td></tr>
+            <tr><td><strong>OCT− / OCT+</strong></td><td>transpose the built-in keyboard</td></tr>
+            <tr><td><strong>MASTER</strong></td><td>output volume</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">The full manual covers the MIDI table, what is saved and troubleshooting: <a href="../manual/">Português</a> · <a href="../manual/en/">English</a>.</p>
+    </div>
+  </section>
+
+  <section class="section" id="install">
+    <div class="wrap">
+      <div class="cta">
+        <div>
+          <h2>Take it to the FM-1</h2>
+          <p>Package {{VERSION}}, web installer and direct download. Connect with a USB data cable; installing is at your own risk.</p>
+        </div>
+        <div class="actions">
+          <a class="btn primary" href="../install/">Web installer</a>
+          <a class="btn" href="../firmware/fm1-wheel-{{VERSION}}.fwsc" download>Download .fwsc</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="source">
+    <div class="wrap">
+      <h2>Source, base and licence</h2>
+      <p class="sub">fm1-wheel is free software. The code, the DSP port and the documentation are on GitHub.</p>
+      <div class="source-grid">
+        <article class="card">
+          <h3>Base projects</h3>
+          <p>
+            <a href="https://github.com/pantherb/setBfree">setBfree</a> (GPL-2.0-or-later) — DSP and algorithms.<br>
+            <a href="https://github.com/charlesvestal/fm1-base">fm1-base</a> (MPL-2.0) — platform, host simulator, emulator and installer.<br>
+            <a href="https://github.com/hugelton/felucca-bsp">felucca-bsp</a> (MPL-2.0) — AC79 layer, boot and loader.<br>
+            <a href="https://github.com/hugelton/Felucca">Felucca</a> (GPL-3.0-only) — firmware/UX reference.
+          </p>
+        </article>
+        <article class="card">
+          <h3>Licence and credits</h3>
+          <p>The combined firmware is <strong>GPL-3.0-or-later</strong>. See <a href="{{REPO}}/blob/main/LICENSING.md">LICENSING.md</a> and <a href="{{REPO}}/tree/main/LICENSES">LICENSES/</a>.</p>
+          <p>Built with <strong>OpenCode</strong> and <strong>DeepSeek V4.1 Flash</strong>, under human direction and review.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="sitefoot">
+  <div class="wrap">
+    <span>fm1-wheel {{VERSION}} · {{DATE}}</span>
+    <span class="right"><a href="{{REPO}}">GitHub</a> · <a href="../manual/">Manual PT</a> · <a href="../manual/en/">Manual EN</a> · <a href="../install/">Install</a></span>
+  </div>
+</footer>
+</body>
+</html>

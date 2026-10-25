@@ -1,102 +1,101 @@
-# fm1-wheel — manual do hardware
+# fm1-wheel — hardware manual
 
-**Português** · [English](MANUAL.en.md)
+[Português](MANUAL.pt.md) · **English**
 
-Firmware de órgão tonewheel para o **M-VAVE FM-1**, derivado do
-[setBfree](https://github.com/pantherb/setBfree), rodando sobre o
+Tonewheel organ firmware for the **M-VAVE FM-1**, derived from
+[setBfree](https://github.com/pantherb/setBfree), running on
 [fm1-base](https://github.com/charlesvestal/fm1-base).
 
-> **Estado:** o firmware compila para o FM-1 e passa nas checagens do build,
-> mas ainda **não foi testado no hardware**. O host simulator e o emulador web
-> rodam a cadeia completa (tonegen, scanner, preamp, reverb e Leslie). Este
-> manual descreve o comportamento pretendido/implementado; ajustes de
-> performance e de teclado podem mudar depois do primeiro teste no aparelho.
+> **Status:** the firmware builds for the FM-1 and passes the build checks, but
+> it has **not been tested on hardware yet**. The host simulator and the web
+> emulator run the full chain (tone generator, scanner, preamp, reverb and
+> Leslie). This manual describes the intended/implemented behaviour; keyboard
+> and performance details may change after the first device test.
 
 ---
 
-## 1. Instalar
+## 1. Install
 
-O firmware é instalado por USB-MIDI. É preciso o FM-1 conectado por um cabo USB
-de **dados** e nenhum outro aplicativo usando as portas MIDI do aparelho.
+The firmware is installed over USB-MIDI. Connect the FM-1 with a USB **data**
+cable and close any other application using its MIDI ports.
 
 ```sh
-make device          # gera app/build/fm1-wheel.fwsc
-make install         # mostra o aparelho e pede confirmação antes de gravar
+make device          # builds app/build/fm1-wheel.fwsc
+make install         # shows the device and asks before writing
 ```
 
-Também é possível usar o instalador web do projeto (Chrome/Edge) ou o
-`fm1_install.py` diretamente. Instalar firmware é por sua conta e risco.
-Mantenha o firmware oficial e as ferramentas de recuperação
-(`fm1-base/bsp/tools/fm1_rescue.py`, `FM-1-transporter`) à mão.
+You can also use the project's web installer (Chrome/Edge) or run
+`fm1_install.py` directly. Installing firmware is at your own risk. Keep the
+official firmware and the recovery tools
+(`fm1-base/bsp/tools/fm1_rescue.py`, `FM-1-transporter`) at hand.
 
-Se a instalação for interrompida, o FM-1 fica em modo de update e o mesmo
-comando retoma a gravação. Para voltar ao firmware oficial, use o atualizador
-da M-VAVE ou o instalador web.
-
----
-
-## 2. Ligar e tocar
-
-O FM-1 tem **27 teclas** (F3–G5), 7 encoders, 14 botões, um potenciômetro
-MASTER e a tela de 240×240.
-
-- As teclas tocam o **manual superior** (upper) por padrão.
-- `OCT-` / `OCT+` transpõem o teclado embutido em até ±2 oitavas. O MIDI
-  externo **não** é transposto por esses botões.
-- O potenciômetro MASTER controla o volume de saída.
-- Um controlador MIDI externo (USB ou TRS) pode tocar qualquer manual; veja a
-  seção 5.
-
-![fm1-wheel no emulador](docs/img/emulator.png)
-
-A tela mostra:
-
-- **cabeçalho:** nome, nota que está soando e carga de CPU;
-- **corpo:** manual selecionado, registração, percussão, vibrato e as 9 barras
-  de drawbar com os footages 16', 5⅓', 8', 4', 2⅔', 2', 1⅗', 1⅓', 1';
-- **rodapé:** oitava, página, volume, rotor, estado do SAVE, drive e reverb.
+If the install is interrupted, the FM-1 stays in update mode and the same
+command finishes the write. To go back to the official firmware, use M-VAVE's
+updater or the web installer.
 
 ---
 
-## 3. Botões e encoders
+## 2. Power on and play
+
+The FM-1 has **27 keys** (F3–G5), 7 encoders, 14 buttons, a MASTER pot and a
+240×240 screen.
+
+- The keys play the **upper manual** by default.
+- `OCT-` / `OCT+` transpose the built-in keyboard by up to ±2 octaves. External
+  MIDI is **not** transposed by these buttons.
+- The MASTER pot controls the output level.
+- An external MIDI controller (USB or TRS) can play any manual; see section 5.
+
+![fm1-wheel in the emulator](docs/img/emulator.png)
+
+The screen shows:
+
+- **header:** name, the note that is sounding, and CPU load;
+- **body:** selected manual, registration, percussion, vibrato and the nine
+  drawbar columns with the 16', 5⅓', 8', 4', 2⅔', 2', 1⅗', 1⅓', 1' footages;
+- **footer:** octave, page, volume, rotor, SAVE state, drive and reverb.
+
+---
+
+## 3. Buttons and encoders
 
 ### Encoders
 
-| Encoder | Função |
+| Encoder | Function |
 |---|---|
-| `SELECT` | página de edição: 0 = barras 0–3, 1 = barras 4–7, 2 = barra 8 + percussão |
-| `ALGO` | manual sendo editado: UPPER, LOWER, PEDAL |
-| `PRESET` | 8 registrações de fábrica; aplica ao manual selecionado |
-| `K1`–`K4` | editam as quatro barras da página atual |
+| `SELECT` | edit page: 0 = bars 0–3, 1 = bars 4–7, 2 = bar 8 + percussion |
+| `ALGO` | manual being edited: UPPER, LOWER, PEDAL |
+| `PRESET` | eight factory registrations; applies to the selected manual |
+| `K1`–`K4` | edit the four bars of the current page |
 
-Na página 2, `K1` edita a barra 1' e `K2`–`K4` controlam percussão
-(on/off), harmônico (2º/3º) e decay (fast/slow).
+On page 2, `K1` edits the 1' bar and `K2`–`K4` control percussion (on/off),
+harmonic (2nd/3rd) and decay (fast/slow).
 
-### Botões
+### Buttons
 
-| Botão | Função |
+| Button | Function |
 |---|---|
 | `FX` | drive on/off (preamp/overdrive) |
-| `SEL` | próxima página de drawbars |
-| `ENV` | percussão on/off |
-| `LFO` | ciclo de vibrato/chorus: OFF → V1 → C1 → V2 → C2 → V3 → C3 |
-| `EDIT` | próximo manual: UPPER → LOWER → PEDAL |
-| `GLO` | **modo drawbar keys** (seção 4); o LED acende quando ligado |
-| `HOME` | volta à registração 0 (3BAR) |
-| `SAVE` | grava os ajustes na flash |
-| `ARP` | percussão 2º/3º harmônico |
-| `SEQ` | ciclo de reverb: OFF → 30% → 60% → 100% |
+| `SEL` | next drawbar page |
+| `ENV` | percussion on/off |
+| `LFO` | vibrato/chorus cycle: OFF → V1 → C1 → V2 → C2 → V3 → C3 |
+| `EDIT` | next manual: UPPER → LOWER → PEDAL |
+| `GLO` | **drawbar-key mode** (section 4); its LED is lit while the mode is on |
+| `HOME` | back to registration 0 (3BAR) |
+| `SAVE` | write the settings to flash |
+| `ARP` | percussion 2nd/3rd harmonic |
+| `SEQ` | reverb cycle: OFF → 30% → 60% → 100% |
 | `PLAY` | rotor: STOP → SLOW → FAST |
-| `REC` | reservado (sem função nesta versão) |
-| `OCT-` / `OCT+` | transpose do teclado embutido (−2..+2 oitavas) |
-| `MASTER` | volume de saída |
+| `REC` | reserved (no function in this version) |
+| `OCT-` / `OCT+` | transpose the built-in keyboard (−2..+2 octaves) |
+| `MASTER` | output volume |
 
-Os rótulos impressos no FM-1 são os originais; a tela mostra a função real de
-cada controle.
+The labels printed on the FM-1 are the stock ones; the screen shows the real
+function of each control.
 
-### Registrações de fábrica
+### Factory registrations
 
-| # | Nome | Barras |
+| # | Name | Bars |
 |---|---|---|
 | 0 | 3BAR | 888000000 |
 | 1 | BLUES | 888800000 |
@@ -107,63 +106,61 @@ cada controle.
 | 6 | BASS | 858000000 |
 | 7 | STRNG | 006876540 |
 
-A registração é aplicada ao manual selecionado (`ALGO`/`EDIT`).
+The registration is applied to the selected manual (`ALGO`/`EDIT`).
 
 ---
 
-## 4. Modo drawbar keys (teclado como controle)
+## 4. Drawbar-key mode (the keyboard as a controller)
 
-O `GLO` liga/desliga o modo em que as 27 teclas deixam de tocar e passam a
-editar os drawbars do manual selecionado. É o equivalente ao modo de
-programação dos órgãos clonewheel antigos.
+`GLO` turns on/off the mode in which the 27 keys stop playing and edit the
+drawbars of the selected manual. It is the equivalent of the programming mode
+on older clonewheel organs.
 
-- **Modo ligado:** as teclas embutidas **não tocam**; cada pressão empurra ou
-  puxa um drawbar em uma posição. O MIDI externo **continua tocando** — você
-  pode usar um controlador para tocar e o teclado do FM-1 para editar a
-  registração.
-- **Modo desligado:** as teclas voltam a tocar normalmente.
-- O modo não é salvo: no próximo boot ele começa desligado.
-- As mudanças de drawbar marcam `SAVE`; use `SAVE` para gravá-las.
+- **Mode on:** the built-in keys **do not play**; each press pushes or pulls a
+  drawbar by one position. External MIDI **keeps playing** — you can play from
+  a controller and use the FM-1 keyboard to edit the registration.
+- **Mode off:** the keys play normally again.
+- The mode is not saved: it starts off at the next boot.
+- Drawbar changes mark `SAVE`; press `SAVE` to store them.
 
-### Mapa das teclas
+### Key map
 
-Cada par **bemol (tecla preta) / natural (tecla branca)** controla um drawbar:
+Each pair **flat (black key) / natural (white key)** controls one drawbar:
 
-| Par | Drawbar | Ação |
+| Pair | Drawbar | Action |
 |---|---|---|
-| F#3 / G3 | 16' | F# empurra, G puxa |
-| G#3 / A3 | 5⅓' | G# empurra, A puxa |
-| A#3 / B3 | 8' | A# empurra, B puxa |
-| C#4 / D4 | 4' | C# empurra, D puxa |
-| D#4 / E4 | 2⅔' | D# empurra, E puxa |
-| F#4 / G4 | 2' | F# empurra, G puxa |
-| G#4 / A4 | 1⅗' | G# empurra, A puxa |
-| A#4 / B4 | 1⅓' | A# empurra, B puxa |
-| C#5 / D5 | 1' | C# empurra, D puxa |
+| F#3 / G3 | 16' | F# push, G pull |
+| G#3 / A3 | 5⅓' | G# push, A pull |
+| A#3 / B3 | 8' | A# push, B pull |
+| C#4 / D4 | 4' | C# push, D pull |
+| D#4 / E4 | 2⅔' | D# push, E pull |
+| F#4 / G4 | 2' | F# push, G pull |
+| G#4 / A4 | 1⅗' | G# push, A pull |
+| A#4 / B4 | 1⅓' | A# push, B pull |
+| C#5 / D5 | 1' | C# push, D pull |
 
-- **F3, C4, F4 e C5** são ignoradas.
-- **D#5, E5, F5, F#5 e G5** ficam livres (sem função nesta versão).
-- No modo drawbar, **as 18 teclas de controle acendem com o mesmo brilho**;
-  as ignoradas/livres ficam apagadas. A cor da tecla (preta = empurra,
-  branca = puxa) indica a direção.
-- A barra cresce de cima para baixo: 0 = todo empurrado, 8 = todo puxado
-  (volume máximo).
-- Cada pressão muda uma posição (0..8). O valor aparece na barra correspondente
-  na tela; ao chegar em 0 ou 8, a tecla não passa do limite.
-- O manual editado é o que aparece no topo da tela (`UPPER`/`LOWER`/`PEDAL`);
-  use `EDIT` ou o encoder `ALGO` para trocar.
+- **F3, C4, F4 and C5** are ignored.
+- **D#5, E5, F5, F#5 and G5** are free (no function in this version).
+- In drawbar mode all **18 control keys light equally**; the ignored/free keys
+  stay dark. The key color (black = push, white = pull) shows the direction.
+- The bar grows from top to bottom: 0 = fully pushed in, 8 = fully pulled out
+  (maximum volume).
+- Each press changes one step (0..8). The value appears in the corresponding
+  column on the screen; at 0 or 8 the key does not go past the limit.
+- The edited manual is the one shown at the top of the screen
+  (`UPPER`/`LOWER`/`PEDAL`); use `EDIT` or the `ALGO` encoder to change it.
 
-Para tocar com o teclado embutido novamente, aperte `GLO` outra vez. Se uma
-tecla estiver pressionada na troca, ela é liberada e só volta a soar depois de
-solta e pressionada de novo.
+To play from the built-in keyboard again, press `GLO` again. If a key is held
+while switching, it is released and only sounds again after being released and
+pressed again.
 
 ---
 
 ## 5. MIDI
 
-O FM-1 tem USB-MIDI (in/out) e entrada TRS-MIDI; não há saída DIN.
+The FM-1 has USB-MIDI (in/out) and a TRS-MIDI input; there is no DIN output.
 
-| Canal | Manual |
+| Channel | Manual |
 |---|---|
 | 1 | upper |
 | 2 | lower |
@@ -171,89 +168,88 @@ O FM-1 tem USB-MIDI (in/out) e entrada TRS-MIDI; não há saída DIN.
 
 ### Control Changes
 
-| CC | Função |
+| CC | Function |
 |---|---|
 | 1 / 11 | swell (volume) |
-| 70–78 | drawbars do upper: 16', 5⅓', 8', 4', 2⅔', 2', 1⅗', 1⅓', 1' (0 = máximo, 127 = mínimo) |
-| 80 | percussão on/off (≥64 liga) |
+| 70–78 | upper drawbars: 16', 5⅓', 8', 4', 2⅔', 2', 1⅗', 1⅓', 1' (0 = maximum, 127 = minimum) |
+| 80 | percussion on/off (≥64 on) |
 | 81 | decay fast/slow (≥64 fast) |
-| 82 | percussão 2º/3º (≥64 2º) |
-| 64 | rotor slow/fast (≥64 alterna) |
-| 65 | drive on/off (≥64 liga) |
+| 82 | percussion 2nd/3rd (≥64 2nd) |
+| 64 | rotor slow/fast (≥64 toggles) |
+| 65 | drive on/off (≥64 on) |
 | 92 | vibrato: 0..127 → OFF/V1/C1/V2/C2/V3/C3 |
-| 93 | caráter do drive |
-| 95 | routing do vibrato: 0 off, 32 lower, 64 upper, 96 both |
+| 93 | drive character |
+| 95 | vibrato routing: 0 off, 32 lower, 64 upper, 96 both |
 
-Program Change 0–7 seleciona uma das oito registrações.
+Program Change 0–7 selects one of the eight registrations.
 
-O mapa de drawbars é o do setBfree (invertido: 0 = máximo). Um controlador de
-drawbars externo funciona sem configuração adicional, inclusive no modo
-drawbar keys.
+The drawbar map is setBfree's (inverted: 0 = maximum). An external drawbar
+controller works without extra configuration, including in drawbar-key mode.
 
 ---
 
-## 6. O que é salvo
+## 6. What is saved
 
-`SAVE` grava na flash:
+`SAVE` writes to flash:
 
-- a oitava;
-- o swell;
-- os 27 drawbars (upper/lower/pedal);
-- percussão (on/off, 2º/3º, fast/slow);
-- a registração selecionada;
-- vibrato (modo);
-- drive e caráter;
+- the octave;
+- the swell;
+- all 27 drawbars (upper/lower/pedal);
+- percussion (on/off, 2nd/3rd, fast/slow);
+- the selected registration;
+- vibrato (mode);
+- drive and character;
 - reverb;
 - rotor (stop/slow/fast).
 
-Não são salvos: o modo drawbar keys, a página de edição e o manual selecionado
-(voltam ao padrão no boot).
+Not saved: drawbar-key mode, the edit page and the selected manual (they return
+to their defaults at boot).
 
 ---
 
-## 7. Solução de problemas
+## 7. Troubleshooting
 
-| Sintoma | O que conferir |
+| Symptom | What to check |
 |---|---|
-| Sem som | MASTER, cabo de áudio, `PLAY`/rotor, volume do amplificador; no modo drawbar as teclas não tocam (aperte `GLO`) |
-| Teclas não tocam | modo drawbar ligado (`GLO` aceso) |
-| Nota presa | solte e pressione a tecla; se persistir, desligue e ligue o FM-1 |
-| MIDI externo não toca | canal 1/2/3, cabo USB de dados, outro app usando a porta |
-| Instalação não encontra o FM-1 | cabo USB de dados, feche DAWs/apps MIDI; confira `fm1_install.py --info` |
-| Instalação interrompida | reconecte e rode `make install` de novo; o FM-1 fica em modo update |
-| Som distorcido | reduza MASTER, drive ou a registração (FULL); o limiter do app atua no pico |
+| No sound | MASTER, audio cable, `PLAY`/rotor, amplifier volume; in drawbar mode the keys do not play (press `GLO`) |
+| Keys do not play | drawbar-key mode is on (`GLO` lit) |
+| Stuck note | release and press the key again; if it persists, power-cycle the FM-1 |
+| External MIDI does not play | channel 1/2/3, USB data cable, another app using the port |
+| Installer cannot find the FM-1 | USB data cable, close DAWs/MIDI apps; check `fm1_install.py --info` |
+| Install interrupted | reconnect and run `make install` again; the FM-1 stays in update mode |
+| Distorted sound | lower MASTER, drive or the registration (FULL); the app's limiter acts on peaks |
 
 ---
 
-## 8. Desenvolvimento
+## 8. Development
 
 ```sh
-make build-host      # simulador de host
-make test-host       # testes do app (teclas, drawbars, MIDI, persistência)
-make web             # emulador no navegador (Emscripten)
+make build-host      # host simulator
+make test-host       # app tests (keys, drawbars, MIDI, persistence)
+make web             # browser emulator (Emscripten)
 make serve-web       # http://localhost:8790/
-make compare         # A/B contra o setBfree
-make device          # firmware para o FM-1
-make install         # grava no FM-1 conectado
+make compare         # A/B against setBfree
+make device          # firmware for the FM-1
+make install         # writes it to the connected FM-1
 ```
 
-O emulador web roda o mesmo código C do firmware; use Cmd+Shift+R para pegar
-um wasm novo depois de `make web`.
+The web emulator runs the same C code as the firmware; use Cmd+Shift+R to
+load a new wasm after `make web`.
 
 ---
 
-## 9. Licença e marcas
+## 9. Licence and trademarks
 
-O firmware é **GPL-3.0-or-later**. O setBfree é GPL-2.0-or-later; fm1-base e
-felucca-bsp são MPL-2.0; os arquivos do SDK JieLi são Apache-2.0. Veja
-`LICENSING.md` e `LICENSES/`.
+The firmware is **GPL-3.0-or-later**. setBfree is GPL-2.0-or-later; fm1-base
+and felucca-bsp are MPL-2.0; the JieLi SDK files are Apache-2.0. See
+`LICENSING.md` and `LICENSES/`.
 
-“Hammond”, “B3” e “Leslie” são marcas de seus proprietários. O fm1-wheel não é
-afiliado nem endossado por eles. Use “tonewheel organ” e “rotary speaker” em
-material público.
+“Hammond”, “B3” and “Leslie” are trademarks of their owners. fm1-wheel is not
+affiliated with or endorsed by them. Use “tonewheel organ” and “rotary
+speaker” in public material.
 
-### Desenvolvimento
+### Development
 
-O código, o port do DSP, os testes, as ferramentas e a documentação do
-fm1-wheel foram desenvolvidos com **OpenCode** usando **DeepSeek V4.1 Flash**,
-sob direção e revisão humanas.
+The fm1-wheel code, DSP port, tests, tools and documentation were developed
+with **OpenCode** using **DeepSeek V4.1 Flash**, under human direction and
+review.

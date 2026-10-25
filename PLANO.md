@@ -1,176 +1,220 @@
-# Firmware clonewheel para o M-VAVE FM-1 baseado no setBfree
+# Clonewheel firmware for the M-VAVE FM-1 based on setBfree
 
-Análise dos repositórios e plano de execução. Data: 2026-10-23.
+Repository analysis and execution plan. Date: 2026-10-23.
 
-**Estado (2026-10-23):** Fase 0 e a Fase 1 completas no host (dry + scanner +
-preamp + reverb + Leslie).
-O repositório está montado (`fm1-base` e `setBfree` como submodules), o
-`app/` compila e toca no simulador de host, e o tone generator, o scanner, o
-preamp e o reverb foram portados com A/B contra o setBfree:
+**Status (2026-10-23):** Phase 0 and Phase 1 are complete on the host (dry +
+scanner + preamp + reverb + Leslie).
+The repository is assembled (`fm1-base` and `setBfree` as submodules), `app/`
+builds and plays in the host simulator, and the tone generator, scanner,
+preamp and reverb were ported with A/B against setBfree:
 
-| Teste | Correlação | Null | Bandas |
+| Test | Correlation | Null | Bands |
 |---|---:|---:|---|
-| acorde (888000000) | 0,99995 | -40 dB | ±0,0 dB |
-| percussão (2º/3º) | 0,9996 | -31 dB | ±0,0 dB |
-| drawbars (mudanças) | 0,9979 | -24 dB | graves/médios ±0,3 dB; agudos -10 dB no transiente |
-| scanner V1→C1→V3 | 0,9815 | -14,3 dB | ±0,5 dB até 1,6 kHz; agudos -3,7/+2,9 dB |
-| preamp (drive 0→60→127) | 0,9999 | -37,8 dB | ±0,0 dB |
-| reverb (demo, mix 40) | 0,9983 | -24,6 dB | ±0,0 dB |
-| Leslie (stop→slow→fast) | 0,9995 | -30,4 dB | ±0,0 dB |
-| cadeia completa (demo) | 0,9991 | -27,6 dB | ±0,0 dB |
+| chord (888000000) | 0.99995 | -40 dB | ±0.0 dB |
+| percussion (2nd/3rd) | 0.9996 | -31 dB | ±0.0 dB |
+| drawbars (changes) | 0.9979 | -24 dB | lows/mids ±0.3 dB; highs -10 dB on the transient |
+| scanner V1→C1→V3 | 0.9815 | -14.3 dB | ±0.5 dB up to 1.6 kHz; highs -3.7/+2.9 dB |
+| preamp (drive 0→60→127) | 0.9999 | -37.8 dB | ±0.0 dB |
+| reverb (demo, mix 40) | 0.9983 | -24.6 dB | ±0.0 dB |
+| Leslie (stop→slow→fast) | 0.9995 | -30.4 dB | ±0.0 dB |
+| full chain (demo) | 0.9991 | -27.6 dB | ±0.0 dB |
 
-O **emulador web** compila com Emscripten e roda em `app/build/emu/`
-(`make serve-web` → http://localhost:8790/), com a mesma cadeia e a mesma UI do
-device. O build de device também roda nesta máquina via **Colima + Rosetta**
-(`colima start --vz-rosetta`). Pacote gerado: `app/build/fm1-wheel.fwsc`
-(611.354 B), app 315.520 B, `.data+.bss` 77.300 B de 98.304, pool 180.844 B de
-344.064, sem soft-double. Falta apenas conectar o FM-1 e gravar/medir; até lá, o emulador web é o
-ambiente de trabalho interativo.
-
----
-
-## 1. Resumo e recomendação
-
-**Recomendação:** criar um firmware novo em cima do **fm1-base** (que já usa o **felucca-bsp**) e portar o núcleo DSP do **setBfree** para ele. Não forkear a Felucca inteira.
-
-- **Base de plataforma:** `charlesvestal/fm1-base` (MPL-2.0) — tela, teclado, LEDs, áudio I2S, USB-MIDI, TRS-MIDI, storage, instalador, **simulador de host** e **emulador no navegador**.
-- **Base de DSP:** `pantherb/setBfree` (GPL-2.0-or-later) — tone generator de 91 rodas, scanner vibrato/chorus, percussão, key click, key compression, preamp/overdrive, reverb e Leslie.
-- **Licença do app:** **GPL-3.0-or-later**. O setBfree é GPL-2.0-or-later; o fm1-base e o BSP são MPL-2.0; o SDK da JieLi é Apache-2.0. A combinação limpa é GPLv3.
-- **Produto:** um **módulo de órgão tonewheel** com teclado de 27 teclas embutido. O uso "de verdade" é com um controlador MIDI externo de 61 teclas/drawbars via USB ou TRS. Isso contorna a maior limitação física do FM-1.
-- **Prazo realista:** 9 a 14 semanas de trabalho focado para um MVP sólido; 4 a 6 meses em ritmo parcial.
-
-O que **não** recomendo:
-
-- Tentar rodar o setBfree como está: as wavetables dele ocupam **604 KB** em float e o Leslie ocupa **929 KB**. Não cabe nos 336 KB de pool do FM-1.
-- Reescrever tudo em ponto fixo: o FM-1 tem **FPU de precisão simples** (`-mfprev1`). O ganho não compensa o risco de perder o timbre.
-- Forkear a Felucca só para herdar a UI: a arquitetura dela é por voz/parte (8 vozes × 4 partes), e o setBfree é global (91 rodas compartilhadas). A briga arquitetural custa mais do que escrever a UI de um órgão do zero.
-- Prometer um clonewheel completo de 61 teclas: o FM-1 tem **27 teclas** (F3–G5), 7 encoders e 14 botões. O caminho honesto é "módulo de som + teclado de conveniência".
+The **web emulator** builds with Emscripten and runs in `app/build/emu/`
+(`make serve-web` → http://localhost:8790/), with the same chain and the same
+device UI. The device build also runs on this machine through **Colima +
+Rosetta** (`colima start --vz-rosetta`). Generated package:
+`app/build/fm1-wheel.fwsc` (611,354 B), app 315,520 B, `.data+.bss` 77,300 B
+of 98,304, pool 180,844 B of 344,064, no soft-double. The only remaining step
+is connecting the FM-1 and flashing/measuring; until then, the web emulator is
+the interactive work environment.
 
 ---
 
-## 2. O que cada repositório é (e o que não é)
+## 1. Summary and recommendation
 
-| Repositório | O que é | Licença | Papel no projeto |
+**Recommendation:** create a new firmware on top of **fm1-base** (which already
+uses **felucca-bsp**) and port the **setBfree** DSP core to it. Do not fork all
+of Felucca.
+
+- **Platform base:** `charlesvestal/fm1-base` (MPL-2.0) — screen, keyboard,
+  LEDs, I2S audio, USB-MIDI, TRS-MIDI, storage, installer, **host simulator**
+  and **browser emulator**.
+- **DSP base:** `pantherb/setBfree` (GPL-2.0-or-later) — 91-wheel tone
+  generator, scanner vibrato/chorus, percussion, key click, key compression,
+  preamp/overdrive, reverb and Leslie.
+- **App licence:** **GPL-3.0-or-later**. setBfree is GPL-2.0-or-later; fm1-base
+  and the BSP are MPL-2.0; the JieLi SDK is Apache-2.0. The clean combination
+  is GPLv3.
+- **Product:** a **tonewheel organ module** with a built-in 27-key keyboard.
+  The "real" use is with an external 61-key/drawbar MIDI controller over USB or
+  TRS. This works around the FM-1's biggest physical limitation.
+- **Realistic schedule:** 9 to 14 weeks of focused work for a solid MVP; 4 to
+  6 months at a part-time pace.
+
+What I **do not** recommend:
+
+- Trying to run setBfree as-is: its wavetables take **604 KB** in float and the
+  Leslie takes **929 KB**. It does not fit in the FM-1's 336 KB pool.
+- Rewriting everything in fixed point: the FM-1 has a **single-precision FPU**
+  (`-mfprev1`). The gain does not justify the risk of losing the timbre.
+- Forking Felucca just to inherit its UI: its architecture is per-voice/part
+  (8 voices × 4 parts), and setBfree is global (91 shared wheels). The
+  architectural fight costs more than writing an organ UI from scratch.
+- Promising a complete 61-key clonewheel: the FM-1 has **27 keys** (F3–G5), 7
+  encoders and 14 buttons. The honest path is "sound module + convenience
+  keyboard".
+
+---
+
+## 2. What each repository is (and is not)
+
+| Repository | What it is | Licence | Role in the project |
 |---|---|---|---|
-| `pantherb/setBfree` | DSP de órgão tonewheel em C float, com app JACK, plugin LV2 e GUI OpenGL | GPL-2.0-or-later | **Fonte do algoritmo e do timbre.** Portar só o DSP. |
-| `hugelton/Felucca` | Firmware completo para FM-1 (multi-engine, sequencer, web editor) | GPL-3.0-only | **Referência de UX/áudio/latência.** Não é um kit; é um produto. |
-| `hugelton/felucca-bsp` | Camada de hardware do FM-1 (clock, IRQ, flash, USB, UART, loader, packaging) | MPL-2.0 | Já vem dentro do fm1-base. Não precisa mexer. |
-| `charlesvestal/fm1-base` | Base de firmware com `plat.h`, template, simulador de host, emulador WASM, instalador e site | MPL-2.0 | **Base do projeto.** |
+| `pantherb/setBfree` | Tonewheel organ DSP in C float, with a JACK app, LV2 plugin and OpenGL GUI | GPL-2.0-or-later | **Source of the algorithm and timbre.** Port only the DSP. |
+| `hugelton/Felucca` | Complete FM-1 firmware (multi-engine, sequencer, web editor) | GPL-3.0-only | **UX/audio/latency reference.** It is not a kit; it is a product. |
+| `hugelton/felucca-bsp` | FM-1 hardware layer (clock, IRQ, flash, USB, UART, loader, packaging) | MPL-2.0 | Already inside fm1-base. No need to touch it. |
+| `charlesvestal/fm1-base` | Firmware base with `plat.h`, template, host simulator, WASM emulator, installer and site | MPL-2.0 | **Project base.** |
 
-O "kit para criar firmwares customizados" que você suspeitava existir é a combinação **felucca-bsp + fm1-base**. A Felucca é o primeiro produto grande em cima deles, não o kit.
+The "kit for building custom firmwares" you suspected existed is the
+combination **felucca-bsp + fm1-base**. Felucca is the first large product on
+top of them, not the kit.
 
-### 2.1 Por que o clonewheel existente (WHEEL da Felucca) não soa como o setBfree
+### 2.1 Why the existing clonewheel (Felucca's WHEEL) does not sound like setBfree
 
-A engine `WHEEL` da Felucca é uma aproximação leve:
+Felucca's `WHEEL` engine is a lightweight approximation:
 
-- 9 parciais senoidais **por voz**, 8 vozes por parte;
-- 16 registrações fixas + 4 macros;
-- percussão, click, drive e um "rotary" barato (AM + Doppler sem delay lines);
-- ponto fixo, pensada para custar pouco.
+- 9 sine partials **per voice**, 8 voices per part;
+- 16 fixed registrations + 4 macros;
+- percussion, click, drive and a cheap "rotary" (AM + Doppler without delay
+  lines);
+- fixed point, designed to be inexpensive.
 
-O setBfree modela o instrumento:
+setBfree models the instrument:
 
-- **91 rodas livres** rodando continuamente, cada uma com sua frequência mecânica (gear ratios), não uma senoide por nota;
-- **matriz de contatos** de 3 manuais × 61 teclas × 9 buses, com **taper** e **crosstalk** de terminal, compartimento e fiação;
-- **key compression** (o volume cai conforme mais teclas são pressionadas);
-- **percussão** com trigger bus mutando o drawbar de 1';
-- **scanner vibrato/chorus** de verdade (delay line modulada);
-- **Leslie** com horn/drum, Doppler, reflexões, filtros e aceleração;
-- **preamp/overdrive** valvulado.
+- **91 free-running wheels**, each with its mechanical frequency (gear ratios),
+  not one sine per note;
+- **contact matrix** of 3 manuals × 61 keys × 9 buses, with **taper** and
+  **crosstalk** from terminals, compartments and wiring;
+- **key compression** (volume drops as more keys are pressed);
+- **percussion** with a trigger bus muting the 1' drawbar;
+- real **scanner vibrato/chorus** (modulated delay line);
+- **Leslie** with horn/drum, Doppler, reflections, filters and acceleration;
+- tube **preamp/overdrive**.
 
-É outra categoria de modelo. O custo computacional é surpreendentemente baixo porque as 91 rodas são **compartilhadas** entre as teclas: não há polifonia por voz.
+It is a different class of model. The computational cost is surprisingly low
+because the 91 wheels are **shared** between the keys: there is no per-voice
+polyphony.
 
 ---
 
-## 3. Viabilidade no hardware do FM-1
+## 3. Feasibility on the FM-1 hardware
 
-### 3.1 O hardware
+### 3.1 The hardware
 
-| Item | Valor | Observação |
+| Item | Value | Note |
 |---|---|---|
-| SoC | JieLi AC79, CPU `pi32v2` | 320 MHz no SDK; 360 MHz no boot loader |
-| FPU | precisão simples (`-mfprev1`), sem FMA | `-ffp-contract=off`; nada de `double` no runtime |
-| RAM | 96 KB (`.data`/`.bss`) + 336 KB (pool) | mapa do fm1-base |
-| Flash | ~581 KB de app slot + área de dados | XIP; código roda do flash |
-| Áudio | I2S, 44,1 kHz, stereo, 24-bit | half buffer de 128 ou 256 frames |
-| Latência | 128 frames = 2,9 ms por half | com `APP_BLOCK 128` |
-| Tela | LCD 240×240 (ST7789) | canvas útil de 240×144 no fm1-base |
-| Teclado | 27 teclas, F3–G5 | com velocity/pressure opcionais |
-| Controles | 7 encoders + 14 botões + pot MASTER | labels físicos: FX, SEL, ENV, LFO, EDIT, GLO, HOME, SAVE, ARP, SEQ, PLAY, REC, OCT-, OCT+ |
-| MIDI | USB device (in/out) + TRS **in** | **não há MIDI DIN out** |
-| USB | MIDI + áudio (in/out) + serial | ótimo para gravar e comparar |
+| SoC | JieLi AC79, `pi32v2` CPU | 320 MHz in the SDK; 360 MHz in the boot loader |
+| FPU | single precision (`-mfprev1`), no FMA | `-ffp-contract=off`; no runtime `double` |
+| RAM | 96 KB (`.data`/`.bss`) + 336 KB (pool) | fm1-base map |
+| Flash | ~581 KB app slot + data area | XIP; code runs from flash |
+| Audio | I2S, 44.1 kHz, stereo, 24-bit | 128- or 256-frame half buffer |
+| Latency | 128 frames = 2.9 ms per half | with `APP_BLOCK 128` |
+| Screen | 240×240 LCD (ST7789) | 240×144 usable canvas in fm1-base |
+| Keyboard | 27 keys, F3–G5 | with optional velocity/pressure |
+| Controls | 7 encoders + 14 buttons + MASTER pot | physical labels: FX, SEL, ENV, LFO, EDIT, GLO, HOME, SAVE, ARP, SEQ, PLAY, REC, OCT-, OCT+ |
+| MIDI | USB device (in/out) + TRS **in** | **no MIDI DIN out** |
+| USB | MIDI + audio (in/out) + serial | great for recording and comparing |
 
-### 3.2 O que já validei nesta análise (spikes no host)
+### 3.2 What I already validated in this analysis (host spikes)
 
-Compilei o `tonegen.c`, `vibrato.c`, `whirl.c`, `overdrive.c` e `reverb.c` do setBfree **sem JACK/LV2**, num harness mínimo no macOS, e renderizei WAVs. Resultados:
+I compiled setBfree's `tonegen.c`, `vibrato.c`, `whirl.c`, `overdrive.c` and
+`reverb.c` **without JACK/LV2**, in a minimal harness on macOS, and rendered
+WAVs. Results:
 
-| Medição | Resultado |
+| Measurement | Result |
 |---|---|
-| Tonegen, 1 nota (888000000) | 18 rodas ativas |
-| Tonegen, 3 notas | 54 rodas ativas |
-| Tonegen, 9 notas | 91 rodas (satura) |
-| Tonegen, 91 rodas | ~740× tempo real no Mac (host; não é o FM-1) |
-| Wavetables do setBfree @44,1 kHz | **604 KB em float** (91 rodas) |
-| `keyContrib` (3 manuais, 154 teclas) | **20.488 entradas**, máx. 194/tecla, ~120 KB a 6 B/entrada |
-| `struct b_whirl` original | **929 KB** (tabelas de 16.384 posições) |
-| `b_whirl` com 1.024 posições | **89 KB**; diferença de **-50,2 dB** vs. original num acorde com Leslie fast |
-| Reverb | ~79 KB de delay lines; ~867× tempo real no Mac |
-| Preamp/overdrive | poucos KB; ~1.424× tempo real no Mac |
+| Tonegen, 1 note (888000000) | 18 active wheels |
+| Tonegen, 3 notes | 54 active wheels |
+| Tonegen, 9 notes | 91 wheels (saturates) |
+| Tonegen, 91 wheels | ~740× real time on the Mac (host; not the FM-1) |
+| setBfree wavetables @44.1 kHz | **604 KB in float** (91 wheels) |
+| `keyContrib` (3 manuals, 154 keys) | **20,488 entries**, max 194/key, ~120 KB at 6 B/entry |
+| Original `struct b_whirl` | **929 KB** (16,384-position tables) |
+| `b_whirl` with 1,024 positions | **89 KB**; **-50.2 dB** difference vs. the original on a chord with Leslie fast |
+| Reverb | ~79 KB of delay lines; ~867× real time on the Mac |
+| Preamp/overdrive | a few KB; ~1,424× real time on the Mac |
 
-Conclusões:
+Conclusions:
 
-1. **O tonegen é viável.** Mesmo com 91 rodas, o custo por amostra é dominado por 3 MACs + leitura de tabela. A FPU dá conta; o gargalo real é memória, não CPU.
-2. **As wavetables de 604 KB não cabem.** A solução é usar **acumulador de fase + tabela senoidal compartilhada**. Isso é fiel ao setBfree porque, na configuração default, **as rodas são senoides puras** (`wheel_Harmonics[0] = 1.0`, o resto 0; os harmônicos no `default.cfg` estão comentados). O timbre vem do routing/drawbars/crosstalk/percussão/Leslie, não de harmônicos por roda.
-3. **O Leslie é o maior consumo de RAM.** Reduzir `WHIRL_DISPLC_SIZE` de 16.384 para 1.024 derruba de 929 KB para 89 KB com diferença de -50 dB. É o ponto doce para o pool do FM-1.
-4. **O reverb custa 79 KB** e é opcional. Cabe, mas é o primeiro candidato a cortar se faltar pool.
-5. **A matriz de contatos pode ir para o flash** (120 KB) ou ser regenerada de forma compacta a partir de 9 entradas de taper por tecla (~6 KB). Para o MVP, flash é mais simples.
+1. **The tonegen is feasible.** Even with 91 wheels, the per-sample cost is
+   dominated by 3 MACs + table lookup. The FPU handles it; the real bottleneck
+   is memory, not CPU.
+2. **The 604 KB wavetables do not fit.** The solution is a **phase accumulator
+   + shared sine table**. This is faithful to setBfree because, in the default
+   configuration, **the wheels are pure sines** (`wheel_Harmonics[0] = 1.0`,
+   the rest 0; the extras in `default.cfg` are commented out). The timbre comes
+   from routing/drawbars/crosstalk/percussion/Leslie, not from per-wheel
+   harmonics.
+3. **The Leslie is the largest RAM consumer.** Reducing
+   `WHIRL_DISPLC_SIZE` from 16,384 to 1,024 drops it from 929 KB to 89 KB with
+   a -50 dB difference. It is the sweet spot for the FM-1 pool.
+4. **The reverb costs 79 KB** and is optional. It fits, but it is the first
+   candidate to cut if the pool runs short.
+5. **The contact matrix can live in flash** (120 KB) or be regenerated in a
+   compact form from 9 taper entries per key (~6 KB). For the MVP, flash is
+   simpler.
 
-### 3.3 Orçamento de memória proposto
+### 3.3 Proposed memory budget
 
-| Bloco | Pool | Flash |
+| Block | Pool | Flash |
 |---|---:|---:|
-| Canvas da UI (240×144×2 B, o pool do template) | 68 KB | — |
-| Leslie (1.024 posições) | 89 KB | ~40 KB de código |
+| UI canvas (240×144×2 B, the template's pool) | 68 KB | — |
+| Leslie (1,024 positions) | 89 KB | ~40 KB of code |
 | Reverb | 77 KB | ~5 KB |
-| Tonegen (fases, ganhos, AOT, buffers) | ~20 KB | ~60 KB |
+| Tonegen (phases, gains, AOT, buffers) | ~20 KB | ~60 KB |
 | Preamp/overdrive | ~3 KB | ~10 KB |
-| Buffers de áudio/UI | ~5 KB | — |
-| Tabelas de rodas/contatos | — | ~120 KB (ou ~6 KB compacto) |
-| Plataforma fm1-base (fora o canvas) | ~1 KB | ~77 KB |
-| UI/app própria | ~10 KB | ~40 KB |
-| **Total aproximado** | **~273 KB de 336 KB** | **~350 KB de 581 KB** |
+| Audio/UI buffers | ~5 KB | — |
+| Wheel/contact tables | — | ~120 KB (or ~6 KB compact) |
+| fm1-base platform (outside the canvas) | ~1 KB | ~77 KB |
+| UI/app proper | ~10 KB | ~40 KB |
+| **Approximate total** | **~273 KB of 336 KB** | **~350 KB of 581 KB** |
 
-Sobra pouco pool, mas sobra. Sem Bluetooth/WiFi no v1. Se precisar de BLE (+24 KB pool, +45 KB RAM, +124 KB flash), primeiro corte o reverb ou compacte a matriz.
+The pool is tight, but it fits. No Bluetooth/WiFi in v1. If BLE is needed
+(+24 KB pool, +45 KB RAM, +124 KB flash), cut the reverb first or compact the
+matrix.
 
-### 3.4 Orçamento de CPU (estimativa para 320 MHz)
+### 3.4 CPU budget (estimate for 320 MHz)
 
-| Bloco | Custo estimado | % de 320 MHz |
+| Block | Estimated cost | % of 320 MHz |
 |---|---:|---:|
-| Tonegen, 91 rodas | 40–100 M ciclos/s | 12–31% |
+| Tonegen, 91 wheels | 40–100 M cycles/s | 12–31% |
 | Scanner vibrato | ~1 M | <1% |
 | Preamp | 10–30 M | 3–9% |
 | Reverb | ~1–2 M | <1% |
 | Leslie | 5–15 M | 2–5% |
-| **Áudio total** | **~60–150 M** | **~19–47%** |
-| UI/main loop | à parte | ~10–20% |
+| **Total audio** | **~60–150 M** | **~19–47%** |
+| UI/main loop | separate | ~10–20% |
 
-Margem razoável, mas a faixa é larga. **A primeira coisa a medir no device é o pior caso** (9 notas, 888888888, Leslie fast, drive + reverb, 91 rodas). Se passar de 60% médio, corte crosstalk, reduza o Leslie para 512 posições ou offload para o segundo core.
+Reasonable margin, but the range is wide. **The first thing to measure on the
+device is the worst case** (9 notes, 888888888, Leslie fast, drive + reverb,
+91 wheels). If it exceeds 60% average, cut crosstalk, reduce the Leslie to 512
+positions, or offload to the second core.
 
 ---
 
-## 4. Arquitetura proposta
+## 4. Proposed architecture
 
 ```
-                 USB-MIDI / TRS-MIDI          27 teclas + encoders/botões
+                 USB-MIDI / TRS-MIDI          27 keys + encoders/buttons
                         │                              │
                         ▼                              ▼
-                 fila de eventos (lock-free)     UI (app_frame, 60 Hz)
+                 event queue (lock-free)         UI (app_frame, 60 Hz)
                         │                              │
                         ▼                              ▼
 ┌─────────────────────────────────────────────────────────────────────┐
-│ app_render (ISR de áudio, blocos de 128 frames)                     │
+│ app_render (audio ISR, 128-frame blocks)                            │
 │                                                                     │
-│  tonegen (91 rodas, 27 buses, taper/crosstalk)                      │
+│  tonegen (91 wheels, 27 buses, taper/crosstalk)                     │
 │      │  swell + vibrato + percussion (mono)                         │
 │      ▼                                                              │
 │  scanner vibrato/chorus                                             │
@@ -187,259 +231,301 @@ Margem razoável, mas a faixa é larga. **A primeira coisa a medir no device é 
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
-### 4.1 Tonegen: o coração
+### 4.1 Tonegen: the heart
 
-Portar de `setBfree/src/tonegen.c`:
+Port from `setBfree/src/tonegen.c`:
 
-- `aot[91]` (active oscillator table) e as listas de contribuição;
-- `oscKeyOn` / `oscKeyOff` com a fila de mensagens;
-- `keyContrib` (taper + crosstalk) — gerado no build ou compactado;
+- `aot[91]` (active oscillator table) and the contribution lists;
+- `oscKeyOn` / `oscKeyOff` with the message queue;
+- `keyContrib` (taper + crosstalk) — generated at build time or compacted;
 - `drawBarGain[27]`, `drawBarLevel[27][9]`;
-- percussão (normal/soft, fast/slow, 2º/3º harmônico, trigger bus);
-- key click (4 modelos de envelope, attack/release);
+- percussion (normal/soft, fast/slow, 2nd/3rd harmonic, trigger bus);
+- key click (4 envelope models, attack/release);
 - key compression;
 - scanner vibrato/chorus (V1/V2/V3/C1/C2/C3).
 
-**Mudança principal:** trocar as wavetables por **91 acumuladores de fase** e uma tabela senoidal compartilhada (ex.: 2.048 pontos, float ou int16 com interpolação linear).
+**Main change:** replace the wavetables with **91 phase accumulators** and one
+shared sine table (e.g. 2,048 points, float or int16 with linear
+interpolation).
 
-- Frequências: calcular as gear ratios do setBfree no build e gerar incrementos de fase Q32.
-- Ganho por roda: `attenuation` do EQ do setBfree, gerado no build.
-- Fase inicial: 0 para todas (como no setBfree).
-- Dither: o setBfree adiciona 1 LSB de ruído nas wavetables; irrelevante. Se quiser, adicione um LFSR minúsculo.
+- Frequencies: calculate setBfree's gear ratios at build time and generate
+  Q32 phase increments.
+- Per-wheel gain: setBfree's EQ `attenuation`, generated at build time.
+- Initial phase: 0 for all (as in setBfree).
+- Dither: setBfree adds 1 LSB of noise to the wavetables; irrelevant. Add a
+  tiny LFSR if desired.
 
-Isso preserva o **batimento** entre rodas (a parte que faz o órgão "vivo") e elimina 604 KB.
+This preserves the **beating** between wheels (the part that makes the organ
+"alive") and eliminates 604 KB.
 
-### 4.2 Matriz de contatos
+### 4.2 Contact matrix
 
-Duas opções:
+Two options:
 
-1. **MVP — tabela completa no flash:** gerar `key_contrib[]` com o próprio código do setBfree num host tool e emitir um `.h` com arrays `const` (120 KB). Leitura só no key-on; não pesa no áudio.
-2. **Otimização — compacta:** guardar por tecla as 9 contribuições diretas (terminal + nível) e o `terminalMix[91]`; reconstruir o crosstalk de fiação no key-on com a mesma fórmula (`defaultWiringCrosstalk * level / |Δbus|`). Cai para ~6 KB e é fiel.
+1. **MVP — full table in flash:** generate `key_contrib[]` with setBfree's own
+   code in a host tool and emit a `.h` with `const` arrays (120 KB). Read only
+   on key-on; no audio cost.
+2. **Optimisation — compact:** store the 9 direct contributions per key
+   (terminal + level) and `terminalMix[91]`; rebuild the wiring crosstalk on
+   key-on with the same formula (`defaultWiringCrosstalk * level / |Δbus|`).
+   It drops to ~6 KB and remains faithful.
 
-Comece pela 1; migre para a 2 se o flash apertar (BLE, presets, samples).
+Start with 1; migrate to 2 if flash becomes tight (BLE, presets, samples).
 
 ### 4.3 Leslie
 
-Portar `b_whirl/whirl.c` com:
+Port `b_whirl/whirl.c` with:
 
-- `WHIRL_DISPLC_SIZE = 1024` (medido: -50,2 dB vs. original, 89 KB);
-- buffers de delay de 2.048 amostras (32 KB);
-- filtros IIR e reflexões como estão;
-- `setRevSelect` (STOP/SLOW/FAST) com rampas de aceleração;
-- preset de microfone único (horn/drum) para economizar.
+- `WHIRL_DISPLC_SIZE = 1024` (measured: -50.2 dB vs. original, 89 KB);
+- 2,048-sample delay buffers (32 KB);
+- IIR filters and reflections as they are;
+- `setRevSelect` (STOP/SLOW/FAST) with acceleration ramps;
+- single-microphone preset (horn/drum) to save memory.
 
-Se o pool permitir, teste 2.048 posições (153 KB) e compare de ouvido. 1.024 já é suficiente para o FM-1.
+If the pool allows, try 2,048 positions (153 KB) and compare by ear. 1,024 is
+already enough for the FM-1.
 
-### 4.4 Preamp, reverb e overdrive
+### 4.4 Preamp, reverb and overdrive
 
-- `b_overdrive/overdrive.c` + `filterTools.c`: portar como está (oversampling 4×, filtros de 33 taps). Barato.
-- `b_reverb/reverb.c`: portar como está; 79 KB. Default 20–30% de mix.
-- Sem cabinet IR (convolução) no v1.
+- `b_overdrive/overdrive.c` + `filterTools.c`: port as-is (4× oversampling,
+  33-tap filters). Cheap.
+- `b_reverb/reverb.c`: port as-is; 79 KB. Default 20–30% mix.
+- No cabinet IR (convolution) in v1.
 
-### 4.5 Integração com o fm1-base
+### 4.5 Integration with fm1-base
 
-- Copiar `fm1-base/template/` para `app/`.
-- `APP_BLOCK 128` (2,9 ms) para latência de teclado aceitável.
-- `app_render`: drenar MIDI, ler teclas, rodar o motor em blocos de 128, aplicar MASTER, converter para int32 24-bit.
-- `app_frame`: UI a ~60 Hz; LEDs; persistência.
-- `app_tick` (1 kHz) opcional para o relógio da UI/sequencer; não para o áudio.
-- Compartilhamento de estado: fila de eventos para drawbars/percussão/Leslie; snapshots atômicos de 32 bits. Nada de locks no ISR.
-- `fm1.toml`: `o2 = ["dsp/*.c"]` para o DSP a -O2; `vendored = ["third_party/setbfree/"]` para o código do setBfree; `gen` para as tabelas.
+- Copy `fm1-base/template/` to `app/`.
+- `APP_BLOCK 128` (2.9 ms) for acceptable keyboard latency.
+- `app_render`: drain MIDI, read keys, run the engine in 128-frame blocks,
+  apply MASTER, convert to int32 24-bit.
+- `app_frame`: UI at ~60 Hz; LEDs; persistence.
+- `app_tick` (1 kHz) optional for the UI/sequencer clock; not for audio.
+- State sharing: event queue for drawbars/percussion/Leslie; atomic 32-bit
+  snapshots. No locks in the ISR.
+- `fm1.toml`: `o2 = ["dsp/*.c"]` for DSP at -O2;
+  `vendored = ["third_party/setbfree/"]` for the setBfree code; `gen` for the
+  tables.
 
-### 4.6 Mapeamento de controles (proposta)
+### 4.6 Control mapping (proposal)
 
 **Encoders**
 
 | Encoder | HOME | DRAWBARS | PERC/VIB | FX |
 |---|---|---|---|---|
-| SELECT | pagina | cursor (barra 1–9) | — | — |
-| ALGO | modelo (B3/C3/A100) | manual (U/L/P) | — | — |
-| PRESET | registração | — | — | — |
-| K1 | 16' / 5⅓' | valor da barra | percussão on/off | drive |
+| SELECT | page | cursor (bar 1–9) | — | — |
+| ALGO | model (B3/C3/A100) | manual (U/L/P) | — | — |
+| PRESET | registration | — | — | — |
+| K1 | 16' / 5⅓' | bar value | percussion on/off | drive |
 | K2 | 8' / 4' | — | decay (fast/slow) | reverb mix |
-| K3 | 2⅔' / 2' | — | harmonic (2nd/3rd) | leslie speed |
+| K3 | 2⅔' / 2' | — | harmonic (2nd/3rd) | Leslie speed |
 | K4 | 1⅗' / 1⅓' / 1' | — | vibrato/chorus (V1..C3) | — |
 
-**Botões**
+**Buttons**
 
-| Botão | Função |
+| Button | Function |
 |---|---|
 | FX | drive on/off |
-| SEL | cursor / próxima página |
-| ENV | percussão on/off |
+| SEL | cursor / next page |
+| ENV | percussion on/off |
 | LFO | vibrato/chorus on/off |
-| EDIT | menu avançado (tuning, MIDI, etc.) |
-| GLO | brilho dos LEDs (plataforma) |
-| HOME | tela principal |
-| SAVE | salvar preset |
-| ARP | manual U/L/P (rótulo físico difere; mostrar na tela) |
-| SEQ | split on/off (rótulo difere) |
-| PLAY | Leslie fast/slow (LED verde/vermelho) |
+| EDIT | advanced menu (tuning, MIDI, etc.) |
+| GLO | LED brightness (platform) |
+| HOME | main screen |
+| SAVE | save preset |
+| ARP | manual U/L/P (the physical label differs; show it on screen) |
+| SEQ | split on/off (label differs) |
+| PLAY | Leslie fast/slow (green/red LED) |
 | REC | panic / MIDI learn |
-| OCT- / OCT+ | transpose do teclado |
+| OCT- / OCT+ | keyboard transpose |
 
-Os rótulos físicos não batem com um órgão. A tela deve mostrar a função real; um adesivo/overlay impresso ajuda. Para uso sério, o controlador externo resolve.
+The physical labels do not match an organ. The screen should show the real
+function; a printed sticker/overlay helps. For serious use, an external
+controller solves it.
 
 ### 4.7 MIDI
 
-Adotar o mapa do setBfree para compatibilidade com controladores existentes:
+Adopt setBfree's map for compatibility with existing controllers:
 
-- Canais 1/2/3 = upper/lower/pedal.
+- Channels 1/2/3 = upper/lower/pedal.
 - CC 1/11 = swell.
-- CC 70–78 = drawbars 16', 5⅓', 8', 4', 2⅔', 2', 1⅗', 1⅓', 1' (invertidos: 0 = máximo).
+- CC 70–78 = drawbars 16', 5⅓', 8', 4', 2⅔', 2', 1⅗', 1⅓', 1' (inverted:
+  0 = maximum).
 - CC 64 = Leslie speed toggle.
 - CC 80/81/82 = percussion enable/decay/harmonic.
 - CC 83 = vibrato knob; CC 92 = vibrato routing.
 - CC 93 = overdrive character.
-- Program change = registração/preset.
-- USB-MIDI out para DAW/editor; TRS é só entrada.
+- Program change = registration/preset.
+- USB-MIDI out to a DAW/editor; TRS is input only.
 
-Isso transforma o FM-1 num módulo compatível com drawbar controllers (Ocean Beach, Crumar, Viscount etc.) e DAWs.
+This turns the FM-1 into a module compatible with drawbar controllers (Ocean
+Beach, Crumar, Viscount, etc.) and DAWs.
 
-### 4.8 Presets e storage
+### 4.8 Presets and storage
 
-- 16–32 registrações clássicas de fábrica (888000000, 888800000, 888000008, 800000888 etc.).
-- Presets de usuário em flash (usar o store do fm1-base; `APP_STORE_MAP`).
-- Salvar: drawbars U/L/P, percussão, vibrato, drive, reverb, Leslie, tuning, configurações MIDI.
-- Backup/restore via USB: o fm1-base já tem `backup = true` (opcional).
+- 16–32 classic factory registrations (888000000, 888800000, 888000008,
+  800000888, etc.).
+- User presets in flash (use fm1-base's store; `APP_STORE_MAP`).
+- Save: drawbars U/L/P, percussion, vibrato, drive, reverb, Leslie, tuning,
+  MIDI settings.
+- Backup/restore over USB: fm1-base already has `backup = true` (optional).
 
 ---
 
-## 5. Licenciamento
+## 5. Licensing
 
-| Componente | Licença | Obrigação |
+| Component | Licence | Obligation |
 |---|---|---|
-| setBfree (DSP portado) | GPL-2.0-or-later | manter headers; disponibilizar fonte das modificações |
-| fm1-base | MPL-2.0 | modificações nos arquivos dele ficam MPL-2.0; o app pode ter outra licença |
-| felucca-bsp | MPL-2.0 | idem |
-| SDK JieLi (boot/cfg) | Apache-2.0 | compatível com GPLv3; manter avisos |
-| **App/firmware combinado** | **GPL-3.0-or-later** | publicar o código e o binário; sem restrições extras |
+| setBfree (ported DSP) | GPL-2.0-or-later | keep headers; publish the source of modifications |
+| fm1-base | MPL-2.0 | modifications to its files stay MPL-2.0; the app may use another licence |
+| felucca-bsp | MPL-2.0 | same |
+| JieLi SDK (boot/cfg) | Apache-2.0 | compatible with GPLv3; keep notices |
+| **Combined app/firmware** | **GPL-3.0-or-later** | publish the source and binary; no extra restrictions |
 
-Cuidados:
+Cautions:
 
-- **Não copie código da Felucca** (GPL-3.0-only) para o app se quiser manter a opção "or later"; use só como referência. Se copiar, o combinado fica GPL-3.0-only (ainda compatível com o setBfree "or later", mas menos flexível).
-- **Não use as texturas/fontes da GUI do setBfree**; elas têm licenças próprias.
-- **Marcas:** evite "Hammond", "B3" e "Leslie" no nome do produto e no marketing. Descreva como "tonewheel organ" e "rotary speaker". No código, "leslie" como termo técnico é aceitável, mas o produto não deve se chamar assim.
-- Se um dia habilitar Bluetooth/WiFi da JieLi (bibliotecas binárias Apache-2.0), revise a combinação com GPLv3 e o custo de RAM. No v1, não habilite.
+- **Do not copy Felucca code** (GPL-3.0-only) into the app if you want to keep
+  the "or later" option; use it only as a reference. If you copy it, the
+  combination becomes GPL-3.0-only (still compatible with setBfree "or later",
+  but less flexible).
+- **Do not use setBfree's GUI textures/fonts**; they have their own licences.
+- **Trademarks:** avoid "Hammond", "B3" and "Leslie" in the product name and
+  marketing. Describe it as a "tonewheel organ" and a "rotary speaker". In
+  code, "leslie" as a technical term is acceptable, but the product must not
+  be named that.
+- If you ever enable JieLi Bluetooth/WiFi (Apache-2.0 binary libraries), review
+  the combination with GPLv3 and the RAM cost. Do not enable it in v1.
 
 ---
 
 ## 6. Roadmap
 
-Estimativas para uma pessoa focada. Some 30–50% se for em paralelo com outras tarefas.
+Estimates for one focused person. Add 30–50% if working in parallel with other
+tasks.
 
-### Fase 0 — Base e referência (3–5 dias)
+### Phase 0 — Base and reference (3–5 days)
 
-- [x] Repositório criado; `fm1-base` (com o BSP) e `setBfree` como submodules fixados.
-- [x] `app/` copiado do template; `APP_BLOCK 128`; `id_prefix FM-1_12`.
-- [x] Build de host e `tests/basic.txt` passando.
-- [x] `tools/setbfree-host/refrender`: cadeia completa do setBfree (tonegen → preamp → reverb → whirl) em WAV float.
-- [x] `tools/setbfree-host/dump_tables`: `wheel_inc`, `wheel_att`, `key_contrib`, `key_comp`, envelopes.
-- [ ] Instalar Docker Desktop, toolchain JieLi e SDK AC79.
-- [x] Compilar o firmware no device via Colima/Rosetta (pacote `fm1-wheel.fwsc`).
-- [ ] Gravar no FM-1 e testar boot, tela, teclas, áudio, USB-MIDI, TRS, update, recovery.
+- [x] Repository created; `fm1-base` (with the BSP) and `setBfree` pinned as
+  submodules.
+- [x] `app/` copied from the template; `APP_BLOCK 128`; `id_prefix FM-1_12`.
+- [x] Host build and `tests/basic.txt` passing.
+- [x] `tools/setbfree-host/refrender`: full setBfree chain (tonegen → preamp →
+  reverb → whirl) to float WAV.
+- [x] `tools/setbfree-host/dump_tables`: `wheel_inc`, `wheel_att`,
+  `key_contrib`, `key_comp`, envelopes.
+- [ ] Install Docker Desktop, the JieLi toolchain and the AC79 SDK.
+- [x] Build the device firmware through Colima/Rosetta (`fm1-wheel.fwsc`
+  package).
+- [ ] Flash the FM-1 and test boot, screen, keys, audio, USB-MIDI, TRS, update
+  and recovery.
 
-**Aceite:** host OK; falta o teste no device (Docker/toolchain/SDK).
+**Acceptance:** host OK; device test pending (Docker/toolchain/SDK).
 
-### Fase 1 — Port do tonegen (2–3 semanas) — em andamento
+### Phase 1 — Tonegen port (2–3 weeks) — in progress
 
-- [x] Tone generator dry: rodas como acumulador de fase + tabela senoidal.
-- [x] Drawbars, keyContrib, taper/crosstalk, key compression, click, percussão.
-- [x] App de host tocando: 27 teclas, MIDI USB/TRS, drawbars, percussão, settings.
-- [x] A/B contra o setBfree (`make compare`): acorde 0,99995 / -40 dB; percussão 0,9996 / -31 dB.
-- [x] Portar `vibrato.c` (scanner V1–V3/C1–C3): 0,9815 / -14,3 dB.
-- [x] Portar preamp/overdrive: 0,9999 / -37,8 dB; reverb: 0,9983 / -24,6 dB.
-- [x] Portar o Leslie (whirl, 1.024 posições): 0,9995 / -30,4 dB.
-- [ ] Medir CPU no device e ajustar o limiter.
+- [x] Dry tone generator: wheels as phase accumulators + sine table.
+- [x] Drawbars, keyContrib, taper/crosstalk, key compression, click,
+  percussion.
+- [x] Host app playing: 27 keys, USB/TRS MIDI, drawbars, percussion, settings.
+- [x] A/B against setBfree (`make compare`): chord 0.99995 / -40 dB;
+  percussion 0.9996 / -31 dB.
+- [x] Port `vibrato.c` (scanner V1–V3/C1–C3): 0.9815 / -14.3 dB.
+- [x] Port preamp/overdrive: 0.9999 / -37.8 dB; reverb: 0.9983 / -24.6 dB.
+- [x] Port the Leslie (whirl, 1,024 positions): 0.9995 / -30.4 dB.
+- [ ] Measure CPU on the device and adjust the limiter.
 
-**Aceite:** a cadeia completa bate com o setBfree no host; falta o teste no device.
+**Acceptance:** the full chain matches setBfree on the host; device test
+pending.
 
-### Fase 2 — Device: áudio e performance (1–2 semanas)
+### Phase 2 — Device: audio and performance (1–2 weeks)
 
-- Integrar no `app_render`; saída 24-bit; limiter/soft-clip; DC blocker.
-- Portar preamp, reverb e Leslie (1.024 posições).
-- Medir CPU no FM-1: ocioso, 1, 3, 9, 27 notas; 888888888; Leslie fast; drive+reverb.
-- Medir latência de tecla e estabilidade (30 min sem dropout).
-- Ajustar níveis e headroom.
+- Integrate into `app_render`; 24-bit output; limiter/soft-clip; DC blocker.
+- Port preamp, reverb and Leslie (1,024 positions).
+- Measure CPU on the FM-1: idle, 1, 3, 9, 27 notes; 888888888; Leslie fast;
+  drive+reverb.
+- Measure key latency and stability (30 min without dropout).
+- Adjust levels and headroom.
 
-**Aceite:** toca no FM-1; CPU média < 50% e pico < 80% no pior caso; latência < 10 ms.
+**Acceptance:** plays on the FM-1; average CPU < 50% and peak < 80% in the
+worst case; latency < 10 ms.
 
-### Fase 3 — UI, MIDI e persistência (2–3 semanas)
+### Phase 3 — UI, MIDI and persistence (2–3 weeks)
 
-- Telas: HOME (drawbars), DRAWBARS, PERC/VIB, FX, SETTINGS, PRESETS.
-- Mapeamento dos encoders/botões/LEDs.
-- MIDI completo (USB + TRS, canais, CCs, program change).
-- Salvar/carregar presets e settings; factory reset.
-- Testes de UI no simulador de host e screenshots.
+- Screens: HOME (drawbars), DRAWBARS, PERC/VIB, FX, SETTINGS, PRESETS.
+- Encoder/button/LED mapping.
+- Complete MIDI (USB + TRS, channels, CCs, program change).
+- Save/load presets and settings; factory reset.
+- UI tests in the host simulator and screenshots.
 
-**Aceite:** dá para tocar e mudar registração sem computador; settings sobrevivem a reboot; MIDI externo controla tudo.
+**Acceptance:** can play and change registration without a computer; settings
+survive a reboot; external MIDI controls everything.
 
-### Fase 4 — Paridade de som e polimento (2–3 semanas)
+### Phase 4 — Sound parity and polish (2–3 weeks)
 
-- Crosstalk completo (ou versão compacta), key compression, trigger bus.
-- Calibrar Leslie (aceleração, brake, mic), drive, reverb.
-- A/B contra setBfree e gravações de referência.
-- Presets clássicos; usuário.
-- Testes golden (hash de render), orçamento de CPU no CI.
+- Full crosstalk (or the compact version), key compression, trigger bus.
+- Calibrate Leslie (acceleration, brake, mic), drive, reverb.
+- A/B against setBfree and reference recordings.
+- Classic presets; user presets.
+- Golden tests (render hash), CPU budget in CI.
 
-**Aceite:** A/B subjetivo aprovado; nenhuma regressão de timbre; CPU estável.
+**Acceptance:** subjective A/B approved; no timbre regressions; stable CPU.
 
-### Fase 5 — Produto (1–2 semanas)
+### Phase 5 — Product (1–2 weeks)
 
-- Site + instalador (fm1-base), manual, guia de recuperação.
-- Release 0.1.1; changelog; licenças e créditos.
-- Opcional: editor web via USB SysEx, BLE MIDI, segundo core.
+- Site + installer (fm1-base), manual, recovery guide.
+- Release 0.1.1; changelog; licences and credits.
+- Optional: web editor over USB SysEx, BLE MIDI, second core.
 
-**Aceite:** instalador funciona em Chrome/Edge; manual cobre controles, MIDI e recovery.
+**Acceptance:** installer works in Chrome/Edge; manual covers controls, MIDI
+and recovery.
 
 ---
 
-## 7. Riscos e mitigação
+## 7. Risks and mitigation
 
-| Risco | Prob. | Impacto | Mitigação |
+| Risk | Prob. | Impact | Mitigation |
 |---|---|---|---|
-| CPU/FPU pior que o estimado | média | alto | medir na Fase 2; reduzir crosstalk; Leslie 1.024; offload para CPU1 (experimental) |
-| Pool estourar | média | alto | cortar reverb; compactar keyContrib; canvas menor; sem BLE |
-| Leslie a 1.024 soar diferente | baixa | médio | teste A/B; 2.048 se o pool permitir; ajustar filtros |
-| Latência de tecla alta | média | médio | `APP_BLOCK 128`; ler teclas no ISR; evitar filas longas |
-| API do fm1-base mudar | alta | baixo | fixar commit; patches mínimos; vendorizar |
-| Bug sutil no port do setBfree | alta | médio | port bloco a bloco; golden tests; A/B |
-| Licença | baixa | alto | GPL-3.0-or-later; headers; fonte publicada; sem marcas |
-| Brick na gravação | baixa | alto | testar recovery antes; manter firmware oficial; `fm1_rescue`/transporter |
-| 27 teclas limitam o produto | certa | médio | posicionar como módulo; MIDI externo; octave shift |
+| CPU/FPU worse than estimated | medium | high | measure in Phase 2; reduce crosstalk; Leslie 1,024; offload to CPU1 (experimental) |
+| Pool overflow | medium | high | cut reverb; compact keyContrib; smaller canvas; no BLE |
+| Leslie at 1,024 sounds different | low | medium | A/B test; 2,048 if the pool allows; adjust filters |
+| High key latency | medium | medium | `APP_BLOCK 128`; read keys in the ISR; avoid long queues |
+| fm1-base API changes | high | low | pin the commit; minimal patches; vendor it |
+| Subtle bug in the setBfree port | high | medium | port block by block; golden tests; A/B |
+| Licence | low | high | GPL-3.0-or-later; headers; published source; no trademarks |
+| Bricking during flashing | low | high | test recovery first; keep the official firmware; `fm1_rescue`/transporter |
+| 27 keys limit the product | certain | medium | position it as a module; external MIDI; octave shift |
 
 ---
 
-## 8. MVP vs. depois
+## 8. MVP vs. later
 
 **MVP (v1):**
 
-- Upper manual no teclado de 27 teclas, com OCT-/OCT+.
-- 9 drawbars editáveis + 16 registrações.
-- Percussão (on/off, 2nd/3rd, fast/slow, normal/soft).
+- Upper manual on the 27-key keyboard, with OCT-/OCT+.
+- 9 editable drawbars + 16 registrations.
+- Percussion (on/off, 2nd/3rd, fast/slow, normal/soft).
 - Vibrato/chorus V1–V3/C1–C3.
 - Drive, reverb, Leslie slow/fast.
-- MIDI USB + TRS (upper/lower/pedal por canal; mapa de CC do setBfree).
-- Presets de usuário e settings em flash.
-- Host simulator + testes golden.
-- Sem BLE, sem WiFi, sem segundo core, sem editor web.
+- USB + TRS MIDI (upper/lower/pedal per channel; setBfree CC map).
+- User presets and settings in flash.
+- Host simulator + golden tests.
+- No BLE, no WiFi, no second core, no web editor.
 
-**Depois:**
+**Later:**
 
-- Lower/pedal editáveis na UI e split no teclado.
-- Editor web (Web MIDI/SysEx).
-- BLE MIDI (se o pool/flash permitirem).
-- Segundo core para o Leslie ou o tonegen.
-- Modelos de órgão (50 Hz, 82 rodas, 91FB00/12).
-- Harmônicos por roda (wheels "sujas").
+- Editable lower/pedal in the UI and keyboard split.
+- Web editor (Web MIDI/SysEx).
+- BLE MIDI (if the pool/flash allow).
+- Second core for the Leslie or tonegen.
+- Organ models (50 Hz, 82 wheels, 91FB00/12).
+- Per-wheel harmonics ("dirty" wheels).
 - Cabinet IR.
-- Sequencer/arpejador (a Felucca já tem; não é o foco).
+- Sequencer/arpeggiator (Felucca already has one; not the focus).
 
 ---
 
-## 9. Próximos passos concretos (primeiras 2 semanas)
+## 9. Concrete next steps (first 2 weeks)
 
-1. **Ambiente de device** (1–2 dias) — pendente
+1. **Device environment** (1–2 days) — pending
    ```sh
    # from the repository root; needs Docker Desktop running
    fm1-base/tools/get_toolchain.sh
@@ -448,86 +534,113 @@ Estimativas para uma pessoa focada. Some 30–50% se for em paralelo com outras 
    make device
    python3 fm1-base/tools/fm1_install.py app/build/fm1-wheel.fwsc
    ```
-   Requer Docker Desktop (o toolchain é Linux x86-64; no Apple Silicon roda via Rosetta).
-   Testar boot, tela, teclas, áudio, USB-MIDI, TRS, update e recovery.
+   Requires Docker Desktop (the toolchain is Linux x86-64; on Apple Silicon it
+   runs through Rosetta). Test boot, screen, keys, audio, USB-MIDI, TRS, update
+   and recovery.
 
-2. **Repositório** (1 dia) — feito
-   - `app/` copiado do template; `APP_BLOCK 128`; `id_prefix FM-1_12`.
-   - `fm1.toml`: nome, USB names, licença GPL-3.0-or-later.
-   - Submodules `fm1-base` (com BSP) e `setBfree` fixados.
-   - `make build-host` e `make test-host` passando.
+2. **Repository** (1 day) — done
+   - `app/` copied from the template; `APP_BLOCK 128`; `id_prefix FM-1_12`.
+   - `fm1.toml`: name, USB names, GPL-3.0-or-later licence.
+   - `fm1-base` (with BSP) and `setBfree` submodules pinned.
+   - `make build-host` and `make test-host` passing.
 
-3. **Referência** (2–3 dias) — feito
+3. **Reference** (2–3 days) — done
    - `tools/setbfree-host/refrender` (tonegen → preamp → reverb → whirl).
-   - `tools/setbfree-host/dump_tables` (`wheel_inc`, `wheel_att`, `key_contrib`, `key_comp`, envelopes).
-   - `make ref` e `make tables`.
+   - `tools/setbfree-host/dump_tables` (`wheel_inc`, `wheel_att`,
+     `key_contrib`, `key_comp`, envelopes).
+   - `make ref` and `make tables`.
 
-4. **Tonegen no host** (1 semana) — feito (dry)
-   - `app/dsp/organ.c`: rodas de fase, drawbars, key matrix, percussão, click.
-   - `app/app.c`: teclado, MIDI, drawbars, presets, settings; toca no simulador.
+4. **Tonegen on the host** (1 week) — done (dry)
+   - `app/dsp/organ.c`: phase wheels, drawbars, key matrix, percussion, click.
+   - `app/app.c`: keyboard, MIDI, drawbars, presets, settings; plays in the
+     simulator.
    - A/B: `make compare`.
-   - Feitos o scanner, o preamp, o reverb e o Leslie; próximo: o device.
+   - Scanner, preamp, reverb and Leslie done; next: the device.
 
-5. **Primeiro som no device** (2–3 dias)
-   - Integrar no `app_render`; saída 24-bit; limiter. (já integrado)
-   - Tocar um acorde no FM-1 e gravar via USB audio.
-   - Medir CPU/latência.
+5. **First sound on the device** (2–3 days)
+   - Integrate into `app_render`; 24-bit output; limiter. (already integrated)
+   - Play a chord on the FM-1 and record through USB audio.
+   - Measure CPU/latency.
 
-## 10. Decisões que preciso de você
+## 10. Decisions I need from you
 
-Defaults que adotei (diga se quer outro caminho):
+Defaults I adopted (tell me if you want another path):
 
-1. **Base:** fm1-base + setBfree, app novo. (Alternativa: fork da Felucca.)
-2. **Posicionamento:** módulo de órgão com teclado de 27 teclas; MIDI externo para a experiência completa.
-3. **Licença:** GPL-3.0-or-later.
-4. **Escopo v1:** upper manual, drawbars, percussão, vibrato/chorus, drive, reverb, Leslie; sem BLE/WiFi/segundo core/editor web.
-5. **Leslie:** 1.024 posições (89 KB, -50 dB) — se você tiver ouvido exigente, testamos 2.048.
-6. **Nome do produto:** **fm1-wheel**, em referência às tonewheels. O `id_prefix` do pacote continua `FM-1_12` para não invalidar instalações.
+1. **Base:** fm1-base + setBfree, new app. (Alternative: fork Felucca.)
+2. **Positioning:** organ module with a 27-key keyboard; external MIDI for the
+   full experience.
+3. **Licence:** GPL-3.0-or-later.
+4. **v1 scope:** upper manual, drawbars, percussion, vibrato/chorus, drive,
+   reverb, Leslie; no BLE/WiFi/second core/web editor.
+5. **Leslie:** 1,024 positions (89 KB, -50 dB) — if you have a demanding ear,
+   we test 2,048.
+6. **Product name:** **fm1-wheel**, a reference to tonewheels. The package
+   `id_prefix` remains `FM-1_12` to avoid invalidating installs.
 
-A Fase 0 está feita no host. O próximo passo é o ambiente de device (Docker + toolchain + SDK), gravar o template no FM-1 e então começar a Fase 1 (port do tonegen).
+Phase 0 is done on the host. The next step is the device environment (Docker
++ toolchain + SDK), flashing the template to the FM-1, and then starting Phase
+1 (tonegen port).
 
 ---
 
-## Apêndice A — Comandos e arquivos de referência
+## Appendix A — Commands and reference files
 
-- Toolchain/SDK: `fm1-base/tools/get_toolchain.sh`, `fm1-base/README.md` (Build).
+- Toolchain/SDK: `fm1-base/tools/get_toolchain.sh`, `fm1-base/README.md`
+  (Build).
 - Build: `fm1-base/tools/build.py APP_DIR [--host|--web|--release X.Y]`.
-- Instalação: `python3 fm1-base/tools/fm1_install.py build/NAME.fwsc`.
-- Simulador: `APP_DIR/build/host/NAME_host APP_DIR/tests/basic.txt APP_DIR/build/host`.
-- Emulador web: `fm1-base/tools/build.py APP_DIR --web`, servir `APP_DIR/build/emu/`.
-- Mapa de memória: `fm1-base/device/app.ld`.
-- HAL do FM-1: `felucca-bsp/chip/`, `felucca-bsp/boards/fm1/`.
+- Install: `python3 fm1-base/tools/fm1_install.py build/NAME.fwsc`.
+- Simulator: `APP_DIR/build/host/NAME_host APP_DIR/tests/basic.txt
+  APP_DIR/build/host`.
+- Web emulator: `fm1-base/tools/build.py APP_DIR --web`, serve
+  `APP_DIR/build/emu/`.
+- Memory map: `fm1-base/device/app.ld`.
+- FM-1 HAL: `felucca-bsp/chip/`, `felucca-bsp/boards/fm1/`.
 - CPU/FPU: `felucca-bsp/docs/CPU.md`, `fm1-base/include/fastmath.h`.
-- setBfree: `src/tonegen.c`, `src/vibrato.c`, `b_whirl/whirl.c`, `b_overdrive/overdrive.c`, `b_reverb/reverb.c`, `cfg/default.cfg`.
-- Felucca (referência de UX): `firmware/src/audio.c`, `firmware/src/main.c`, `firmware/hal/fm1_input.h`.
+- setBfree: `src/tonegen.c`, `src/vibrato.c`, `b_whirl/whirl.c`,
+  `b_overdrive/overdrive.c`, `b_reverb/reverb.c`, `cfg/default.cfg`.
+- Felucca (UX reference): `firmware/src/audio.c`, `firmware/src/main.c`,
+  `firmware/hal/fm1_input.h`.
 
-## Apêndice B — Por que a tabela senoidal é fiel
+## Appendix B — Why the sine table is faithful
 
-No setBfree, `initOscillators` gera uma wavetable por roda a partir de `wheel_Harmonics[]`. O default é:
+In setBfree, `initOscillators` generates one wavetable per wheel from
+`wheel_Harmonics[]`. The default is:
 
 ```c
 t->wheel_Harmonics[0] = 1.0;   /* fundamental */
-/* todos os demais = 0 */
+/* all others = 0 */
 ```
 
-E os harmônicos extras no `cfg/default.cfg` estão comentados. Ou seja: **cada roda é uma senoide pura**, com frequência mecânica (gear ratio) e atenuação (EQ). O "som de órgão" vem de:
+And the extra harmonics in `cfg/default.cfg` are commented out. That is:
+**each wheel is a pure sine**, with a mechanical frequency (gear ratio) and
+attenuation (EQ). The "organ sound" comes from:
 
-- 9 drawbars por manual, cada um conectando a uma roda diferente (16', 5⅓', 8', 4', 2⅔', 2', 1⅗', 1⅓', 1');
-- taper e crosstalk dos contatos;
-- key click e key compression;
-- percussão;
+- 9 drawbars per manual, each connecting to a different wheel (16', 5⅓', 8',
+  4', 2⅔', 2', 1⅗', 1⅓', 1');
+- contact taper and crosstalk;
+- key click and key compression;
+- percussion;
 - scanner vibrato/chorus;
-- preamp, reverb e Leslie.
+- preamp, reverb and Leslie.
 
-Portanto, trocar as wavetables por `sin(2π · fase)` com a mesma frequência/atenuação preserva o modelo default. Se um dia quisermos rodas com harmônicos, basta gerar uma tabela senoidal por perfil (12 harmônicos) e compartilhar entre rodas do mesmo perfil — sem voltar aos 604 KB.
+Therefore, replacing the wavetables with `sin(2π · phase)` at the same
+frequency/attenuation preserves the default model. If we ever want wheels with
+harmonics, we only need to generate a sine table per profile (12 harmonics) and
+share it between wheels of the same profile — without going back to 604 KB.
 
-## Apêndice C — Reprodução dos spikes
+## Appendix C — Reproducing the spikes
 
-O harness usado nesta análise:
+The harness used in this analysis:
 
-- Compila `tonegen.c` + `vibrato.c` sem JACK/LV2, define `SampleRateD`, e chama `allocTonegen`, `initToneGenerator`, `oscKeyOn`, `oscGenerateFragment`.
-- Compila `whirl.c` + `eqcomp.c` e chama `allocWhirl`, `initWhirl`, `whirlProc3`.
-- Compila `overdrive.c` + `filterTools.c` e `reverb.c` para medir memória/CPU.
-- Para o teste do Leslie, muda `WHIRL_DISPLC_SIZE` de `1 << 14` para `1 << 10` e compara os WAVs (diferença -50,2 dB).
+- Compiles `tonegen.c` + `vibrato.c` without JACK/LV2, defines `SampleRateD`,
+  and calls `allocTonegen`, `initToneGenerator`, `oscKeyOn`,
+  `oscGenerateFragment`.
+- Compiles `whirl.c` + `eqcomp.c` and calls `allocWhirl`, `initWhirl`,
+  `whirlProc3`.
+- Compiles `overdrive.c` + `filterTools.c` and `reverb.c` to measure
+  memory/CPU.
+- For the Leslie test, changes `WHIRL_DISPLC_SIZE` from `1 << 14` to `1 << 10`
+  and compares the WAVs (-50.2 dB difference).
 
-Esses arquivos vivem em `tools/setbfree-host/` no repositório e são a base dos testes golden.
+These files live in `tools/setbfree-host/` in the repository and are the basis
+of the golden tests.

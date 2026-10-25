@@ -7,9 +7,17 @@ and writes the landing and manual pages into `docs/`.
 | File | What |
 |---|---|
 | `build_site.py` | the builder; `--no-build` reuses `app/build` and `build/site` |
-| `landing.html` | the Portuguese front page template (`{{VERSION}}`, `{{DATE}}`, `{{SITE}}`, `{{REPO}}`) |
+| `root.html` | the root language detector (`/`); chooses `/pt/` or `/en/` |
+| `landing.pt.html` | the Portuguese front page template |
+| `landing.en.html` | the English front page template |
+| `lang.js` | remembers a language chosen from a page's language link |
 | `style.css` | the landing and manual styles |
 | `favicon.svg` | the site icon |
+
+The templates use `{{VERSION}}`, `{{DATE}}`, `{{SITE}}` and `{{REPO}}`.
+The root page sends Portuguese browsers to `/pt/` and every other browser to
+`/en/` (English is the fallback); a saved choice and `?lang=pt|en` override it.
+The manuals stay at `/manual/` (Português) and `/manual/en/` (English).
 
 The generated `docs/` is committed and served by GitHub Pages from
 `main` / `docs` at https://ograndebe.github.io/fm1wheel/.

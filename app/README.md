@@ -89,6 +89,6 @@ make install         # writes to the connected FM-1
 ```
 
 The platform, host simulator and browser emulator are in `../fm1-base/`. The
-hardware manual is in [`../MANUAL.md`](../MANUAL.md) (pt-BR) and
-[`../MANUAL.en.md`](../MANUAL.en.md) (English). See also the top-level
+hardware manual is in [`../MANUAL.md`](../MANUAL.md) (English) and
+[`../MANUAL.pt.md`](../MANUAL.pt.md) (Português). See also the top-level
 `README.md` and `PLANO.md`.

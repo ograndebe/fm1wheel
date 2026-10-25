@@ -1,200 +1,53 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>fm1-wheel · órgão tonewheel para o M-VAVE FM-1</title>
-<meta name="description" content="fm1-wheel: firmware de órgão tonewheel para o M-VAVE FM-1, baseado no setBfree. 91 rodas, scanner, preamp, reverb e Leslie.">
+<title>fm1-wheel · tonewheel organ for the M-VAVE FM-1</title>
+<meta name="description" content="fm1-wheel: tonewheel organ firmware for the M-VAVE FM-1, based on setBfree. Choose Português or English.">
 <meta property="og:title" content="fm1-wheel">
-<meta property="og:description" content="Um órgão tonewheel completo para o M-VAVE FM-1, baseado no setBfree.">
+<meta property="og:description" content="A complete tonewheel organ for the M-VAVE FM-1, based on setBfree.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://ograndebe.github.io/fm1wheel/">
 <meta property="og:image" content="https://ograndebe.github.io/fm1wheel/img/emulator.png">
+<meta name="robots" content="noindex">
+<link rel="canonical" href="https://ograndebe.github.io/fm1wheel/en/">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="style.css">
+<link rel="alternate" hreflang="pt-BR" href="https://ograndebe.github.io/fm1wheel/pt/">
+<link rel="alternate" hreflang="en" href="https://ograndebe.github.io/fm1wheel/en/">
+<link rel="alternate" hreflang="x-default" href="https://ograndebe.github.io/fm1wheel/en/">
+<style>
+  :root { color-scheme: light; font: 16px/1.5 Barlow, "Helvetica Neue", Arial, sans-serif; }
+  body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #faf4e8; color: #48392f; }
+  main { text-align: center; padding: 2rem; }
+  h1 { font-size: 2rem; margin: 0 0 .4rem; }
+  p { margin: 0 0 1.2rem; color: #6e5c4b; }
+  a { display: inline-block; margin: .3rem; padding: .7rem 1.2rem; border: 1px solid #b84a1e; border-radius: 999px; color: #b84a1e; text-decoration: none; font-weight: 600; }
+  a:hover { background: #b84a1e; color: #fffaf1; }
+</style>
+<script>
+(() => {
+  const KEY = "fm1-wheel-lang";
+  const q = new URLSearchParams(location.search).get("lang");
+  let saved = null;
+  try { saved = localStorage.getItem(KEY); } catch (_) {}
+  const lang = q === "pt" || q === "en" ? q
+    : saved === "pt" || saved === "en" ? saved
+    : ((navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || ""])
+        .some((l) => /^pt(-|$)/i.test(l)) ? "pt" : "en");
+  if (q === "pt" || q === "en") {
+    try { localStorage.setItem(KEY, q); } catch (_) {}
+  }
+  location.replace(lang + "/");
+})();
+</script>
 </head>
 <body>
-<a class="skip" href="#main">Ir para o conteúdo</a>
-
-<header class="topnav">
-  <div class="wrap navwrap">
-    <a class="brand" href="./">fm1-wheel</a>
-    <nav class="navlinks" aria-label="Principal">
-      <a href="manual/">Manual</a>
-      <a href="manual/en/">English</a>
-      <a href="emu/">Experimentar</a>
-      <a href="install/">Instalar</a>
-      <a class="github" href="https://github.com/ograndebe/fm1wheel">GitHub ↗</a>
-    </nav>
-  </div>
-</header>
-
-<main id="main">
-  <div class="wrap">
-    <section class="hero">
-      <div>
-        <p class="eyebrow">M-VAVE FM-1 · tonewheel organ · after setBfree</p>
-        <h1>fm1-wheel</h1>
-        <p class="lede">Um órgão <strong>tonewheel</strong> completo para o FM-1: 91 rodas, matriz de contatos, scanner, preamp valvulado, reverb e Leslie. O mesmo código roda no aparelho e no navegador.</p>
-        <div class="actions">
-          <a class="btn primary" href="emu/">Experimentar no navegador</a>
-          <a class="btn" href="manual/">Manual</a>
-          <a class="btn" href="install/">Instalar</a>
-        </div>
-        <p class="hero-note">Versão 0.1.1 · firmware em desenvolvimento · build de device e emulador validados; teste no FM-1 pendente.</p>
-      </div>
-      <figure class="shot">
-        <img src="img/emulator.png" width="756" height="413" alt="O fm1-wheel rodando no emulador: tela do FM-1, painel e teclado.">
-        <figcaption>O firmware completo no emulador: tela, painel, teclado e áudio em tempo real.</figcaption>
-      </figure>
-    </section>
-  </div>
-
-  <section class="section" id="about">
-    <div class="wrap">
-      <h2>O que é o fm1-wheel</h2>
-      <p class="sub">Não é um órgão por voz: é um gerador de tonewheels compartilhado, como o instrumento original. O timbre vem das rodas, dos contatos, dos drawbars e da cadeia analógica.</p>
-      <div class="cards">
-        <article class="card">
-          <div class="kicker">Tone generator</div>
-          <h3>91 rodas</h3>
-          <p>Frequências mecânicas (gear ratios), 27 buses, taper e crosstalk de terminal, fiação e compartimento. As rodas são compartilhadas entre as teclas.</p>
-        </article>
-        <article class="card">
-          <div class="kicker">Cadeia setBfree</div>
-          <h3>Do scanner ao Leslie</h3>
-          <p>Scanner vibrato/chorus V1–V3/C1–C3, preamp valvulado, reverb Schroeder e Leslie com Doppler, reflexões e aceleração.</p>
-        </article>
-        <article class="card">
-          <div class="kicker">FM-1</div>
-          <h3>27 teclas + MIDI</h3>
-          <p>Teclado embutido, USB-MIDI e TRS-MIDI. O modo drawbar keys transforma as teclas em controle dos drawbars enquanto um controlador externo toca.</p>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <section class="section" id="start">
-    <div class="wrap">
-      <h2>Comece em três passos</h2>
-      <p class="sub">Você pode ouvir agora no navegador, ou instalar no FM-1 quando o aparelho estiver conectado.</p>
-      <div class="steps">
-        <article class="step">
-          <h3>Instale</h3>
-          <p>Conecte o FM-1 por USB de dados e use o instalador web no Chrome/Edge. O instalador também volta ao firmware oficial.</p>
-        </article>
-        <article class="step">
-          <h3>Toque</h3>
-          <p>As 27 teclas tocam o manual superior. Um controlador MIDI externo pode tocar upper, lower e pedal nos canais 1, 2 e 3.</p>
-        </article>
-        <article class="step">
-          <h3>Edite</h3>
-          <p>Aperte <strong>GLO</strong>: as teclas deixam de tocar e passam a empurrar/puxar os drawbars. O MIDI externo continua soando.</p>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <section class="section" id="drawbars">
-    <div class="wrap split">
-      <div>
-        <h2>Modo drawbar keys</h2>
-        <p>Com o modo ligado, cada par <strong>bemol / natural</strong> controla um drawbar do manual selecionado. A tecla preta empurra (diminui); a branca puxa (aumenta). A barra cresce de cima para baixo: 8 é todo puxado, no volume máximo. As 18 teclas de controle acendem com o mesmo brilho; as demais ficam apagadas.</p>
-        <p><span class="pill">GLO</span> liga/desliga o modo. O MIDI externo continua tocando — o teclado embutido vira o controle da registração.</p>
-        <p>F3, C4, F4 e C5 são ignoradas. D#5, E5, F5, F#5 e G5 ficam livres.</p>
-        <p><a href="manual/">Ver o mapa completo no manual →</a></p>
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Par</th><th>Drawbar</th></tr></thead>
-          <tbody>
-            <tr><td>F#3 / G3</td><td>16'</td></tr>
-            <tr><td>G#3 / A3</td><td>5⅓'</td></tr>
-            <tr><td>A#3 / B3</td><td>8'</td></tr>
-            <tr><td>C#4 / D4</td><td>4'</td></tr>
-            <tr><td>D#4 / E4</td><td>2⅔'</td></tr>
-            <tr><td>F#4 / G4</td><td>2'</td></tr>
-            <tr><td>G#4 / A4</td><td>1⅗'</td></tr>
-            <tr><td>A#4 / B4</td><td>1⅓'</td></tr>
-            <tr><td>C#5 / D5</td><td>1'</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </section>
-
-  <section class="section" id="controls">
-    <div class="wrap">
-      <h2>Controles no FM-1</h2>
-      <p class="sub">Os rótulos impressos no aparelho são os originais; a tela mostra a função real.</p>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Controle</th><th>Função</th></tr></thead>
-          <tbody>
-            <tr><td><strong>SELECT</strong></td><td>página de drawbars: 0–3, 4–7, 8 + percussão</td></tr>
-            <tr><td><strong>ALGO / EDIT</strong></td><td>manual: UPPER, LOWER, PEDAL</td></tr>
-            <tr><td><strong>PRESET</strong></td><td>oito registrações de fábrica</td></tr>
-            <tr><td><strong>K1–K4</strong></td><td>as quatro barras da página; na página 3, barra 1' e percussão</td></tr>
-            <tr><td><strong>FX</strong></td><td>drive on/off</td></tr>
-            <tr><td><strong>ENV / ARP</strong></td><td>percussão on/off; 2º/3º harmônico</td></tr>
-            <tr><td><strong>LFO</strong></td><td>vibrato/chorus OFF → V1 → C1 → V2 → C2 → V3 → C3</td></tr>
-            <tr><td><strong>PLAY</strong></td><td>rotor STOP → SLOW → FAST</td></tr>
-            <tr><td><strong>SEQ</strong></td><td>reverb OFF → 30% → 60% → 100%</td></tr>
-            <tr><td><strong>GLO</strong></td><td>modo drawbar keys</td></tr>
-            <tr><td><strong>SAVE</strong></td><td>grava os ajustes na flash</td></tr>
-            <tr><td><strong>OCT− / OCT+</strong></td><td>transpose do teclado embutido</td></tr>
-            <tr><td><strong>MASTER</strong></td><td>volume de saída</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <p class="note">O manual completo traz a tabela de MIDI, o que é salvo e a solução de problemas: <a href="manual/">português</a> · <a href="manual/en/">English</a>.</p>
-    </div>
-  </section>
-
-  <section class="section" id="install">
-    <div class="wrap">
-      <div class="cta">
-        <div>
-          <h2>Leve para o FM-1</h2>
-          <p>Pacote 0.1.1, instalador web e download direto. Conecte por USB de dados; instalar é por sua conta e risco.</p>
-        </div>
-        <div class="actions">
-          <a class="btn primary" href="install/">Instalador web</a>
-          <a class="btn" href="firmware/fm1-wheel-0.1.1.fwsc" download>Baixar .fwsc</a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="section" id="source">
-    <div class="wrap">
-      <h2>Fonte, base e licença</h2>
-      <p class="sub">O fm1-wheel é software livre. O código, o port do DSP e a documentação estão no GitHub.</p>
-      <div class="source-grid">
-        <article class="card">
-          <h3>Projetos base</h3>
-          <p>
-            <a href="https://github.com/pantherb/setBfree">setBfree</a> (GPL-2.0-or-later) — DSP e algoritmos.<br>
-            <a href="https://github.com/charlesvestal/fm1-base">fm1-base</a> (MPL-2.0) — plataforma, simulador, emulador e instalador.<br>
-            <a href="https://github.com/hugelton/felucca-bsp">felucca-bsp</a> (MPL-2.0) — camada AC79, boot e loader.<br>
-            <a href="https://github.com/hugelton/Felucca">Felucca</a> (GPL-3.0-only) — referência de firmware/UX.
-          </p>
-        </article>
-        <article class="card">
-          <h3>Licença e créditos</h3>
-          <p>O firmware combinado é <strong>GPL-3.0-or-later</strong>. Veja <a href="https://github.com/ograndebe/fm1wheel/blob/main/LICENSING.md">LICENSING.md</a> e <a href="https://github.com/ograndebe/fm1wheel/tree/main/LICENSES">LICENSES/</a>.</p>
-          <p>Desenvolvido com <strong>OpenCode</strong> e <strong>DeepSeek V4.1 Flash</strong>, sob direção e revisão humanas.</p>
-        </article>
-      </div>
-    </div>
-  </section>
+<main>
+  <h1>fm1-wheel</h1>
+  <p>Choose your language · Escolha o idioma</p>
+  <a href="pt/" hreflang="pt-BR" lang="pt-BR">Português</a>
+  <a href="en/" hreflang="en" lang="en">English</a>
 </main>
-
-<footer class="sitefoot">
-  <div class="wrap">
-    <span>fm1-wheel 0.1.1 · 2026-10-25</span>
-    <span class="right"><a href="https://github.com/ograndebe/fm1wheel">GitHub</a> · <a href="manual/">Manual pt-BR</a> · <a href="manual/en/">Manual EN</a> · <a href="install/">Install</a></span>
-  </div>
-</footer>
 </body>
 </html>

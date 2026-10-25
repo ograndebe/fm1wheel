@@ -8,10 +8,15 @@
 <meta property="og:title" content="fm1-wheel">
 <meta property="og:description" content="Um órgão tonewheel completo para o M-VAVE FM-1, baseado no setBfree.">
 <meta property="og:type" content="website">
-<meta property="og:url" content="{{SITE}}">
-<meta property="og:image" content="{{SITE}}img/emulator.png">
-<link rel="icon" href="favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="style.css">
+<meta property="og:url" content="https://ograndebe.github.io/fm1wheel/pt/">
+<meta property="og:image" content="https://ograndebe.github.io/fm1wheel/img/emulator.png">
+<link rel="canonical" href="https://ograndebe.github.io/fm1wheel/pt/">
+<link rel="alternate" hreflang="pt-BR" href="https://ograndebe.github.io/fm1wheel/pt/">
+<link rel="alternate" hreflang="en" href="https://ograndebe.github.io/fm1wheel/en/">
+<link rel="alternate" hreflang="x-default" href="https://ograndebe.github.io/fm1wheel/en/">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../style.css">
+<script src="../lang.js" defer></script>
 </head>
 <body>
 <a class="skip" href="#main">Ir para o conteúdo</a>
@@ -20,11 +25,11 @@
   <div class="wrap navwrap">
     <a class="brand" href="./">fm1-wheel</a>
     <nav class="navlinks" aria-label="Principal">
-      <a href="manual/">Manual</a>
-      <a href="manual/en/">English</a>
-      <a href="emu/">Experimentar</a>
-      <a href="install/">Instalar</a>
-      <a class="github" href="{{REPO}}">GitHub ↗</a>
+      <a href="../manual/">Manual</a>
+      <a href="../en/" data-lang="en" hreflang="en" lang="en">English</a>
+      <a href="../emu/">Experimentar</a>
+      <a href="../install/">Instalar</a>
+      <a class="github" href="https://github.com/ograndebe/fm1wheel">GitHub ↗</a>
     </nav>
   </div>
 </header>
@@ -37,14 +42,14 @@
         <h1>fm1-wheel</h1>
         <p class="lede">Um órgão <strong>tonewheel</strong> completo para o FM-1: 91 rodas, matriz de contatos, scanner, preamp valvulado, reverb e Leslie. O mesmo código roda no aparelho e no navegador.</p>
         <div class="actions">
-          <a class="btn primary" href="emu/">Experimentar no navegador</a>
-          <a class="btn" href="manual/">Manual</a>
-          <a class="btn" href="install/">Instalar</a>
+          <a class="btn primary" href="../emu/">Experimentar no navegador</a>
+          <a class="btn" href="../manual/">Manual</a>
+          <a class="btn" href="../install/">Instalar</a>
         </div>
-        <p class="hero-note">Versão {{VERSION}} · firmware em desenvolvimento · build de device e emulador validados; teste no FM-1 pendente.</p>
+        <p class="hero-note">Versão 0.1.1 · firmware em desenvolvimento · build de device e emulador validados; teste no FM-1 pendente.</p>
       </div>
       <figure class="shot">
-        <img src="img/emulator.png" width="756" height="413" alt="O fm1-wheel rodando no emulador: tela do FM-1, painel e teclado.">
+        <img src="../img/emulator.png" width="756" height="413" alt="O fm1-wheel rodando no emulador: tela do FM-1, painel e teclado.">
         <figcaption>O firmware completo no emulador: tela, painel, teclado e áudio em tempo real.</figcaption>
       </figure>
     </section>
@@ -102,7 +107,7 @@
         <p>Com o modo ligado, cada par <strong>bemol / natural</strong> controla um drawbar do manual selecionado. A tecla preta empurra (diminui); a branca puxa (aumenta). A barra cresce de cima para baixo: 8 é todo puxado, no volume máximo. As 18 teclas de controle acendem com o mesmo brilho; as demais ficam apagadas.</p>
         <p><span class="pill">GLO</span> liga/desliga o modo. O MIDI externo continua tocando — o teclado embutido vira o controle da registração.</p>
         <p>F3, C4, F4 e C5 são ignoradas. D#5, E5, F5, F#5 e G5 ficam livres.</p>
-        <p><a href="manual/">Ver o mapa completo no manual →</a></p>
+        <p><a href="../manual/">Ver o mapa completo no manual →</a></p>
       </div>
       <div class="table-wrap">
         <table>
@@ -147,7 +152,7 @@
           </tbody>
         </table>
       </div>
-      <p class="note">O manual completo traz a tabela de MIDI, o que é salvo e a solução de problemas: <a href="manual/">português</a> · <a href="manual/en/">English</a>.</p>
+      <p class="note">O manual completo traz a tabela de MIDI, o que é salvo e a solução de problemas: <a href="../manual/">português</a> · <a href="../manual/en/">English</a>.</p>
     </div>
   </section>
 
@@ -156,11 +161,11 @@
       <div class="cta">
         <div>
           <h2>Leve para o FM-1</h2>
-          <p>Pacote {{VERSION}}, instalador web e download direto. Conecte por USB de dados; instalar é por sua conta e risco.</p>
+          <p>Pacote 0.1.1, instalador web e download direto. Conecte por USB de dados; instalar é por sua conta e risco.</p>
         </div>
         <div class="actions">
-          <a class="btn primary" href="install/">Instalador web</a>
-          <a class="btn" href="firmware/fm1-wheel-{{VERSION}}.fwsc" download>Baixar .fwsc</a>
+          <a class="btn primary" href="../install/">Instalador web</a>
+          <a class="btn" href="../firmware/fm1-wheel-0.1.1.fwsc" download>Baixar .fwsc</a>
         </div>
       </div>
     </div>
@@ -182,7 +187,7 @@
         </article>
         <article class="card">
           <h3>Licença e créditos</h3>
-          <p>O firmware combinado é <strong>GPL-3.0-or-later</strong>. Veja <a href="{{REPO}}/blob/main/LICENSING.md">LICENSING.md</a> e <a href="{{REPO}}/tree/main/LICENSES">LICENSES/</a>.</p>
+          <p>O firmware combinado é <strong>GPL-3.0-or-later</strong>. Veja <a href="https://github.com/ograndebe/fm1wheel/blob/main/LICENSING.md">LICENSING.md</a> e <a href="https://github.com/ograndebe/fm1wheel/tree/main/LICENSES">LICENSES/</a>.</p>
           <p>Desenvolvido com <strong>OpenCode</strong> e <strong>DeepSeek V4.1 Flash</strong>, sob direção e revisão humanas.</p>
         </article>
       </div>
@@ -192,8 +197,8 @@
 
 <footer class="sitefoot">
   <div class="wrap">
-    <span>fm1-wheel {{VERSION}} · {{DATE}}</span>
-    <span class="right"><a href="{{REPO}}">GitHub</a> · <a href="manual/">Manual pt-BR</a> · <a href="manual/en/">Manual EN</a> · <a href="install/">Install</a></span>
+    <span>fm1-wheel 0.1.1 · 2026-10-25</span>
+    <span class="right"><a href="https://github.com/ograndebe/fm1wheel">GitHub</a> · <a href="../manual/">Manual pt-BR</a> · <a href="../manual/en/">Manual EN</a> · <a href="../install/">Instalar</a></span>
   </div>
 </footer>
 </body>
