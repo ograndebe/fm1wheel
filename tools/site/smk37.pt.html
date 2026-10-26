@@ -27,7 +27,7 @@
     <nav class="navlinks" aria-label="Principal">
       <a href="../../manual/">Manual</a>
       <a href="../../en/smk37/" data-lang="en" hreflang="en" lang="en">English</a>
-      <a href="../../emu/">Emulador FM-1</a>
+      <a href="../../smk37/emu/">Emulador SMK-37</a>
       <a href="../../install/">Instalador FM-1</a>
       <a class="github" href="{{REPO}}">GitHub ↗</a>
     </nav>
@@ -43,6 +43,8 @@
         <p class="lede">A mesma cadeia tonewheel, agora com 37 teclas, 16 pads e quatro faders. As 27 teclas do meio são as F3–G5 do FM-1; os faders editam os drawbars página por página.</p>
         <div class="actions">
           <a class="btn primary" href="../../firmware/fm1-wheel-smk37-{{VERSION}}.fwsc" download>Baixar .fwsc ({{VERSION}})</a>
+          <a class="btn" href="../../smk37/install/">Instalar no navegador</a>
+          <a class="btn" href="../../smk37/emu/">Experimentar o emulador</a>
           <a class="btn" href="{{REPO}}/blob/main/SMK37.md">Build e segurança</a>
         </div>
         <p class="hero-note">Versão {{VERSION}} · build e testes de host passam · teste no SMK-37 físico pendente.</p>
@@ -63,7 +65,7 @@
         <article class="card">
           <div class="kicker">Instalação</div>
           <h3>Linha de comando</h3>
-          <p>O instalador web deste site é o do FM-1. Para o SMK use <code>python3 fm1-base/tools/fm1_install.py app/build/smk37/fm1-wheel-smk37-{{VERSION}}.fwsc</code>, ou um atualizador compatível do SMK. Nunca instale pacote de FM-1 no SMK nem o contrário.</p>
+          <p>Use o <a href="../../smk37/install/">instalador SMK-37 no navegador</a> no Chrome/Edge, ou <code>python3 fm1-base/tools/fm1_install.py app/build/smk37/fm1-wheel-smk37-{{VERSION}}.fwsc</code> / um atualizador compatível do SMK. Nunca instale pacote de FM-1 no SMK nem o contrário.</p>
         </article>
         <article class="card">
           <div class="kicker">Segurança</div>
@@ -111,7 +113,7 @@
           </tbody>
         </table>
       </div>
-      <p class="note">O build do SMK compila e passa nos testes de host; ainda não foi gravado em uma unidade física. A primeira instalação é um bring-up. O emulador no navegador continua sendo o painel do FM-1.</p>
+      <p class="note">O build do SMK compila e passa nos testes de host; ainda não foi gravado em uma unidade física. A primeira instalação é um bring-up. O <a href="../../smk37/emu/">emulador SMK-37 no navegador</a> roda o mesmo app pelo simulador de host; não é um emulador de CPU ciclo a ciclo.</p>
     </div>
   </section>
 </main>

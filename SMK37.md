@@ -19,6 +19,7 @@ Rosetta setup works.
 ```sh
 make smk37                 # M-VAVE SMK-37 Pro (identity SMK-37 Pro_...)
 make test-host-smk         # host simulator: pads, faders, 37 keys
+make web-smk               # SMK-37 panel emulator (WebAssembly)
 ```
 
 The package is written to:
@@ -60,10 +61,10 @@ Install with the command-line installer:
 python3 fm1-base/tools/fm1_install.py app/build/smk37/fm1-wheel-smk37-0.2.0.fwsc
 ```
 
-The web installer in this repository is currently the FM-1 installer. For the
-SMK use the command above, or install the same `.fwsc` through a compatible
-M-VAVE SMK updater. Never install an FM-1 package on an SMK, or an SMK package
-on an FM-1.
+The site's SMK-37 page has a separate browser installer at `/smk37/install/`
+(Chrome or Edge, Web MIDI). The command above and a compatible SMK updater are
+the fallbacks. The FM-1 installer at `/install/` is not for the SMK; never
+install an FM-1 package on an SMK, or an SMK package on an FM-1.
 
 The first SMK boot prepares its own settings area and leaves the stock
 calibration, Bluetooth pairing and key data untouched.
@@ -120,9 +121,10 @@ unchanged in `app/app.c`.
 - The pitch and mod wheels are not assigned yet.
 - The 37-key range extends beyond the FM-1's upper manual at the highest
   octave setting; keys above MIDI note 96 are ignored there.
-- The browser emulator is the FM-1 panel. The SMK build is tested in the host
-  simulator and needs a physical unit for display, pads, faders, audio and
-  update checks.
+- The SMK-37 browser emulator is at `/smk37/emu/` on the site (or
+  `make web-smk`); it runs the host simulator with the SMK panel. It is not a
+  cycle-accurate CPU emulator, and the physical unit is still needed for
+  display, pads, faders, audio and update checks.
 - The SMK package is for the **SMK-37 Pro**. Elite and MKE-P37 packages need a
   shorter identity than the current 0.2.0 release format; they are not built
   yet.

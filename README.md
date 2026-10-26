@@ -52,6 +52,7 @@ make build-host          # fm1-base/tools/build.py app --host
 make test-host           # app/build/host/fm1-wheel_host app/tests/basic.txt app/build/host
 make test-host-smk       # SMK-37 host simulator: 37 keys, pads, faders
 make web                 # the browser emulator in app/build/emu/
+make web-smk             # the SMK-37 panel emulator in app/build/smk37/emu/
 make serve-web           # builds it and serves http://localhost:8790/
 make site                # static site in docs/ (GitHub Pages)
 make ref                 # setBfree reference renders (tools/setbfree-host/build)
@@ -126,8 +127,8 @@ finishes the write.
 from fm1-base. The package is `app/build/smk37/fm1-wheel-smk37.fwsc`; the
 command-line installer understands the SMK identity. The SMK has a protected
 factory calibration, so make a full flash backup before the first install.
-The web installer in `docs/install/` is still FM-1-only; use
-`fm1_install.py` for the SMK or a compatible SMK updater. See
+The SMK installer is at `docs/smk37/install/`; the FM-1 installer remains
+`docs/install/`. The command-line installer also understands the SMK package. See
 [SMK37.md](SMK37.md) for the controls and the bring-up checklist. The SMK
 build is not flashed yet.
 

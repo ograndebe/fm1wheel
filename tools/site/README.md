@@ -21,9 +21,10 @@ The root page sends Portuguese browsers to `/pt/` and every other browser to
 `/en/` (English is the fallback); a saved choice and `?lang=pt|en` override it.
 The manuals stay at `/manual/` (Português) and `/manual/en/` (English).
 
-The SMK-37 pages are `/pt/smk37/` and `/en/smk37/`; the SMK package is
-published beside the FM-1 package in `docs/firmware/`. The web installer is
-still the FM-1 installer; the SMK install command is documented on its page.
+The SMK-37 pages are `/pt/smk37/` and `/en/smk37/`; the package is published
+beside the FM-1 package in `docs/firmware/`. The SMK panel emulator is
+`/smk37/emu/` and its browser installer is `/smk37/install/`; the FM-1 keeps
+`/emu/` and `/install/`.
 
 The generated `docs/` is committed and served by GitHub Pages from
 `main` / `docs` at https://ograndebe.github.io/fm1wheel/.

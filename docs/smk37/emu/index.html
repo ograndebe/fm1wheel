@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>fm1-wheel · SMK-37 emulator</title>
+<style>
+  :root { color-scheme: dark; --bg:#17130f; --card:#241d17; --ink:#f2e8d8; --dim:#b3a28e; --hi:#f28a5a; --line:#554536; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.4 "Barlow Semi Condensed", "Helvetica Neue", Arial, sans-serif; }
+  .wrap { max-width:1080px; margin:0 auto; padding:24px 16px 48px; }
+  h1 { font-size:clamp(1.6rem,4vw,2.4rem); margin:0 0 .2em; }
+  .sub { color:var(--dim); margin:0 0 1.2rem; }
+  a { color:var(--hi); }
+  .stage { display:grid; grid-template-columns:minmax(180px,240px) 1fr; gap:18px; align-items:start; background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px; }
+  #screen { width:240px; height:240px; image-rendering:pixelated; background:#000; border-radius:4px; }
+  #status { color:var(--dim); margin:.2rem 0 .8rem; min-height:1.4em; }
+  button { font:inherit; color:var(--ink); background:#33281f; border:1px solid var(--line); border-radius:7px; padding:.35em .65em; cursor:pointer; }
+  button:active { background:var(--hi); color:#2a140a; }
+  button.primary { background:var(--hi); color:#2a140a; border-color:var(--hi); font-weight:700; }
+  .controls { display:grid; gap:14px; margin-top:14px; }
+  .box { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px; }
+  .box h2 { font-size:.85rem; letter-spacing:.08em; text-transform:uppercase; color:var(--dim); margin:0 0 .6rem; }
+  .keys { display:flex; gap:3px; overflow-x:auto; padding-bottom:4px; }
+  .key { flex:1 0 22px; min-width:22px; height:76px; padding:4px 0; writing-mode:vertical-rl; text-orientation:mixed; font-size:11px; background:#f2e8d8; color:#241d17; border:1px solid #8b735d; }
+  .key.black { height:58px; background:#241d17; color:#f2e8d8; margin-top:0; }
+  .key:active { background:var(--hi); }
+  .pads { display:grid; grid-template-columns:repeat(8,1fr); gap:6px; }
+  .pad { aspect-ratio:1; border-radius:8px; background:#231d18; border:1px solid #4b3b2e; color:var(--dim); font-size:12px; }
+  .faders { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+  .fader { display:grid; gap:4px; font-size:12px; color:var(--dim); }
+  input[type=range] { width:100%; accent-color:var(--hi); }
+  .knobs { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+  .knob { display:grid; gap:4px; font-size:12px; text-align:center; }
+  .knob .row { display:flex; gap:4px; justify-content:center; }
+  .knob button { min-width:2em; }
+  .buttons { display:grid; grid-template-columns:repeat(6,1fr); gap:6px; }
+  .buttons button { font-size:12px; }
+  .wheels { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .note { color:var(--dim); font-size:.9rem; }
+  @media (max-width:700px) { .stage { grid-template-columns:1fr; } .buttons { grid-template-columns:repeat(3,1fr); } .knobs { grid-template-columns:repeat(2,1fr); } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>fm1-wheel · SMK-37 emulator</h1>
+  <p class="sub">A compact SMK-37 panel for the same WebAssembly app. Sound starts after you press Start. <a href="../../en/smk37/">Back to the SMK-37 page</a> · <a href="../../manual/en/#s10">Manual</a></p>
+
+  <div class="stage">
+    <div>
+      <canvas id="screen" width="240" height="240" aria-label="The emulated SMK-37 screen"></canvas>
+      <p id="status">Press Start to boot.</p>
+      <button id="start" class="primary" type="button">Start</button>
+    </div>
+    <div class="note">
+      <p><strong>Keys</strong> are C3–C6. Pads 1–8 recall registrations; pads 9–11 select fader pages A–C; faders 1–4 edit the four values on the current page. Drag the faders or wheels; use the +/− buttons for the encoders.</p>
+      <p>The emulator uses the host simulator and the same app/DSP as the firmware. It is not a cycle-accurate CPU emulator. A physical SMK-37 is still needed for the final hardware check.</p>
+    </div>
+  </div>
+
+  <div class="controls">
+    <section class="box"><h2>Keys · C3–C6</h2><div class="keys" id="keys"></div></section>
+
+    <section class="box"><h2>Pads</h2><div class="pads" id="pads"></div></section>
+
+    <section class="box"><h2>Drawbar faders</h2><div class="faders" id="faders"></div></section>
+
+    <section class="box"><h2>Encoders · K1–K8</h2><div class="knobs" id="knobs"></div></section>
+
+    <section class="box"><h2>Buttons</h2><div class="buttons" id="buttons"></div></section>
+
+    <section class="box"><h2>Wheels</h2><div class="wheels">
+      <label class="fader">Pitch <input id="pitch" type="range" min="-127" max="127" value="0"></label>
+      <label class="fader">Mod <input id="mod" type="range" min="0" max="127" value="0"></label>
+    </div></section>
+  </div>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const send = (m) => { if (node) node.port.postMessage(m); };
+let node = null, started = false, btnMask = 0;
+
+// ---- the panel ----------------------------------------------------------
+const NOTES = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+const BLACK = new Set([1,3,6,8,10]);
+function noteName(k) { const n = 48 + k; return NOTES[n % 12] + (Math.floor(n / 12) - 1); }
+for (let k = 0; k < 37; k++) {
+  const b = document.createElement("button");
+  b.className = "key" + (BLACK.has(k % 12) ? " black" : "");
+  b.type = "button"; b.textContent = noteName(k); b.dataset.k = k;
+  b.setAttribute("aria-label", noteName(k));
+  b.addEventListener("pointerdown", (e) => { e.preventDefault(); b.setPointerCapture(e.pointerId); send({type:"keybed",key:k,vel:100}); });
+  b.addEventListener("pointerup", () => send({type:"keybed",key:k,vel:0}));
+  b.addEventListener("pointercancel", () => send({type:"keybed",key:k,vel:0}));
+  $("keys").appendChild(b);
+}
+for (let p = 0; p < 16; p++) {
+  const b = document.createElement("button");
+  b.className = "pad"; b.type = "button"; b.textContent = String(p + 1); b.dataset.pad = p;
+  b.setAttribute("aria-label", "Pad " + (p + 1));
+  b.addEventListener("pointerdown", (e) => { e.preventDefault(); b.setPointerCapture(e.pointerId); send({type:"pad",pad:p,vel:100}); });
+  b.addEventListener("pointerup", () => send({type:"pad",pad:p,vel:0}));
+  b.addEventListener("pointercancel", () => send({type:"pad",pad:p,vel:0}));
+  $("pads").appendChild(b);
+}
+for (let i = 0; i < 4; i++) {
+  const l = document.createElement("label"); l.className = "fader";
+  l.textContent = "Fader " + (i + 1);
+  const r = document.createElement("input"); r.type = "range"; r.min = 0; r.max = 127; r.value = i === 0 ? 127 : 64;
+  r.addEventListener("input", () => send({type:"fader",fader:i,value:+r.value}));
+  l.appendChild(r); $("faders").appendChild(l);
+}
+const KNOBS = [
+  { name: "K1", role: 3 }, { name: "K2", role: 4 }, { name: "K3", role: 5 }, { name: "K4", role: 6 },
+  { name: "K5", role: null }, { name: "K6", role: 0 }, { name: "K7", role: 1 }, { name: "K8", role: 2 },
+];
+for (const k of KNOBS) {
+  const l = document.createElement("div"); l.className = "knob";
+  const n = document.createElement("div"); n.textContent = k.name; l.appendChild(n);
+  const row = document.createElement("div"); row.className = "row";
+  if (k.role === null) {
+    const r = document.createElement("input"); r.type = "range"; r.min = 0; r.max = 4096; r.value = 2800;
+    r.addEventListener("input", () => send({type:"master",value:+r.value}));
+    row.appendChild(r);
+  } else {
+    const m = document.createElement("button"); m.type = "button"; m.textContent = "−";
+    m.addEventListener("click", () => send({type:"enc",role:k.role,n:-1}));
+    const p = document.createElement("button"); p.type = "button"; p.textContent = "+";
+    p.addEventListener("click", () => send({type:"enc",role:k.role,n:1}));
+    row.append(m, p);
+  }
+  l.appendChild(row); $("knobs").appendChild(l);
+}
+const BUTTONS = [
+  ["FX",0],["SCALE",1],["CHORD",2],["NOTE REPEAT",3],["PARA",4],["GLOBE",5],
+  ["PATCH",6],["BT",7],["ARP",8],["SEQ",9],["SEQ PLAY",10],["SEQ REC",11],
+  ["OCTAVE−",12],["OCTAVE+",13],
+];
+for (const [name, bit] of BUTTONS) {
+  const b = document.createElement("button"); b.type = "button"; b.textContent = name;
+  b.addEventListener("pointerdown", (e) => { e.preventDefault(); b.setPointerCapture(e.pointerId); btnMask |= 1 << bit; send({type:"buttons",mask:btnMask}); });
+  b.addEventListener("pointerup", () => { btnMask &= ~(1 << bit); send({type:"buttons",mask:btnMask}); });
+  b.addEventListener("pointercancel", () => { btnMask &= ~(1 << bit); send({type:"buttons",mask:btnMask}); });
+  $("buttons").appendChild(b);
+}
+const EXTRA = [["KNOB BANK",0],["FADER BANK",1],["<",2],[">",3]];
+for (const [name, bit] of EXTRA) {
+  const b = document.createElement("button"); b.type = "button"; b.textContent = name;
+  b.addEventListener("pointerdown", (e) => { e.preventDefault(); b.setPointerCapture(e.pointerId); send({type:"smkbtn",button:bit,on:1}); });
+  b.addEventListener("pointerup", () => send({type:"smkbtn",button:bit,on:0}));
+  b.addEventListener("pointercancel", () => send({type:"smkbtn",button:bit,on:0}));
+  $("buttons").appendChild(b);
+}
+$("pitch").addEventListener("input", () => send({type:"wheel",pitch:+$("pitch").value,mod:+$("mod").value}));
+$("mod").addEventListener("input", () => send({type:"wheel",pitch:+$("pitch").value,mod:+$("mod").value}));
+
+// ---- screen and lights --------------------------------------------------
+const screen = $("screen"), sctx = screen.getContext("2d");
+const lcd = document.createElement("canvas"); lcd.width = lcd.height = 240;
+const lctx = lcd.getContext("2d"), img = lctx.createImageData(240, 240);
+function drawScreen(fb) {
+  const d = img.data;
+  for (let i = 0; i < 240 * 240; i++) {
+    const v = fb[i], p = ((v >> 8) | (v << 8)) & 0xFFFF;
+    d[i * 4] = ((p >> 11) & 31) * 255 / 31;
+    d[i * 4 + 1] = ((p >> 5) & 63) * 255 / 63;
+    d[i * 4 + 2] = (p & 31) * 255 / 31;
+    d[i * 4 + 3] = 255;
+  }
+  lctx.putImageData(img, 0, 0);
+  sctx.imageSmoothingEnabled = false;
+  sctx.drawImage(lcd, 0, 0, 240, 240);
+}
+function drawPads(pads) {
+  for (let p = 0; p < 16; p++) {
+    const c = pads[p] || 0, el = $("pads").children[p];
+    el.style.background = `rgb(${(c >> 16) & 255},${(c >> 8) & 255},${c & 255})`;
+    el.style.color = (c ? "#fff" : "var(--dim)");
+  }
+}
+
+// ---- start --------------------------------------------------------------
+$("start").addEventListener("click", async () => {
+  if (started) return;
+  started = true;
+  const status = $("status");
+  status.textContent = "Starting…";
+  try {
+    const ac = new AudioContext({sampleRate: 44100, latencyHint: "interactive"});
+    await ac.audioWorklet.addModule("worklet.js");
+    node = new AudioWorkletNode(ac, "fm1");
+    node.connect(ac.destination);
+    const wasm = await (await fetch("app.wasm")).arrayBuffer();
+    node.port.onmessage = (e) => {
+      const m = e.data;
+      if (m.type === "frame") {
+        if (m.fb) drawScreen(m.fb);
+        if (m.pads) drawPads(m.pads);
+        if (m.load !== undefined) status.textContent = `fm1-wheel · SMK-37 · ${m.load}% audio load`;
+      }
+    };
+    node.port.postMessage({type:"load", wasm, store:{}, master:2800}, [wasm]);
+    status.textContent = "Booting…";
+    $("start").hidden = true;
+    await ac.resume();
+  } catch (err) {
+    started = false;
+    status.textContent = "Could not start: " + (err && err.message || err);
+    $("start").hidden = false;
+  }
+});
+</script>
+</body>
+</html>

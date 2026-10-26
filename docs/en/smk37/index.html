@@ -27,7 +27,7 @@
     <nav class="navlinks" aria-label="Main">
       <a href="../../manual/en/">Manual</a>
       <a href="../../pt/smk37/" data-lang="pt" hreflang="pt-BR" lang="pt-BR">Português</a>
-      <a href="../../emu/">FM-1 emulator</a>
+      <a href="../../smk37/emu/">SMK-37 emulator</a>
       <a href="../../install/">FM-1 installer</a>
       <a class="github" href="https://github.com/ograndebe/fm1wheel">GitHub ↗</a>
     </nav>
@@ -43,6 +43,8 @@
         <p class="lede">The same tonewheel chain, now with 37 keys, 16 pads and four faders. The middle 27 keys are the FM-1's F3–G5; the faders edit drawbars page by page.</p>
         <div class="actions">
           <a class="btn primary" href="../../firmware/fm1-wheel-smk37-0.2.0.fwsc" download>Download .fwsc (0.2.0)</a>
+          <a class="btn" href="../../smk37/install/">Install in browser</a>
+          <a class="btn" href="../../smk37/emu/">Try the emulator</a>
           <a class="btn" href="https://github.com/ograndebe/fm1wheel/blob/main/SMK37.md">Build and safety</a>
         </div>
         <p class="hero-note">Version 0.2.0 · build and host tests pass · physical SMK-37 test pending.</p>
@@ -63,7 +65,7 @@
         <article class="card">
           <div class="kicker">Install</div>
           <h3>Command line</h3>
-          <p>The web installer on this site is the FM-1 installer. For the SMK use <code>python3 fm1-base/tools/fm1_install.py app/build/smk37/fm1-wheel-smk37-0.2.0.fwsc</code>, or a compatible SMK updater. Never cross-flash FM-1 and SMK packages.</p>
+          <p>Use the <a href="../../smk37/install/">SMK-37 browser installer</a> in Chrome/Edge, or <code>python3 fm1-base/tools/fm1_install.py app/build/smk37/fm1-wheel-smk37-0.2.0.fwsc</code> / a compatible SMK updater. Never cross-flash FM-1 and SMK packages.</p>
         </article>
         <article class="card">
           <div class="kicker">Safety</div>
@@ -111,7 +113,7 @@
           </tbody>
         </table>
       </div>
-      <p class="note">The SMK build is compile- and host-tested; it has not been flashed on a physical unit. The first install is a bring-up. The browser emulator remains the FM-1 panel.</p>
+      <p class="note">The SMK build is compile- and host-tested; it has not been flashed on a physical unit. The first install is a bring-up. The <a href="../../smk37/emu/">SMK-37 browser emulator</a> runs the same app through the host simulator; it is not a cycle-accurate CPU emulator.</p>
     </div>
   </section>
 </main>
