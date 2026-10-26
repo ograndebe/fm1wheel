@@ -644,3 +644,32 @@ The harness used in this analysis:
 
 These files live in `tools/setbfree-host/` in the repository and are the basis
 of the golden tests.
+
+---
+
+## 11. M-VAVE SMK-37 Pro build
+
+The SMK-37 Pro is a second build target, not a second app. It uses the same
+JieLi AC791N family, SPL, update loader, audio path and tonewheel engine; the
+board layer supplies the 37-key/two-contact matrix, 16 RGB pads, four faders,
+eight encoders, 240x240 panel, ADC muxes and the SMK flash map.
+
+Implemented:
+
+- `BOARD=smk37` (or `--board smk37`) in `fm1-base/tools/build.py`;
+  `boards/smk37/` in felucca-bsp; `BOARD_SMK37` default 0.
+- SMK package layout and identity in `fm1pkg_make.py`; the app slot is
+  `0x97400`, the app area ends at `0x9D000`.
+- `plat_smk_*`, `plat_keybed`, `plat_fader`, `plat_pad_*` in `plat.h`.
+- `app/smk37.c`: 37-key keybed, drawbar faders on pages A/B/C, pads 1-8 for
+  registrations, pads 9-11 for pages, soft takeover, pad lights.
+- Host simulator commands (`pad`, `fader`, `keybed`, `wheel`) and
+  `app/tests/smk37.txt`.
+- The FM-1 build remains byte-identical to its baseline; the SMK build is
+  compile- and host-tested, not hardware-tested.
+
+Still to validate on a physical SMK-37 Pro: display, pad LEDs, fader
+calibration, key velocity, audio, USB-MIDI, save/reload, update and recovery.
+The SMK's TRS jack is MIDI out; the FM-1 TRS-in driver is disabled for this
+board. The factory calibration at `0xC1000` is read-only and a full flash
+backup is required before the first install.

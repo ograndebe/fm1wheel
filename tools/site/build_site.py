@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 """Build the fm1-wheel static site in docs/ (GitHub Pages).
 
-  tools/site/build_site.py [--version 0.1.1] [--no-build]
+  tools/site/build_site.py [--version 0.2.0] [--no-build]
 
 --no-build reuses app/build and build/site (for a quick manual/landing rebuild).
 The normal run builds the browser emulator and a release package first, then
@@ -47,6 +47,7 @@ def manual(src, dst, lang, root_rel, home_rel, old_lang_link, new_lang_link, ver
     text = text.replace("docs/img/emulator.png", "img/emulator.png")
     text = text.replace("](LICENSING.md)", f"]({REPO}/blob/main/LICENSING.md)")
     text = text.replace("](LICENSES/)", f"]({REPO}/tree/main/LICENSES)")
+    text = text.replace("](SMK37.md)", f"]({REPO}/blob/main/SMK37.md)")
     text = text.replace(old_lang_link, new_lang_link)
     tmp = BUILD / ("manual-" + lang.replace("-", "_") + ".md")
     tmp.write_text(text, encoding="utf-8")
@@ -116,12 +117,14 @@ def manual(src, dst, lang, root_rel, home_rel, old_lang_link, new_lang_link, ver
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--version", default="0.1.1")
+    ap.add_argument("--version", default="0.2.0")
     ap.add_argument("--no-build", action="store_true")
     args = ap.parse_args()
     version = args.version
     date = datetime.date.today().isoformat()
     pkg = ROOT / "app" / "build" / f"fm1-wheel-{version}.fwsc"
+    smk_pkg = ROOT / "app" / "build" / "smk37" / f"fm1-wheel-smk37-{version}.fwsc"
+    smk_name = f"fm1-wheel-smk37-{version}.fwsc"
 
     if not args.no_build:
         env = os.environ.copy()
@@ -129,15 +132,24 @@ def main():
         env.setdefault("JIELI_TOOLCHAIN", str(Path.home() / ".jieli" / "toolchain"))
         run([sys.executable, ROOT / "fm1-base" / "tools" / "build.py", "app", "--web"], env)
         run([sys.executable, ROOT / "fm1-base" / "tools" / "build.py", "app", "--release", version], env)
+        run([sys.executable, ROOT / "fm1-base" / "tools" / "build.py", "app", "--board", "smk37",
+             "--model", "pro", "--release", version], env)
         if not pkg.exists():
             sys.exit(f"missing release package: {pkg}")
+        if not smk_pkg.exists():
+            sys.exit(f"missing SMK release package: {smk_pkg}")
         if BUILD.exists():
             shutil.rmtree(BUILD)
         run([sys.executable, ROOT / "fm1-base" / "tools" / "make_site.py",
              "app", pkg, version, BUILD])
+        shutil.copy2(smk_pkg, BUILD / "firmware" / smk_name)
 
     if not BUILD.exists():
         sys.exit(f"missing {BUILD}; run without --no-build")
+    if not (BUILD / "firmware" / smk_name).exists():
+        if not smk_pkg.exists():
+            sys.exit(f"missing SMK release package: {smk_pkg}")
+        shutil.copy2(smk_pkg, BUILD / "firmware" / smk_name)
     DOCS.mkdir(parents=True, exist_ok=True)
 
     if (DOCS / "manual").exists():
@@ -167,9 +179,16 @@ def main():
         render((TOOLS / "landing.pt.html").read_text(encoding="utf-8"), version, date), encoding="utf-8")
     (DOCS / "en" / "index.html").write_text(
         render((TOOLS / "landing.en.html").read_text(encoding="utf-8"), version, date), encoding="utf-8")
+    (DOCS / "pt" / "smk37").mkdir(parents=True, exist_ok=True)
+    (DOCS / "en" / "smk37").mkdir(parents=True, exist_ok=True)
+    (DOCS / "pt" / "smk37" / "index.html").write_text(
+        render((TOOLS / "smk37.pt.html").read_text(encoding="utf-8"), version, date), encoding="utf-8")
+    (DOCS / "en" / "smk37" / "index.html").write_text(
+        render((TOOLS / "smk37.en.html").read_text(encoding="utf-8"), version, date), encoding="utf-8")
     (DOCS / "index.html").write_text(
         render((TOOLS / "root.html").read_text(encoding="utf-8"), version, date), encoding="utf-8")
-    print("wrote", DOCS / "index.html", DOCS / "pt/index.html", DOCS / "en/index.html")
+    print("wrote", DOCS / "index.html", DOCS / "pt/index.html", DOCS / "en/index.html",
+          DOCS / "pt/smk37/index.html", DOCS / "en/smk37/index.html")
 
     manual("MANUAL.pt.md", DOCS / "manual" / "index.html", "pt-BR", "../", "../pt/",
            "[English](MANUAL.md)", "[English](en/)", version, date)

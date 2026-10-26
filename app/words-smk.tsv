@@ -1,0 +1,16 @@
+# SPDX-License-Identifier: MPL-2.0
+# fm1-wheel words for a screen reader (fm1-reader): the text on the screen <TAB> what to say.
+# url: https://ograndebe.github.io/fm1wheel/words/
+FM1-WHEEL	fm one wheel
+K1 OCTAVE	knob 1, octave
+K2 WAVE	knob 2, wave
+DRAWBAR KEYS	drawbar keys
+FLAT=PUSH	flat key pushes in
+NAT=PULL	natural key pulls out
+FADERS	faders
+FADERS ON	faders on
+FADERS OFF	faders off
+PAD RESERVED	pad reserved
+A	A
+B	B
+C	C

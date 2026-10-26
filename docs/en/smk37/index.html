@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>fm1-wheel on the M-VAVE SMK-37 Pro</title>
+<meta name="description" content="The fm1-wheel tonewheel organ on the M-VAVE SMK-37 Pro: 37 keys, fader drawbar pages, pads and build instructions.">
+<meta property="og:title" content="fm1-wheel on the SMK-37 Pro">
+<meta property="og:description" content="The same tonewheel organ, now for the M-VAVE SMK-37 Pro.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://ograndebe.github.io/fm1wheel/en/smk37/">
+<meta property="og:image" content="https://ograndebe.github.io/fm1wheel/img/emulator.png">
+<link rel="canonical" href="https://ograndebe.github.io/fm1wheel/en/smk37/">
+<link rel="alternate" hreflang="pt-BR" href="https://ograndebe.github.io/fm1wheel/pt/smk37/">
+<link rel="alternate" hreflang="en" href="https://ograndebe.github.io/fm1wheel/en/smk37/">
+<link rel="alternate" hreflang="x-default" href="https://ograndebe.github.io/fm1wheel/en/smk37/">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../../style.css">
+<script src="../../lang.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topnav">
+  <div class="wrap navwrap">
+    <a class="brand" href="../../en/">fm1-wheel</a>
+    <nav class="navlinks" aria-label="Main">
+      <a href="../../manual/en/">Manual</a>
+      <a href="../../pt/smk37/" data-lang="pt" hreflang="pt-BR" lang="pt-BR">Português</a>
+      <a href="../../emu/">FM-1 emulator</a>
+      <a href="../../install/">FM-1 installer</a>
+      <a class="github" href="https://github.com/ograndebe/fm1wheel">GitHub ↗</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <div class="wrap">
+    <section class="hero">
+      <div>
+        <p class="eyebrow">M-VAVE SMK-37 Pro · tonewheel organ · after setBfree</p>
+        <h1>fm1-wheel on the SMK-37</h1>
+        <p class="lede">The same tonewheel chain, now with 37 keys, 16 pads and four faders. The middle 27 keys are the FM-1's F3–G5; the faders edit drawbars page by page.</p>
+        <div class="actions">
+          <a class="btn primary" href="../../firmware/fm1-wheel-smk37-0.2.0.fwsc" download>Download .fwsc (0.2.0)</a>
+          <a class="btn" href="https://github.com/ograndebe/fm1wheel/blob/main/SMK37.md">Build and safety</a>
+        </div>
+        <p class="hero-note">Version 0.2.0 · build and host tests pass · physical SMK-37 test pending.</p>
+      </div>
+    </section>
+  </div>
+
+  <section class="section">
+    <div class="wrap">
+      <h2>Before you install</h2>
+      <p class="sub">The SMK-37 has a factory calibration that cannot be downloaded again. Make a full flash backup first and keep M-VAVE's stock package for the way back.</p>
+      <div class="cards">
+        <article class="card">
+          <div class="kicker">Build</div>
+          <h3>One app, two boards</h3>
+          <p><code>make smk37</code> writes <code>app/build/smk37/fm1-wheel-smk37.fwsc</code>. The FM-1 build is unchanged. The SMK board layer is selected by <code>BOARD=smk37</code>; there is no second app or DSP copy.</p>
+        </article>
+        <article class="card">
+          <div class="kicker">Install</div>
+          <h3>Command line</h3>
+          <p>The web installer on this site is the FM-1 installer. For the SMK use <code>python3 fm1-base/tools/fm1_install.py app/build/smk37/fm1-wheel-smk37-0.2.0.fwsc</code>, or a compatible SMK updater. Never cross-flash FM-1 and SMK packages.</p>
+        </article>
+        <article class="card">
+          <div class="kicker">Safety</div>
+          <h3>Protected flash</h3>
+          <p>The boot head, Bluetooth/calibration, stock resources and key/MAC areas are never written by this build. Read <a href="https://github.com/ograndebe/fm1wheel/blob/main/SMK37.md">SMK37.md</a> before the first install.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap split">
+      <div>
+        <h2>Drawbars, page by page</h2>
+        <p>Values stay 0–8, with 8 fully out and the bars filling from the top down. Faders use soft takeover: after a page or preset change they only move a bar when they reach its current value.</p>
+        <p><span class="pill">FADER BANK</span> or pads 9–11 select the page. Pads 1–8 recall the factory registrations. <span class="pill">GLOBE</span> turns the fader/pad controls on and off; the keys keep playing.</p>
+        <p><a href="../../manual/en/#s10">See the manual section →</a></p>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Page</th><th>Fader 1</th><th>Fader 2</th><th>Fader 3</th><th>Fader 4</th></tr></thead>
+          <tbody>
+            <tr><td>A</td><td>16'</td><td>5⅓'</td><td>8'</td><td>4'</td></tr>
+            <tr><td>B</td><td>2⅔'</td><td>2'</td><td>1⅗'</td><td>1⅓'</td></tr>
+            <tr><td>C</td><td>1'</td><td>percussion</td><td>2nd/3rd</td><td>fast/slow</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <h2>SMK-37 differences</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Item</th><th>SMK-37 Pro</th></tr></thead>
+          <tbody>
+            <tr><td>Keys</td><td>37, C3–C6; the middle 27 are F3–G5</td></tr>
+            <tr><td>Pads</td><td>16 RGB; 1–8 presets, 9–11 fader pages, 12–16 reserved</td></tr>
+            <tr><td>Faders</td><td>4, three pages, soft takeover</td></tr>
+            <tr><td>Encoders</td><td>K1–K4 bars, K5 master, K6–K8 select/algo/preset</td></tr>
+            <tr><td>MIDI</td><td>USB-MIDI in/out; TRS is output only (not implemented yet)</td></tr>
+            <tr><td>Wheels</td><td>not assigned yet</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">The SMK build is compile- and host-tested; it has not been flashed on a physical unit. The first install is a bring-up. The browser emulator remains the FM-1 panel.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="sitefoot">
+  <div class="wrap">
+    <span>fm1-wheel 0.2.0 · SMK-37 Pro</span>
+    <span class="right"><a href="https://github.com/ograndebe/fm1wheel">GitHub</a> · <a href="../../manual/">Manual PT</a> · <a href="../../manual/en/">Manual EN</a> · <a href="../../en/">FM-1 site</a></span>
+  </div>
+</footer>
+</body>
+</html>
