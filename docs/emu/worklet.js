@@ -65,6 +65,16 @@ class Fm1 extends AudioWorkletProcessor {
       const b = Uint8Array.from(m.bytes).subarray(0, 64);
       new Uint8Array(this.mem.buffer, this.ex.web_sysex_buf(), b.length).set(b);
       this.ex.web_sysex(b.length);
+    } else if (m.type === "keybed" && this.ex.web_smk_keybed) {
+      this.ex.web_smk_keybed(m.key | 0, m.vel | 0);
+    } else if (m.type === "pad" && this.ex.web_smk_pad) {
+      this.ex.web_smk_pad(m.pad | 0, m.vel | 0);
+    } else if (m.type === "smkbtn" && this.ex.web_smk_button) {
+      this.ex.web_smk_button(m.button | 0, m.on ? 1 : 0);
+    } else if (m.type === "fader" && this.ex.web_smk_fader) {
+      this.ex.web_smk_fader(m.fader | 0, m.value | 0);
+    } else if (m.type === "wheel" && this.ex.web_smk_wheel) {
+      this.ex.web_smk_wheel(m.pitch | 0, m.mod | 0);
     } else if (m.type === "app" && this.app.message) {
       this.app.message(this, m);
     }
@@ -89,6 +99,12 @@ class Fm1 extends AudioWorkletProcessor {
       this.sentBlits = blits;
       msg.fb = new Uint16Array(this.mem.buffer, ex.web_fb(), 240 * 240).slice();
       transfer.push(msg.fb.buffer);
+    }
+    if (ex.web_smk_pad_rgb) {
+      msg.pads = new Uint32Array(16);
+      for (let p = 0; p < 16; p++) msg.pads[p] = ex.web_smk_pad_rgb(p) >>> 0;
+      transfer.push(msg.pads.buffer);
+      msg.smk_leds = ex.web_smk_leds() >>> 0;
     }
     const writes = ex.web_store_writes();
     if (writes !== this.sentWrites) {

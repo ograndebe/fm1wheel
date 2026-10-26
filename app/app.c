@@ -63,6 +63,15 @@ static struct {
     char msg[2][24];
 } ui;
 
+#if BOARD_SMK37
+static void smk_init(void);
+static void smk_input(void);
+static void smk_keys_poll(void);
+static void smk_lights(void);
+static void smk_fader_reset(void);
+static void smk_release_keys(void);
+#endif
+
 /* --------------------------------------------------------------- helpers --- */
 static void text_cat(char *d, const char *s)
 {
@@ -196,6 +205,9 @@ static void preset_apply(void)
         organ_set_drawbar(ui.manual, i, v);
     }
     mark_dirty();
+#if BOARD_SMK37
+    smk_fader_reset();
+#endif
     say("PRESET", REG_NAME[set.preset]);
 }
 
@@ -293,6 +305,9 @@ static void midi_in(void)
 static void release_local_keys(void)
 {
     uint32_t k;
+#if BOARD_SMK37
+    smk_release_keys();
+#endif
     for (k = 0; k < NKEYS; k++) {
         if (key_org[k]) {
             organ_key_off(key_org[k] - 1);
@@ -322,6 +337,10 @@ static void drawbar_step(int bar, int dir)
 
 static void keys_poll(void)
 {
+#if BOARD_SMK37
+    smk_keys_poll();
+    return;
+#else
     uint32_t now = plat_keys();
     uint32_t ch = now ^ prev_keys;
     uint32_t k;
@@ -350,6 +369,7 @@ static void keys_poll(void)
         }
     }
     prev_keys = now;
+#endif
 }
 
 /* ------------------------------------------------------------------- UI --- */
@@ -412,15 +432,26 @@ static void draw(void)
     cv_text(6, 4, &FONT_XS, "OCT", C_GRAY);
     cv_text(34, 4, &FONT_XS, o, C_HI);
     cv_text(66, 4, &FONT_XS, "PAGE", C_GRAY);
+#if BOARD_SMK37
+    t[0] = (char)('A' + ui.page);
+    t[1] = 0;
+#else
     t[0] = (char)('1' + ui.page);
     t[1] = '/';
     t[2] = '3';
     t[3] = 0;
+#endif
     cv_text(98, 4, &FONT_XS, t, C_HI);
     cv_text(130, 4, &FONT_XS, "VOL", C_GRAY);
     int_text(plat_master() * 100 / 4096, t);
     text_cat(t, "%");
     cv_text(156, 4, &FONT_XS, t, C_HI);
+#if BOARD_SMK37
+    if (drawbar_mode)
+        cv_text(6, 22, &FONT_XS, "FAD 1-4  PAD 9-11 PAGE  1-8 PRESET", C_HI);
+    else
+        cv_text(6, 22, &FONT_XS, "FADERS OFF  GLO: ON", C_DIM);
+#else
     if (drawbar_mode)
         cv_text(6, 22, &FONT_XS, "DRAWBAR KEYS  FLAT=PUSH  NAT=PULL", C_HI);
     else {
@@ -428,6 +459,7 @@ static void draw(void)
         cv_text(168, 22, &FONT_XS, set.leslie == LESLIE_STOP ? "ROTOR STOP" :
                                     set.leslie == LESLIE_SLOW ? "ROTOR SLOW" : "ROTOR FAST", C_HI);
     }
+#endif
     if (set_dirty)
         cv_text(6, 38, &FONT_XS, "SAVE has changes", C_AMB);
     else
@@ -500,10 +532,16 @@ static void button(int b, uint32_t now)
     }
     case B_SEL:
         ui.page = (uint8_t)((ui.page + 1u) % 3u);
+#if BOARD_SMK37
+        smk_fader_reset();
+#endif
         ui.redraw = 1;
         break;
     case B_EDIT:
         ui.manual = (uint8_t)((ui.manual + 1u) % 3u);
+#if BOARD_SMK37
+        smk_fader_reset();
+#endif
         ui.redraw = 1;
         say("MANUAL", MANUAL_NAME[ui.manual]);
         break;
@@ -513,11 +551,17 @@ static void button(int b, uint32_t now)
         break;
     case B_GLO:
         drawbar_mode = (uint8_t)!drawbar_mode;
+#if BOARD_SMK37
+        ui.redraw = 1;
+        smk_fader_reset();
+        say(drawbar_mode ? "FADERS ON" : "FADERS OFF", drawbar_mode ? "PADS + 1-4" : "");
+#else
         release_local_keys();
         prev_keys = plat_keys();
         ui.redraw = 1;
         say(drawbar_mode ? "DRAWBAR KEYS ON" : "DRAWBAR KEYS OFF",
             drawbar_mode ? "FLAT=PUSH NAT=PULL" : "");
+#endif
         break;
     case B_SAVE:
         save();
@@ -567,6 +611,9 @@ static void encoder(int role, int d)
             mark_dirty();
         }
     }
+#if BOARD_SMK37
+    smk_fader_reset();
+#endif
 }
 
 /* --------------------------------------------------------------- contract --- */
@@ -582,6 +629,9 @@ void app_init(void)
     }
     apply_all();
     set_dirty = 0;
+#if BOARD_SMK37
+    smk_init();
+#endif
 }
 
 void app_ui_init(void)
@@ -594,6 +644,9 @@ void app_ui_init(void)
 void app_panic(void)
 {
     organ_reset();
+#if BOARD_SMK37
+    smk_release_keys();
+#endif
     last_note = -1;
     prev_keys = 0;
 }
@@ -635,11 +688,18 @@ void app_frame(void)
     encoder(EN_K2, plat_enc(EN_K2));
     encoder(EN_K3, plat_enc(EN_K3));
     encoder(EN_K4, plat_enc(EN_K4));
+#if BOARD_SMK37
+    smk_input();
+#endif
 
     {
         uint32_t leds = (set_dirty ? (1u << B_SAVE) : 0u) | (set.perc ? (1u << B_ENV) : 0u) |
                         (drawbar_mode ? (1u << B_GLO) : 0u);
         uint32_t keys = 0;
+#if BOARD_SMK37
+        led_key_count = 0;
+        smk_lights();
+#else
         if (drawbar_mode) {
             for (i = 0; i < NKEYS; i++)
                 if (KEY_BAR[i] >= 0)
@@ -651,6 +711,7 @@ void app_frame(void)
         for (i = 0; i < NKEYS; i++)
             if (keys & (1u << i))
                 led_key_count++;
+#endif
         plat_lights(leds, keys, 0, 0, 1);
     }
 
@@ -668,6 +729,10 @@ void app_say(const char *a, const char *b)
 {
     say(a, b);
 }
+
+#if BOARD_SMK37
+#include "smk37.c"
+#endif
 
 #ifdef APP_HOST_EXPECT
 int app_expect(const char *what, int *got)

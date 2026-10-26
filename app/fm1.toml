@@ -1,10 +1,12 @@
 # fm1-wheel build settings (fm1-base tools/build.py)
 name = "fm1-wheel"              # the build's file names (lower case); APP_NAME is in app.h
 id_prefix = "FM-1_12"          # package identity: dev FM-1_1200, releases FM-1_12XXYYZZ
+smk_id_prefix = "12"           # SMK-37: SMK-37 Pro_1200, releases SMK-37 Pro_12XXYYZZ (<= 20 chars)
 usb_manufacturer = "fm1-wheel"
 usb_product = "FM1-WHEEL FM-1"
 o2 = ["dsp/*.c"]               # the organ DSP at -O2
 words = "words.tsv"
+words_smk = "words-smk.tsv"
 # the site (tools/make_site.py, tools/publish_site.sh)
 tagline = "a tonewheel organ for the M-VAVE FM-1, after setBfree"
 repo = "https://github.com/ograndebe/fm1wheel"

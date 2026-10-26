@@ -90,5 +90,6 @@ make install         # writes to the connected FM-1
 
 The platform, host simulator and browser emulator are in `../fm1-base/`. The
 hardware manual is in [`../MANUAL.md`](../MANUAL.md) (English) and
-[`../MANUAL.pt.md`](../MANUAL.pt.md) (Português). See also the top-level
-`README.md` and `PLANO.md`.
+[`../MANUAL.pt.md`](../MANUAL.pt.md) (Português); the SMK-37 build is in
+[`../SMK37.md`](../SMK37.md). See also the top-level `README.md` and
+`PLANO.md`.

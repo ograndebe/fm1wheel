@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>fm1-wheel no M-VAVE SMK-37 Pro</title>
+<meta name="description" content="O órgão tonewheel fm1-wheel no M-VAVE SMK-37 Pro: 37 teclas, faders para drawbars, pads e instruções de build.">
+<meta property="og:title" content="fm1-wheel no SMK-37 Pro">
+<meta property="og:description" content="O mesmo órgão tonewheel, agora para o M-VAVE SMK-37 Pro.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="{{SITE}}pt/smk37/">
+<meta property="og:image" content="{{SITE}}img/emulator.png">
+<link rel="canonical" href="{{SITE}}pt/smk37/">
+<link rel="alternate" hreflang="pt-BR" href="{{SITE}}pt/smk37/">
+<link rel="alternate" hreflang="en" href="{{SITE}}en/smk37/">
+<link rel="alternate" hreflang="x-default" href="{{SITE}}en/smk37/">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../../style.css">
+<script src="../../lang.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Ir para o conteúdo</a>
+
+<header class="topnav">
+  <div class="wrap navwrap">
+    <a class="brand" href="../../pt/">fm1-wheel</a>
+    <nav class="navlinks" aria-label="Principal">
+      <a href="../../manual/">Manual</a>
+      <a href="../../en/smk37/" data-lang="en" hreflang="en" lang="en">English</a>
+      <a href="../../smk37/emu/">Emulador SMK-37</a>
+      <a href="../../install/">Instalador FM-1</a>
+      <a class="github" href="{{REPO}}">GitHub ↗</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <div class="wrap">
+    <section class="hero">
+      <div>
+        <p class="eyebrow">M-VAVE SMK-37 Pro · órgão tonewheel · after setBfree</p>
+        <h1>fm1-wheel no SMK-37</h1>
+        <p class="lede">A mesma cadeia tonewheel, agora com 37 teclas, 16 pads e quatro faders. As 27 teclas do meio são as F3–G5 do FM-1; os faders editam os drawbars página por página.</p>
+        <div class="actions">
+          <a class="btn primary" href="../../firmware/fm1-wheel-smk37-{{VERSION}}.fwsc" download>Baixar .fwsc ({{VERSION}})</a>
+          <a class="btn" href="../../smk37/install/">Instalar no navegador</a>
+          <a class="btn" href="../../smk37/emu/">Experimentar o emulador</a>
+          <a class="btn" href="{{REPO}}/blob/main/SMK37.md">Build e segurança</a>
+        </div>
+        <p class="hero-note">Versão {{VERSION}} · build e testes de host passam · teste no SMK-37 físico pendente.</p>
+      </div>
+    </section>
+  </div>
+
+  <section class="section">
+    <div class="wrap">
+      <h2>Antes de instalar</h2>
+      <p class="sub">O SMK-37 tem uma calibração de fábrica que não pode ser baixada de novo. Faça um backup completo do flash primeiro e guarde o pacote oficial da M-VAVE para voltar.</p>
+      <div class="cards">
+        <article class="card">
+          <div class="kicker">Build</div>
+          <h3>Um app, duas placas</h3>
+          <p><code>make smk37</code> gera <code>app/build/smk37/fm1-wheel-smk37.fwsc</code>. O build do FM-1 não muda. A camada do SMK é escolhida por <code>BOARD=smk37</code>; não há um segundo app nem uma cópia do DSP.</p>
+        </article>
+        <article class="card">
+          <div class="kicker">Instalação</div>
+          <h3>Linha de comando</h3>
+          <p>Use o <a href="../../smk37/install/">instalador SMK-37 no navegador</a> no Chrome/Edge, ou <code>python3 fm1-base/tools/fm1_install.py app/build/smk37/fm1-wheel-smk37-{{VERSION}}.fwsc</code> / um atualizador compatível do SMK. Nunca instale pacote de FM-1 no SMK nem o contrário.</p>
+        </article>
+        <article class="card">
+          <div class="kicker">Segurança</div>
+          <h3>Flash protegido</h3>
+          <p>O cabeçalho de boot, Bluetooth/calibração, recursos oficiais e a área de key/MAC nunca são gravados por este build. Leia o <a href="{{REPO}}/blob/main/SMK37.md">SMK37.md</a> antes da primeira instalação.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap split">
+      <div>
+        <h2>Drawbars, página por página</h2>
+        <p>Os valores continuam 0–8, com 8 todo puxado e as barras enchendo de cima para baixo. Os faders usam soft takeover: depois de trocar a página ou o preset, só movem a barra quando chegam ao valor atual.</p>
+        <p><span class="pill">FADER BANK</span> ou os pads 9–11 escolhem a página. Os pads 1–8 chamam as registrações de fábrica. <span class="pill">GLOBE</span> liga/desliga os faders/pads; as teclas continuam tocando.</p>
+        <p><a href="../../manual/#s10">Ver a seção no manual →</a></p>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Página</th><th>Fader 1</th><th>Fader 2</th><th>Fader 3</th><th>Fader 4</th></tr></thead>
+          <tbody>
+            <tr><td>A</td><td>16'</td><td>5⅓'</td><td>8'</td><td>4'</td></tr>
+            <tr><td>B</td><td>2⅔'</td><td>2'</td><td>1⅗'</td><td>1⅓'</td></tr>
+            <tr><td>C</td><td>1'</td><td>percussão</td><td>2º/3º</td><td>rápido/lento</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <h2>Diferenças do SMK-37</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Item</th><th>SMK-37 Pro</th></tr></thead>
+          <tbody>
+            <tr><td>Teclas</td><td>37, C3–C6; as 27 do meio são F3–G5</td></tr>
+            <tr><td>Pads</td><td>16 RGB; 1–8 presets, 9–11 páginas, 12–16 reservados</td></tr>
+            <tr><td>Faders</td><td>4, três páginas, soft takeover</td></tr>
+            <tr><td>Encoders</td><td>K1–K4 barras, K5 master, K6–K8 select/algo/preset</td></tr>
+            <tr><td>MIDI</td><td>USB-MIDI in/out; TRS só saída (ainda não implementada)</td></tr>
+            <tr><td>Wheels</td><td>ainda sem função</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">O build do SMK compila e passa nos testes de host; ainda não foi gravado em uma unidade física. A primeira instalação é um bring-up. O <a href="../../smk37/emu/">emulador SMK-37 no navegador</a> roda o mesmo app pelo simulador de host; não é um emulador de CPU ciclo a ciclo.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="sitefoot">
+  <div class="wrap">
+    <span>fm1-wheel {{VERSION}} · SMK-37 Pro</span>
+    <span class="right"><a href="{{REPO}}">GitHub</a> · <a href="../../manual/">Manual PT</a> · <a href="../../manual/en/">Manual EN</a> · <a href="../../pt/">Site FM-1</a></span>
+  </div>
+</footer>
+</body>
+</html>

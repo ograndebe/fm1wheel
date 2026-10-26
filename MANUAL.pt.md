@@ -257,3 +257,30 @@ material público.
 O código, o port do DSP, os testes, as ferramentas e a documentação do
 fm1-wheel foram desenvolvidos com **OpenCode** usando **DeepSeek V4.1 Flash**,
 sob direção e revisão humanas.
+
+---
+
+## 10. M-VAVE SMK-37 Pro
+
+O mesmo firmware também compila para o SMK-37 Pro:
+
+```sh
+make smk37
+# app/build/smk37/fm1-wheel-smk37.fwsc
+```
+
+O SMK tem 37 teclas (C3–C6), 16 pads, quatro faders e oito encoders. As 27
+teclas do meio são as F3–G5 do FM-1. Os drawbars usam os quatro faders em três
+páginas:
+
+| Página | Fader 1 | Fader 2 | Fader 3 | Fader 4 |
+|---|---|---|---|---|
+| A | 16' | 5⅓' | 8' | 4' |
+| B | 2⅔' | 2' | 1⅗' | 1⅓' |
+| C | 1' | percussão | 2º/3º | rápido/lento |
+
+`FADER BANK` e os pads 9–11 escolhem a página; os pads 1–8 chamam as
+registrações de fábrica. Os valores continuam 0–8 e enchem de cima para baixo.
+Os faders usam soft takeover. `GLOBE` liga/desliga os faders/pads; as teclas
+continuam tocando. O SMK não tem TRS MIDI in: use USB-MIDI. Veja
+[SMK37.md](SMK37.md) para instalação, segurança e o checklist de hardware.

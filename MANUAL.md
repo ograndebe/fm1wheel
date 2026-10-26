@@ -253,3 +253,31 @@ speaker” in public material.
 The fm1-wheel code, DSP port, tests, tools and documentation were developed
 with **OpenCode** using **DeepSeek V4.1 Flash**, under human direction and
 review.
+
+---
+
+## 10. M-VAVE SMK-37 Pro
+
+The same firmware also builds for the SMK-37 Pro:
+
+```sh
+make smk37
+# app/build/smk37/fm1-wheel-smk37.fwsc
+```
+
+The SMK has 37 keys (C3–C6), 16 pads, four faders and eight encoders. The
+middle 27 keys are the FM-1's F3–G5. Drawbars use the four faders on three
+pages:
+
+| Page | Fader 1 | Fader 2 | Fader 3 | Fader 4 |
+|---|---|---|---|---|
+| A | 16' | 5⅓' | 8' | 4' |
+| B | 2⅔' | 2' | 1⅗' | 1⅓' |
+| C | 1' | percussion | 2nd/3rd | fast/slow |
+
+`FADER BANK` and pads 9–11 select the page; pads 1–8 recall the factory
+registrations. Values remain 0–8 and fill from the top down. Faders use soft
+takeover. `GLOBE` turns the fader/pad controls on and off; the keys keep
+playing. There is no TRS MIDI in on the SMK: use USB-MIDI. See
+[SMK37.md](SMK37.md) for installation, safety and the hardware bring-up
+checklist.
