@@ -97,7 +97,7 @@ nav.contents li { break-inside: avoid; }
 <h1>fm1-wheel — hardware manual</h1>
 <p><a href="../" data-lang="pt">Português</a> · <strong>English</strong></p>
 <p>Tonewheel organ firmware for the <strong>M-VAVE FM-1</strong>, derived from <a href="https://github.com/pantherb/setBfree">setBfree</a>, running on <a href="https://github.com/charlesvestal/fm1-base">fm1-base</a>.</p>
-<div class="callout"><p><strong>Status:</strong> the firmware builds for the FM-1 and passes the build checks, but it has <strong>not been tested on hardware yet</strong>. The host simulator and the web emulator run the full chain (tone generator, scanner, preamp, reverb and Leslie). This manual describes the intended/implemented behaviour; keyboard and performance details may change after the first device test.</p></div>
+<div class="callout"><p><strong>Status:</strong> the firmware builds for the FM-1 and has been <strong>tested on a real FM-1</strong> (2026-11-08). The host simulator and the web emulator run the full chain (tone generator, scanner, preamp, reverb and Leslie). The SMK-37 Pro build compiles and passes its host tests; it has not been flashed yet.</p></div>
 <hr>
 <h2 id="s1"><span class="num">1</span>Install</h2>
 <p>The firmware is installed over USB-MIDI. Connect the FM-1 with a USB <strong>data</strong> cable and close any other application using its MIDI ports.</p>
@@ -174,6 +174,6 @@ make install         # writes it to the connected FM-1</code></pre>
 <p><code>FADER BANK</code> and pads 9–11 select the page; pads 1–8 recall the factory registrations. Values remain 0–8 and fill from the top down. Faders use soft takeover. <code>GLOBE</code> turns the fader/pad controls on and off; the keys keep playing. There is no TRS MIDI in on the SMK: use USB-MIDI. See <a href="https://github.com/ograndebe/fm1wheel/blob/main/SMK37.md">SMK37.md</a> for installation, safety and the hardware bring-up checklist.</p>
 </main>
 </div>
-<footer class="sitefoot"><div class="wrap"><span>fm1-wheel 0.2.0 · 2026-10-26</span><span class="right"><a href="https://github.com/ograndebe/fm1wheel">GitHub</a> · <a href="../../en/">Site</a> · GPL-3.0-or-later · OpenCode + DeepSeek V4.1 Flash</span></div></footer>
+<footer class="sitefoot"><div class="wrap"><span>fm1-wheel 0.2.1 · 2026-11-08</span><span class="right"><a href="https://github.com/ograndebe/fm1wheel">GitHub</a> · <a href="../../en/">Site</a> · GPL-3.0-or-later · OpenCode + DeepSeek V4.1 Flash</span></div></footer>
 </body>
 </html>

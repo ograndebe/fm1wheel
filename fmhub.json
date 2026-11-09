@@ -1,0 +1,9 @@
+{
+  "what": "A tonewheel organ: 27 keys, nine drawbars, percussion, vibrato/chorus, tube drive, reverb and a rotary speaker, played from the panel, USB or TRS MIDI.",
+  "author": "Rafael Rossignol Felipe",
+  "kinds": ["synth"],
+  "play": "https://ograndebe.github.io/fm1wheel/emu/",
+  "cheat": "https://ograndebe.github.io/fm1wheel/manual/en/",
+  "image": "docs/img/card.png",
+  "color": "#FF7A00"
+}

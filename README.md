@@ -11,9 +11,9 @@ Pro**, after [setBfree](https://github.com/pantherb/setBfree), on
 the host simulator, the setBfree reference tools, the tone generator, scanner,
 preamp, reverb and the **Leslie** are in place. The app plays the full
 tonewheel chain on the host (27 keys, USB/TRS MIDI, drawbars, percussion,
-V1–V3/C1–C3, drive, reverb, slow/fast/stop rotor). The FM-1 device build works
-through Colima + Rosetta; it has not been flashed yet. The SMK-37 Pro build
-also compiles and passes its host tests; it has not been flashed either. Read
+V1–V3/C1–C3, drive, reverb, slow/fast/stop rotor). The FM-1 device build has
+been flashed and tested on a real FM-1 (2026-11-08). The SMK-37 Pro build also
+compiles and passes its host tests, but it has not been flashed yet. Read
 [MANUAL.md](MANUAL.md) (English) or [MANUAL.pt.md](MANUAL.pt.md) (Português)
 for the controls and the drawbar-key mode, [SMK37.md](SMK37.md) for the SMK-37,
 and [PLANO.md](PLANO.md) for the analysis and roadmap.

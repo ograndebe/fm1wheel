@@ -160,7 +160,7 @@ def smk_installer(pkg, version, name, dst):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--version", default="0.2.0")
+    ap.add_argument("--version", default="0.2.1")
     ap.add_argument("--no-build", action="store_true")
     args = ap.parse_args()
     version = args.version

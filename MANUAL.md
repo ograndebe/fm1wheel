@@ -6,11 +6,10 @@ Tonewheel organ firmware for the **M-VAVE FM-1**, derived from
 [setBfree](https://github.com/pantherb/setBfree), running on
 [fm1-base](https://github.com/charlesvestal/fm1-base).
 
-> **Status:** the firmware builds for the FM-1 and passes the build checks, but
-> it has **not been tested on hardware yet**. The host simulator and the web
-> emulator run the full chain (tone generator, scanner, preamp, reverb and
-> Leslie). This manual describes the intended/implemented behaviour; keyboard
-> and performance details may change after the first device test.
+> **Status:** the firmware builds for the FM-1 and has been **tested on a real
+> FM-1** (2026-11-08). The host simulator and the web emulator run the full
+> chain (tone generator, scanner, preamp, reverb and Leslie). The SMK-37 Pro
+> build compiles and passes its host tests; it has not been flashed yet.
 
 ---
 

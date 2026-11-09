@@ -6,11 +6,10 @@ Firmware de órgão tonewheel para o **M-VAVE FM-1**, derivado do
 [setBfree](https://github.com/pantherb/setBfree), rodando sobre o
 [fm1-base](https://github.com/charlesvestal/fm1-base).
 
-> **Estado:** o firmware compila para o FM-1 e passa nas checagens do build,
-> mas ainda **não foi testado no hardware**. O host simulator e o emulador web
-> rodam a cadeia completa (tonegen, scanner, preamp, reverb e Leslie). Este
-> manual descreve o comportamento pretendido/implementado; ajustes de
-> performance e de teclado podem mudar depois do primeiro teste no aparelho.
+> **Estado:** o firmware compila para o FM-1 e foi **testado num FM-1 real**
+> (2026-11-08). O host simulator e o emulador web rodam a cadeia completa
+> (tonegen, scanner, preamp, reverb e Leslie). O build para o SMK-37 Pro
+> compila e passa nos testes de host; ainda não foi gravado no aparelho.
 
 ---
 
