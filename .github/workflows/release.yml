@@ -11,5 +11,5 @@ jobs:
       attestations: write
     with:
       build: ./build.sh "${GITHUB_REF_NAME#v}"
-      packages: app/build/fm1-wheel-*.fwsc app/build/smk37/fm1-wheel-smk37-*.fwsc
+      packages: app/build/**/*.fwsc
       test: make test-host PY=python3 && make test-host-smk PY=python3
