@@ -1,6 +1,6 @@
 #!/bin/sh
 # Release build for the signed GitHub workflow (.github/workflows/release.yml):
-#   ./build.sh 0.2.1
+#   ./build.sh 0.2.2
 # The shared workflow checks the repository out without its submodules, so this
 # script initialises them first. $JIELI_TOOLCHAIN and $AC79_SDK are set by it.
 set -eu
@@ -11,3 +11,4 @@ export AC79_SDK JIELI_TOOLCHAIN
 git submodule update --init --recursive
 python3 fm1-base/tools/build.py app --release "$version"
 python3 fm1-base/tools/build.py app --board smk37 --model pro --release "$version"
+cp "app/build/smk37/fm1-wheel-smk37-$version.fwsc" app/build/

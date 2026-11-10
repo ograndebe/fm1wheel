@@ -68,7 +68,6 @@ static void smk_init(void);
 static void smk_input(void);
 static void smk_keys_poll(void);
 static void smk_lights(void);
-static void smk_fader_reset(void);
 static void smk_release_keys(void);
 #endif
 
@@ -205,9 +204,6 @@ static void preset_apply(void)
         organ_set_drawbar(ui.manual, i, v);
     }
     mark_dirty();
-#if BOARD_SMK37
-    smk_fader_reset();
-#endif
     say("PRESET", REG_NAME[set.preset]);
 }
 
@@ -447,10 +443,7 @@ static void draw(void)
     text_cat(t, "%");
     cv_text(156, 4, &FONT_XS, t, C_HI);
 #if BOARD_SMK37
-    if (drawbar_mode)
-        cv_text(6, 22, &FONT_XS, "FAD 1-4  PAD 9-11 PAGE  1-8 PRESET", C_HI);
-    else
-        cv_text(6, 22, &FONT_XS, "FADERS OFF  GLO: ON", C_DIM);
+    cv_text(6, 22, &FONT_XS, "FAD 2 1.6 1.3 1  PAD 16 5.3 8 4 2.6", C_HI);
 #else
     if (drawbar_mode)
         cv_text(6, 22, &FONT_XS, "DRAWBAR KEYS  FLAT=PUSH  NAT=PULL", C_HI);
@@ -532,16 +525,10 @@ static void button(int b, uint32_t now)
     }
     case B_SEL:
         ui.page = (uint8_t)((ui.page + 1u) % 3u);
-#if BOARD_SMK37
-        smk_fader_reset();
-#endif
         ui.redraw = 1;
         break;
     case B_EDIT:
         ui.manual = (uint8_t)((ui.manual + 1u) % 3u);
-#if BOARD_SMK37
-        smk_fader_reset();
-#endif
         ui.redraw = 1;
         say("MANUAL", MANUAL_NAME[ui.manual]);
         break;
@@ -550,12 +537,11 @@ static void button(int b, uint32_t now)
         preset_apply();
         break;
     case B_GLO:
-        drawbar_mode = (uint8_t)!drawbar_mode;
 #if BOARD_SMK37
         ui.redraw = 1;
-        smk_fader_reset();
-        say(drawbar_mode ? "FADERS ON" : "FADERS OFF", drawbar_mode ? "PADS + 1-4" : "");
+        say("DRAWBARS", "ALWAYS ON");
 #else
+        drawbar_mode = (uint8_t)!drawbar_mode;
         release_local_keys();
         prev_keys = plat_keys();
         ui.redraw = 1;
@@ -611,9 +597,6 @@ static void encoder(int role, int d)
             mark_dirty();
         }
     }
-#if BOARD_SMK37
-    smk_fader_reset();
-#endif
 }
 
 /* --------------------------------------------------------------- contract --- */

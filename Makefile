@@ -9,7 +9,7 @@
 PY ?= ./.venv/bin/python
 AC79_SDK ?= $(HOME)/fw-AC79_AIoT_SDK
 JIELI_TOOLCHAIN ?= $(HOME)/.jieli/toolchain
-VERSION ?= 0.2.1
+VERSION ?= 0.2.2
 MODEL ?= pro
 
 .PHONY: all build-host build-host-smk test-host test-host-smk web web-smk serve-web site \

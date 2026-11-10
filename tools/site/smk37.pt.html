@@ -47,7 +47,7 @@
           <a class="btn" href="../../smk37/emu/">Experimentar o emulador</a>
           <a class="btn" href="{{REPO}}/blob/main/SMK37.md">Build e segurança</a>
         </div>
-        <p class="hero-note">Versão {{VERSION}} · build e testes de host passam · teste no SMK-37 físico pendente.</p>
+        <p class="hero-note">Versão {{VERSION}} · primeira instalação feita num SMK-37 real · controles em teste.</p>
       </div>
     </section>
   </div>
@@ -79,18 +79,47 @@
   <section class="section">
     <div class="wrap split">
       <div>
-        <h2>Drawbars, página por página</h2>
-        <p>Os valores continuam 0–8, com 8 todo puxado e as barras enchendo de cima para baixo. Os faders usam soft takeover: depois de trocar a página ou o preset, só movem a barra quando chegam ao valor atual.</p>
-        <p><span class="pill">FADER BANK</span> ou os pads 9–11 escolhem a página. Os pads 1–8 chamam as registrações de fábrica. <span class="pill">GLOBE</span> liga/desliga os faders/pads; as teclas continuam tocando.</p>
+        <h2>Drawbars, faders e pads</h2>
+        <p>Os valores continuam 0–8, com 8 todo puxado e as barras enchendo de cima para baixo. Os quatro faders são as quatro últimas barras: 2', 1⅗', 1⅓', 1'. As cinco colunas de pads mais à direita são as cinco primeiras: o pad de cima empurra a barra, o de baixo puxa, um passo por toque. Os faders são absolutos e invertidos: mínimo = todo puxado, máximo = todo recolhido.</p>
+        <p>Os pads 1–3 e 9–11 chamam os presets 1–6; o encoder K8 PRESETS tem todos os oito. Os drawbars dos pads/faders estão sempre ativos; o <span class="pill">GLOBE</span> não liga/desliga, e as teclas continuam tocando.</p>
         <p><a href="../../manual/#s10">Ver a seção no manual →</a></p>
       </div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Página</th><th>Fader 1</th><th>Fader 2</th><th>Fader 3</th><th>Fader 4</th></tr></thead>
+          <thead><tr><th>Controle</th><th>Barras</th></tr></thead>
           <tbody>
-            <tr><td>A</td><td>16'</td><td>5⅓'</td><td>8'</td><td>4'</td></tr>
-            <tr><td>B</td><td>2⅔'</td><td>2'</td><td>1⅗'</td><td>1⅓'</td></tr>
-            <tr><td>C</td><td>1'</td><td>percussão</td><td>2º/3º</td><td>rápido/lento</td></tr>
+            <tr><td>Faders 1–4</td><td>2', 1⅗', 1⅓', 1' — invertidos</td></tr>
+            <tr><td>Pads 4–8 (linha de cima)</td><td>16', 5⅓', 8', 4', 2⅔' — empurrar</td></tr>
+            <tr><td>Pads 12–16 (linha de baixo)</td><td>16', 5⅓', 8', 4', 2⅔' — puxar</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <h2>Controles</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Controle</th><th>Função</th></tr></thead>
+          <tbody>
+            <tr><td>37 teclas</td><td>C3–C6; as 27 do meio são F3–G5 do FM-1</td></tr>
+            <tr><td>K1–K4</td><td>os quatro valores de drawbar da página atual dos encoders</td></tr>
+            <tr><td>K5</td><td>volume MASTER (pot virtual)</td></tr>
+            <tr><td>K6</td><td>SELECT: página dos encoders (A/B/C)</td></tr>
+            <tr><td>K7</td><td>ALGORITHM: UPPER/LOWER/PEDAL</td></tr>
+            <tr><td>K8</td><td>PRESETS: as oito registrações de fábrica</td></tr>
+            <tr><td>Faders 1–4</td><td>os quatro últimos drawbars: 2', 1⅗', 1⅓', 1' (invertidos)</td></tr>
+            <tr><td>Pads 4–8 (topo, direita)</td><td>empurram os cinco primeiros drawbars, um passo por toque</td></tr>
+            <tr><td>Pads 12–16 (baixo, direita)</td><td>puxam os cinco primeiros drawbars</td></tr>
+            <tr><td>Pads 1–3, 9–11</td><td>registrações de fábrica 1–6</td></tr>
+            <tr><td>GLOBE</td><td>sem função: pads/faders são sempre drawbars</td></tr>
+            <tr><td>OCTAVE− / OCTAVE+</td><td>transpõem o teclado</td></tr>
+            <tr><td>FX / SEQ / PLAY</td><td>drive, reverb, rotor</td></tr>
+            <tr><td>ENV / ARP / LFO</td><td>percussão, 2º/3º, vibrato</td></tr>
+            <tr><td>PATCH / PARA / BT</td><td>home, edit/manual, salvar</td></tr>
+            <tr><td>SCALE / CHORD / NOTE REPEAT</td><td>equivalentes a SEL, ENV, LFO</td></tr>
           </tbody>
         </table>
       </div>
@@ -105,15 +134,15 @@
           <thead><tr><th>Item</th><th>SMK-37 Pro</th></tr></thead>
           <tbody>
             <tr><td>Teclas</td><td>37, C3–C6; as 27 do meio são F3–G5</td></tr>
-            <tr><td>Pads</td><td>16 RGB; 1–8 presets, 9–11 páginas, 12–16 reservados</td></tr>
-            <tr><td>Faders</td><td>4, três páginas, soft takeover</td></tr>
+            <tr><td>Pads</td><td>16 RGB; 4–8 e 12–16 barras, 1–3 e 9–11 presets</td></tr>
+            <tr><td>Faders</td><td>4, as quatro últimas barras, absolutos e invertidos (mínimo = todo puxado)</td></tr>
             <tr><td>Encoders</td><td>K1–K4 barras, K5 master, K6–K8 select/algo/preset</td></tr>
             <tr><td>MIDI</td><td>USB-MIDI in/out; TRS só saída (ainda não implementada)</td></tr>
             <tr><td>Wheels</td><td>ainda sem função</td></tr>
           </tbody>
         </table>
       </div>
-      <p class="note">O build do SMK compila e passa nos testes de host; ainda não foi gravado em uma unidade física. A primeira instalação é um bring-up. O <a href="../../smk37/emu/">emulador SMK-37 no navegador</a> roda o mesmo app pelo simulador de host; não é um emulador de CPU ciclo a ciclo.</p>
+      <p class="note">O build do SMK está instalado num SMK-37 real; os controles estão em teste. A primeira instalação é um bring-up. O <a href="../../smk37/emu/">emulador SMK-37 no navegador</a> roda o mesmo app pelo simulador de host; não é um emulador de CPU ciclo a ciclo.</p>
     </div>
   </section>
 </main>

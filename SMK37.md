@@ -6,9 +6,9 @@ screen, USB-MIDI and a TRS MIDI **out** jack. fm1-wheel has a second build
 target for it; the app, the tonewheel engine and the drawbar state are shared
 with the FM-1.
 
-**Status:** the SMK-37 Pro build compiles and passes the host tests. It has
-**not been flashed or tested on a physical SMK-37** yet. Treat the first
-install as a bring-up, with a full flash backup.
+**Status:** the SMK-37 Pro build is installed on a physical SMK-37
+(2026-11-10); the controls are under test. Treat the first install as a
+bring-up, with a full flash backup and the stock package at hand.
 
 ## Build
 
@@ -31,8 +31,8 @@ app/build/smk37/fm1-wheel-smk37.fwsc
 For a release:
 
 ```sh
-fm1-base/tools/build.py app --board smk37 --model pro --release 0.2.0
-# app/build/smk37/fm1-wheel-smk37-0.2.0.fwsc
+fm1-base/tools/build.py app --board smk37 --model pro --release 0.2.2
+# app/build/smk37/fm1-wheel-smk37-0.2.2.fwsc
 ```
 
 The FM-1 build is unchanged:
@@ -58,7 +58,7 @@ and the SMK package layout; it does not select a second app.
 Install with the command-line installer:
 
 ```sh
-python3 fm1-base/tools/fm1_install.py app/build/smk37/fm1-wheel-smk37-0.2.0.fwsc
+python3 fm1-base/tools/fm1_install.py app/build/smk37/fm1-wheel-smk37-0.2.2.fwsc
 ```
 
 The site's SMK-37 page has a separate browser installer at `/smk37/install/`
@@ -79,11 +79,12 @@ calibration, Bluetooth pairing and key data untouched.
 | K6 | SELECT: drawbar page |
 | K7 | ALGORITHM: UPPER/LOWER/PEDAL |
 | K8 | PRESETS: factory registration |
-| FADER BANK / pads 9–11 | fader page A, B or C |
-| Faders 1–4 | the four values on the current page |
-| Pads 1–8 (top row) | factory registrations 1–8 |
-| Pads 12–16 | reserved |
-| GLOBE | turns the faders/pads on and off; keys keep playing |
+| Faders 1–4 | the last four bars: 2', 1⅗', 1⅓', 1' (reversed: minimum = fully out) |
+| Pads 4–8 (top right) | push the first five bars in: 16', 5⅓', 8', 4', 2⅔' |
+| Pads 12–16 (bottom right) | pull the same five bars out |
+| Pads 1–3, 9–11 | factory registrations 1–6 |
+| FADER BANK / LEFT / RIGHT | unused: the faders are not paged |
+| GLOBE | unused: the pad/fader drawbars are always on |
 | OCTAVE− / OCTAVE+ | transpose the keybed |
 | FX / SEQ / PLAY | drive, reverb, rotor |
 | ENV / ARP / LFO | percussion, 2nd/3rd, vibrato |
@@ -95,20 +96,26 @@ calibration, Bluetooth pairing and key data untouched.
 The values are still **0–8**, with **8 = fully out**, and the screen bars fill
 from the top down.
 
-| Page | Fader 1 | Fader 2 | Fader 3 | Fader 4 |
-|---|---|---|---|---|
-| A | 16' | 5⅓' | 8' | 4' |
-| B | 2⅔' | 2' | 1⅗' | 1⅓' |
-| C | 1' | percussion on/off | 2nd/3rd | fast/slow |
+| Control | Bars |
+|---|---|
+| Faders 1–4 | 2', 1⅗', 1⅓', 1' (reversed) |
+| Pads 4–8 (top row, right) | 16', 5⅓', 8', 4', 2⅔' (push) |
+| Pads 12–16 (bottom row, right) | the same five (pull) |
 
-- Faders use **soft takeover**: after a page or preset change, a fader moves
-  the bar only when it reaches the bar's current value. Nothing jumps.
-- Pads 1–8 recall the same eight factory registrations as the PRESETS control.
-- Pads 9–11 select page A/B/C; the FADER BANK button does the same in sequence.
-- `GLOBE` toggles the fader/pad controls. The 37 keys continue to play, unlike
-  the FM-1's drawbar-key mode.
-- The three page-C faders switch percussion when they cross the midpoint.
-- Page C's 1' bar is fader 1.
+- The four faders are always the last four bars; no page change moves them.
+- The 10 rightmost pads are the first five bars as five pairs: the top pad
+  pushes a bar in, the bottom pad pulls it out, one step per tap, like the
+  FM-1's black/white key pairs.
+- The pads show the bar: the top pad lights with the travel left to push, the
+  bottom with the value out. Pads 1–3 and 9–11 recall presets 1–6; the K8
+  PRESETS encoder has all eight.
+- Faders are absolute and reversed: the minimum position is fully out (8), the
+  maximum fully in (0); moving one sets the bar directly.
+- K1–K4 still edit the four bars on the current page; K6/SELECT changes that
+  page. `GLOBE` no longer toggles the pad/fader drawbars (they are always on),
+  and the 37 keys continue to play, unlike the FM-1's drawbar-key mode.
+- Percussion is on the ENV/ARP/LFO buttons; the old page-C fader toggles are
+  gone.
 
 This mapping is implemented in `app/smk37.c`; the FM-1 key-pair drawbar mode is
 unchanged in `app/app.c`.
@@ -146,8 +153,8 @@ After the backup and install:
 
 - boot, screen and backlight;
 - all 37 keys, including the top and bottom octaves;
-- pads 1–8, 9–11 and their colours;
-- faders 1–4 on pages A, B and C, including soft takeover;
+- pads 1–3 and 9–11 (presets) and 4–8, 12–16 (drawbars), and their colours;
+- faders 1–4 (the last four bars), absolute;
 - all encoders, buttons and their LEDs;
 - USB-MIDI in/out; the USB product name;
 - audio output, master volume and CPU load;

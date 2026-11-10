@@ -1,53 +1,45 @@
-# fm1-wheel on the SMK-37 (host simulator): 37 keys, fader pages, pads, presets, drawbar values.
+# fm1-wheel on the SMK-37 (host simulator): 37 keys, the last four bars on the faders, the first five on the pads.
 #   app/build/smk37/host/fm1-wheel-smk37_host app/tests/smk37.txt OUTDIR
 wait 300
 expect drawbar 1
 expect page 0
 expect bar0 8
-# Faders: soft takeover at the bar's current value, then 0..8.
+# Faders 1-4 are the last four bars: 2', 1 3/5', 1 1/3', 1'. Reversed: minimum is fully out.
 fader 0 127
 wait 30
-expect bar0 8
+expect bar5 0
 fader 0 0
 wait 30
-expect bar0 0
+expect bar5 8
 fader 0 64
 wait 30
-expect bar0 4
-# Page B: the same four faders edit 2 2/3 .. 1 1/3.
-tappad 9
-expect page 1
-fader 0 127
+expect bar5 4
+# Pads 4-8 (top row, right) push the first five bars in; pads 12-16 (bottom row, right) pull them out.
+tappad 3
 wait 30
-fader 0 0
+expect bar0 7
+tappad 11
+wait 30
+expect bar0 8
+tappad 15
+wait 30
+expect bar4 1
+tappad 7
 wait 30
 expect bar4 0
-fader 0 127
-wait 30
-expect bar4 8
-# Page C: 1' and the percussion switches.
-tappad 10
-expect page 2
-fader 0 127
-wait 30
-fader 0 0
-wait 30
-expect bar8 0
-fader 1 0
-wait 30
-fader 1 127
-wait 30
-expect perc 1
-fader 1 0
-wait 30
-expect perc 0
-# Pads 1-8 recall the factory registrations.
+# Pads 1-3 and 9-11 recall presets 1-6.
 tappad 0
 expect preset 0
-expect page 2
 expect bar0 8
 expect bar1 8
 expect bar2 8
+# The push pad lights with the travel left; the pull pad with the value out.
+pads
+expect pad0 0xFFA014
+expect pad3 0x000000
+expect pad11 0xFF9614
+tappad 9
+expect preset 4
 # 37 keys: C3..C6; the middle 27 are still F3..G5.
 keybed 0 down 100
 wait 30
@@ -64,7 +56,3 @@ wait 30
 expect note 84
 keybed 36 up
 wait 30
-# Page pads light the active page; the extra LEDs follow.
-pads
-expect pad0 0xFFA014
-expect pad10 0x28B4FF
